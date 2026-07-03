@@ -15,7 +15,7 @@
   </head>
   <body>
     <main id="app">
-      <canvas id="game"></canvas>
+      <canvas id="game" aria-label="First-person 3D horror game scene"></canvas>
       <section id="start-screen" class="overlay">
         <div class="brand">
           <p class="kicker">Ravenswood Institute of Technology</p>
@@ -52,7 +52,7 @@
         <h2 id="case-title">No document selected</h2>
         <p id="case-body"></p>
       </section>
-      <section id="dialogue" class="dialogue" hidden>
+      <section id="dialogue" class="dialogue" aria-live="polite" hidden>
         <p id="speaker" class="speaker"></p>
         <p id="line"></p>
       </section>
@@ -60,7 +60,7 @@
         <h2>Renderer failed to start</h2>
         <p>Refresh the page or open the game in a modern browser with WebGL enabled.</p>
       </section>
-      <div id="interaction-prompt" class="interaction-prompt" hidden>Press E</div>
+      <div id="interaction-prompt" class="interaction-prompt" aria-live="polite" hidden>Press E</div>
       <div id="reticle"></div>
       <div id="vignette"></div>
       <div id="caption">Click to lock pointer. WASD move, mouse look, Shift sprint, F flashlight, E inspect.</div>

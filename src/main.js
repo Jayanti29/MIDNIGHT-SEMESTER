@@ -15,6 +15,9 @@ const caseBody = document.querySelector("#case-body");
 const caption = document.querySelector("#caption");
 const vignette = document.querySelector("#vignette");
 const vrToggle = document.querySelector("#vr-toggle");
+const dialogue = document.querySelector("#dialogue");
+const speaker = document.querySelector("#speaker");
+const line = document.querySelector("#line");
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020303);
@@ -44,6 +47,8 @@ let fear = 0;
 let flashlightOn = true;
 let inspected = 0;
 let xrSession = null;
+let activeLineTimer = 0;
+let introPlayed = false;
 
 async function setupVrEntry() {
   if (!navigator.xr || !vrToggle) return;
@@ -254,6 +259,35 @@ function createBookshelf(position, rotation = 0) {
   return group;
 }
 
+function createCharacter({ name, position, color, ghostly = false }) {
+  const group = new THREE.Group();
+  group.name = name;
+  group.position.set(...position);
+
+  const body = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.28, 0.82, 8, 16),
+    new THREE.MeshStandardMaterial({
+      color,
+      roughness: 0.74,
+      transparent: ghostly,
+      opacity: ghostly ? 0.42 : 1,
+      emissive: ghostly ? color : 0x000000,
+      emissiveIntensity: ghostly ? 0.28 : 0
+    })
+  );
+  body.position.y = 1.05;
+  body.castShadow = !ghostly;
+  group.add(body);
+
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 16), body.material);
+  head.position.y = 1.7;
+  head.castShadow = !ghostly;
+  group.add(head);
+
+  scene.add(group);
+  return group;
+}
+
 function buildCorridor() {
   box("floor", [8, 0.18, 62], [0, -0.1, -18], materials.floor, false);
   box("ceiling", [8, 0.24, 62], [0, 3.8, -18], materials.wall, false);
@@ -290,6 +324,8 @@ function buildCorridor() {
   createStudyTable([-1.1, 0, -29], -0.3);
   buildDormRoom();
   buildDocuments();
+  scene.userData.kulkarni = createCharacter({ name: "Professor Kulkarni", position: [-2.4, 0, -15.5], color: 0x3f5f69 });
+  scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [2.6, 0, -34.5], color: 0xc9d5cf, ghostly: true });
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 }
 
@@ -449,6 +485,8 @@ function updateState(delta) {
   const ghost = scene.userData.ghost;
   ghost.lookAt(camera.position);
   ghost.material.opacity = Math.max(0, Math.sin(clock.elapsedTime * 1.7) * 0.16 + (fear - 42) / 210);
+  scene.userData.kulkarni?.lookAt(camera.position.x, 1.2, camera.position.z);
+  scene.userData.meeraCharacter?.lookAt(camera.position.x, 1.2, camera.position.z);
   scene.userData.dust.rotation.y += delta * 0.018;
 
   flickerLights.forEach(({ light, base, phase }) => {
@@ -459,6 +497,29 @@ function updateState(delta) {
   doors.forEach((door) => {
     const target = door.userData.open ? (door.userData.side === "left" ? -1.18 : 1.18) : 0;
     door.rotation.y = THREE.MathUtils.lerp(door.rotation.y, target, delta * 6);
+  });
+}
+
+function sayLine(name, text, duration = 5600) {
+  speaker.textContent = name;
+  line.textContent = text;
+  dialogue.hidden = false;
+  window.clearTimeout(activeLineTimer);
+  activeLineTimer = window.setTimeout(() => {
+    dialogue.hidden = true;
+  }, duration);
+}
+
+function playIntroDialogue() {
+  if (introPlayed) return;
+  introPlayed = true;
+  const lines = [
+    ["Aarav", "Gate control is offline. Why is Block A drawing backup power?"],
+    ["Professor Kulkarni", "Aarav, listen carefully. Do not enter the basement. Restore the generator and leave."],
+    ["Meera", "Forty-two hours. Still awake. Still here."]
+  ];
+  lines.forEach(([name, text], index) => {
+    window.setTimeout(() => sayLine(name, text, 4200), index * 4700);
   });
 }
 
@@ -476,6 +537,9 @@ function inspectNearest() {
     door.userData.open = !door.userData.open;
     fear = Math.min(100, fear + 4);
     caption.textContent = door.userData.open ? "The door groans open." : "The latch clicks shut.";
+    if (door.userData.open && camera.position.z < -12) {
+      sayLine("Professor Kulkarni", "Some rooms were sealed after 2005. If a door opens by itself, step back.");
+    }
     objective.textContent = "Search rooms for lab records, books, and anything Meera left behind.";
     return;
   }
@@ -490,6 +554,7 @@ function inspectNearest() {
     ? "Case file complete. Reach the basement access at the end of the wing."
     : "Evidence recovered. Keep searching Block A for the sealed lab trail.";
   caption.textContent = "Document added to case file.";
+  sayLine("Aarav", `This belongs in the case file: ${doc.title}.`);
   window.setTimeout(() => {
     caseFile.hidden = true;
   }, 7200);
@@ -507,6 +572,7 @@ function startGame({ lockPointer = true } = {}) {
   document.body.classList.add("started");
   if (lockPointer) canvas.requestPointerLock?.();
   caption.textContent = "WASD move. Mouse or arrow keys look. E inspects. F toggles the flashlight.";
+  playIntroDialogue();
 }
 
 buildCorridor();

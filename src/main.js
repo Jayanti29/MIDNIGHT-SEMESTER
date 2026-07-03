@@ -52,6 +52,7 @@ let introPlayed = false;
 let audioCtx = null;
 let droneGain = null;
 let heartbeatTimer = 0;
+let meeraWarned = false;
 
 async function setupVrEntry() {
   if (!navigator.xr || !vrToggle) return;
@@ -533,7 +534,21 @@ function updateState(delta) {
   ghost.lookAt(camera.position);
   ghost.material.opacity = Math.max(0, Math.sin(clock.elapsedTime * 1.7) * 0.16 + (fear - 42) / 210);
   scene.userData.kulkarni?.lookAt(camera.position.x, 1.2, camera.position.z);
-  scene.userData.meeraCharacter?.lookAt(camera.position.x, 1.2, camera.position.z);
+  if (scene.userData.meeraCharacter) {
+    const meera = scene.userData.meeraCharacter;
+    meera.lookAt(camera.position.x, 1.2, camera.position.z);
+    const active = camera.position.z < -18 || fear > 38;
+    meera.visible = active;
+    if (active) {
+      const target = new THREE.Vector3(camera.position.x * 0.35, 0, camera.position.z - 5.6);
+      meera.position.lerp(target, delta * (0.08 + fear / 460));
+      if (!meeraWarned) {
+        meeraWarned = true;
+        sayLine("Meera", "You opened the wrong wing.");
+        playWhisper();
+      }
+    }
+  }
   scene.userData.dust.rotation.y += delta * 0.018;
 
   flickerLights.forEach(({ light, base, phase }) => {

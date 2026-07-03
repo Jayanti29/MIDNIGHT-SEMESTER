@@ -272,6 +272,9 @@ function createDoor({ side, z, label }) {
   knob.userData.parentDoor = group;
   group.add(knob);
 
+  const sign = addLabel(label.replace(" door", "").toUpperCase(), [direction * 3.48, 1.92, z], 0.16);
+  sign.rotation.y = direction < 0 ? Math.PI / 2 : -Math.PI / 2;
+
   scene.add(group);
   doors.push(group);
   interactables.push(panel, knob);

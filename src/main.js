@@ -47,6 +47,7 @@ const clock = new THREE.Clock();
 const keys = new Set();
 const interactables = [];
 const doors = [];
+const evidenceItems = [];
 const flickerLights = [];
 let yaw = 0;
 let pitch = 0;
@@ -428,6 +429,7 @@ function buildDocuments() {
   docs.forEach((doc) => {
     const mesh = box(doc.title, [0.78, 0.025, 0.52], doc.position, materials.paper);
     mesh.userData.doc = doc;
+    evidenceItems.push(mesh);
     interactables.push(mesh);
   });
 }
@@ -580,7 +582,19 @@ function getFocusedInteractable(maxDistance = 4) {
   const raycaster = new THREE.Raycaster();
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
   const hit = raycaster.intersectObjects(interactables, false)[0];
-  return hit && hit.distance <= maxDistance ? hit : null;
+  if (hit && hit.distance <= maxDistance) return hit;
+
+  const nearestDoor = doors
+    .map((door) => ({ object: door, distance: door.position.distanceTo(camera.position), kind: "door" }))
+    .filter((candidate) => candidate.distance <= 3.2)
+    .sort((a, b) => a.distance - b.distance)[0];
+  if (nearestDoor) return nearestDoor;
+
+  const nearestEvidence = evidenceItems
+    .map((item) => ({ object: item, distance: item.position.distanceTo(camera.position), kind: "evidence" }))
+    .filter((candidate) => candidate.distance <= 3.4)
+    .sort((a, b) => a.distance - b.distance)[0];
+  return nearestEvidence || null;
 }
 
 function updateInteractionPrompt() {
@@ -590,7 +604,7 @@ function updateInteractionPrompt() {
     return;
   }
 
-  const door = hit.object.userData.parentDoor;
+  const door = hit.object.userData.parentDoor || (hit.kind === "door" ? hit.object : null);
   interactionPrompt.hidden = false;
   interactionPrompt.textContent = door ? "Press E - open door" : "Press E - inspect evidence";
 }

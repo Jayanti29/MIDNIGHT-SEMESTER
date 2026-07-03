@@ -332,6 +332,19 @@ body:not(.started) .interaction-prompt {
 }
 
 @media (max-width: 760px) {
+  .overlay {
+    padding: 24px;
+  }
+
+  h1 {
+    font-size: clamp(3rem, 18vw, 5.8rem);
+  }
+
+  .subtitle {
+    max-width: 92vw;
+    font-size: 0.96rem;
+  }
+
   #hud {
     inset: 14px 14px auto;
     display: grid;
@@ -341,5 +354,15 @@ body:not(.started) .interaction-prompt {
   .objective {
     grid-column: 1 / -1;
     max-width: none;
+  }
+
+  .objectives-list {
+    grid-column: 1 / -1;
+    min-width: 0;
+  }
+
+  .dialogue {
+    bottom: 68px;
+    font-size: 0.9rem;
   }
 }

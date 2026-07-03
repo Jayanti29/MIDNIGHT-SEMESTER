@@ -9,6 +9,7 @@ const batteryMeter = document.querySelector("#battery-meter");
 const fearText = document.querySelector("#fear");
 const fearMeter = document.querySelector("#fear-meter");
 const objective = document.querySelector("#objective");
+const objectiveSteps = document.querySelectorAll("[data-step]");
 const caseFile = document.querySelector("#case-file");
 const caseTitle = document.querySelector("#case-title");
 const caseBody = document.querySelector("#case-body");
@@ -54,6 +55,10 @@ let audioCtx = null;
 let droneGain = null;
 let heartbeatTimer = 0;
 let meeraWarned = false;
+
+function completeObjective(step) {
+  document.querySelector(`[data-step="${step}"]`)?.classList.add("done");
+}
 
 async function setupVrEntry() {
   if (!navigator.xr || !vrToggle) return;
@@ -637,6 +642,8 @@ function inspectNearest() {
   objective.textContent = inspected >= 3
     ? "Case file complete. Reach the basement access at the end of the wing."
     : "Evidence recovered. Keep searching Block A for the sealed lab trail.";
+  if (inspected >= 1) completeObjective("evidence");
+  if (inspected >= 3) completeObjective("basement");
   caption.textContent = "Document added to case file.";
   sayLine("Aarav", `This belongs in the case file: ${doc.title}.`);
   window.setTimeout(() => {
@@ -657,6 +664,7 @@ function startGame({ lockPointer = true } = {}) {
   document.body.classList.add("started");
   if (lockPointer) canvas.requestPointerLock?.();
   caption.textContent = "WASD move. Mouse or arrow keys look. E inspects. F toggles the flashlight.";
+  completeObjective("start");
   playTone(33, 1.4, 0.09, "sawtooth");
   playIntroDialogue();
 }

@@ -141,6 +141,33 @@ meter {
   line-height: 1.35;
 }
 
+.objectives-list {
+  display: grid;
+  gap: 7px;
+  min-width: 190px;
+  padding: 11px 13px;
+  color: #aaa196;
+  font-size: 0.78rem;
+}
+
+.objectives-list span::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  margin-right: 8px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+}
+
+.objectives-list span.done {
+  color: #d8be84;
+}
+
+.objectives-list span.done::before {
+  background: currentColor;
+}
+
 .case-file {
   position: fixed;
   right: 28px;

@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import "./styles.css";
 
 const canvas = document.querySelector("#game");
 const startScreen = document.querySelector("#start-screen");

@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Midnight Semester</title>
+    <link rel="stylesheet" href="./src/styles.css" />
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./node_modules/three/build/three.module.js"
+        }
+      }
+    </script>
   </head>
   <body>
     <main id="app">
@@ -53,6 +61,6 @@
       <div id="vignette"></div>
       <div id="caption">Click to lock pointer. WASD move, mouse look, Shift sprint, F flashlight, E inspect.</div>
     </main>
-    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="./src/main.js"></script>
   </body>
 </html>

@@ -55,6 +55,7 @@ let battery = 100;
 let fear = 0;
 let flashlightOn = true;
 let inspected = 0;
+const collectedEvidence = new Set();
 let xrSession = null;
 let activeLineTimer = 0;
 let introPlayed = false;
@@ -654,7 +655,8 @@ function inspectNearest() {
 
   const doc = hit.object.userData.doc;
   if (!doc) return;
-  inspected += 1;
+  collectedEvidence.add(doc.title);
+  inspected = collectedEvidence.size;
   caseTitle.textContent = doc.title;
   caseBody.textContent = doc.body;
   caseFile.hidden = false;

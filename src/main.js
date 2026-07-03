@@ -49,6 +49,9 @@ let inspected = 0;
 let xrSession = null;
 let activeLineTimer = 0;
 let introPlayed = false;
+let audioCtx = null;
+let droneGain = null;
+let heartbeatTimer = 0;
 
 async function setupVrEntry() {
   if (!navigator.xr || !vrToggle) return;
@@ -75,6 +78,50 @@ async function setupVrEntry() {
   } catch (error) {
     console.warn("VR entry unavailable in this browser.", error);
   }
+}
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new AudioContext();
+
+  const drone = audioCtx.createOscillator();
+  drone.type = "sawtooth";
+  drone.frequency.value = 42;
+  droneGain = audioCtx.createGain();
+  droneGain.gain.value = 0.035;
+  drone.connect(droneGain).connect(audioCtx.destination);
+  drone.start();
+
+  heartbeatTimer = window.setInterval(() => {
+    if (!document.body.classList.contains("started")) return;
+    playTone(64, 0.11, 0.04 + fear / 900, "sine");
+    window.setTimeout(() => playTone(52, 0.08, 0.025 + fear / 1400, "sine"), 140);
+  }, 1180);
+}
+
+function playTone(frequency, duration = 0.3, volume = 0.08, type = "sine") {
+  if (!audioCtx) return;
+  const oscillator = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  oscillator.type = type;
+  oscillator.frequency.value = frequency;
+  gain.gain.setValueAtTime(0.0001, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(volume, audioCtx.currentTime + 0.025);
+  gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+  oscillator.connect(gain).connect(audioCtx.destination);
+  oscillator.start();
+  oscillator.stop(audioCtx.currentTime + duration + 0.03);
+}
+
+function playDoorCreak() {
+  playTone(96, 0.55, 0.08, "sawtooth");
+  window.setTimeout(() => playTone(68, 0.45, 0.055, "triangle"), 90);
+}
+
+function playWhisper() {
+  playTone(520, 0.18, 0.035, "triangle");
+  window.setTimeout(() => playTone(410, 0.22, 0.025, "triangle"), 160);
+  window.setTimeout(() => playTone(615, 0.14, 0.025, "sine"), 340);
 }
 
 function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#776b5a", scale = 1 }) {
@@ -536,6 +583,7 @@ function inspectNearest() {
   if (door) {
     door.userData.open = !door.userData.open;
     fear = Math.min(100, fear + 4);
+    playDoorCreak();
     caption.textContent = door.userData.open ? "The door groans open." : "The latch clicks shut.";
     if (door.userData.open && camera.position.z < -12) {
       sayLine("Professor Kulkarni", "Some rooms were sealed after 2005. If a door opens by itself, step back.");
@@ -550,6 +598,7 @@ function inspectNearest() {
   caseTitle.textContent = doc.title;
   caseBody.textContent = doc.body;
   caseFile.hidden = false;
+  playWhisper();
   objective.textContent = inspected >= 3
     ? "Case file complete. Reach the basement access at the end of the wing."
     : "Evidence recovered. Keep searching Block A for the sealed lab trail.";
@@ -568,10 +617,12 @@ function animate() {
 }
 
 function startGame({ lockPointer = true } = {}) {
+  initAudio();
   startScreen.classList.add("hidden");
   document.body.classList.add("started");
   if (lockPointer) canvas.requestPointerLock?.();
   caption.textContent = "WASD move. Mouse or arrow keys look. E inspects. F toggles the flashlight.";
+  playTone(33, 1.4, 0.09, "sawtooth");
   playIntroDialogue();
 }
 

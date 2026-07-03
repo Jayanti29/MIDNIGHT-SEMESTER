@@ -276,6 +276,27 @@ body.started .task-log {
   line-height: 1.5;
 }
 
+.quick-actions {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  display: flex;
+  gap: 10px;
+  z-index: 5;
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+body.started .quick-actions {
+  opacity: 1;
+}
+
+.quick-actions button {
+  min-width: 104px;
+  padding: 10px 12px;
+  background: rgba(12, 14, 14, 0.78);
+}
+
 .speaker {
   margin: 0 0 6px;
   color: #c9a56d;
@@ -360,7 +381,8 @@ body:not(.started) #reticle,
 body:not(.started) #caption,
 body:not(.started) .dialogue,
 body:not(.started) .interaction-prompt,
-body:not(.started) .task-log {
+body:not(.started) .task-log,
+body:not(.started) .quick-actions {
   opacity: 0 !important;
   pointer-events: none;
 }

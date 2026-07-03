@@ -21,6 +21,8 @@ const speaker = document.querySelector("#speaker");
 const line = document.querySelector("#line");
 const nextLineButton = document.querySelector("#next-line");
 const interactionPrompt = document.querySelector("#interaction-prompt");
+const actionInteract = document.querySelector("#action-interact");
+const actionFlashlight = document.querySelector("#action-flashlight");
 const fatalError = document.querySelector("#fatal-error");
 
 const scene = new THREE.Scene();
@@ -777,6 +779,11 @@ document.addEventListener("keydown", (event) => {
 
 document.addEventListener("keyup", (event) => keys.delete(event.code));
 nextLineButton.addEventListener("click", showNextStoryLine);
+actionInteract.addEventListener("click", inspectNearest);
+actionFlashlight.addEventListener("click", () => {
+  flashlightOn = !flashlightOn && battery > 0;
+  caption.textContent = flashlightOn ? "Flashlight on." : "Flashlight off.";
+});
 
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;

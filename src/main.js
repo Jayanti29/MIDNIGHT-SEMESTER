@@ -35,6 +35,7 @@ renderer.xr.enabled = true;
 const clock = new THREE.Clock();
 const keys = new Set();
 const interactables = [];
+const doors = [];
 const flickerLights = [];
 let yaw = 0;
 let pitch = 0;
@@ -169,6 +170,32 @@ function addLabel(text, position, size = 0.34) {
   return mesh;
 }
 
+function createDoor({ side, z, label }) {
+  const direction = side === "left" ? -1 : 1;
+  const group = new THREE.Group();
+  group.name = label;
+  group.position.set(direction * 3.62, 1.18, z);
+  group.userData = { type: "door", open: false, side, label };
+
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.35, 1.18), materials.darkWood);
+  panel.name = `${label} panel`;
+  panel.castShadow = true;
+  panel.receiveShadow = true;
+  panel.userData.parentDoor = group;
+  group.add(panel);
+
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), materials.brass);
+  knob.name = `${label} knob`;
+  knob.position.set(-direction * 0.12, -0.06, 0.36);
+  knob.userData.parentDoor = group;
+  group.add(knob);
+
+  scene.add(group);
+  doors.push(group);
+  interactables.push(panel, knob);
+  return group;
+}
+
 function buildCorridor() {
   box("floor", [8, 0.18, 62], [0, -0.1, -18], materials.floor, false);
   box("ceiling", [8, 0.24, 62], [0, 3.8, -18], materials.wall, false);
@@ -178,8 +205,8 @@ function buildCorridor() {
   for (let z = 5; z > -46; z -= 7) {
     box("wood panel left", [0.34, 1.15, 3.5], [-3.82, 0.78, z], materials.darkWood);
     box("wood panel right", [0.34, 1.15, 3.5], [3.82, 0.78, z - 2.6], materials.darkWood);
-    box("door left", [0.16, 2.35, 1.18], [-3.66, 1.2, z - 2.4], materials.darkWood);
-    box("door right", [0.16, 2.35, 1.18], [3.66, 1.2, z + 0.6], materials.darkWood);
+    createDoor({ side: "left", z: z - 2.4, label: `Room ${Math.abs(Math.round(z - 2.4))} left door` });
+    createDoor({ side: "right", z: z + 0.6, label: `Room ${Math.abs(Math.round(z + 0.6))} right door` });
     box("frame left", [0.22, 2.66, 1.42], [-3.54, 1.32, z - 2.4], materials.brass);
     box("frame right", [0.22, 2.66, 1.42], [3.54, 1.32, z + 0.6], materials.brass);
   }
@@ -364,6 +391,11 @@ function updateState(delta) {
     const pulse = Math.sin(clock.elapsedTime * 7.5 + phase) > 0.92 ? 0.26 : 1;
     light.intensity = THREE.MathUtils.lerp(light.intensity, base * pulse, delta * 8);
   });
+
+  doors.forEach((door) => {
+    const target = door.userData.open ? (door.userData.side === "left" ? -1.18 : 1.18) : 0;
+    door.rotation.y = THREE.MathUtils.lerp(door.rotation.y, target, delta * 6);
+  });
 }
 
 function inspectNearest() {
@@ -375,7 +407,17 @@ function inspectNearest() {
     return;
   }
 
+  const door = hit.object.userData.parentDoor;
+  if (door) {
+    door.userData.open = !door.userData.open;
+    fear = Math.min(100, fear + 4);
+    caption.textContent = door.userData.open ? "The door groans open." : "The latch clicks shut.";
+    objective.textContent = "Search rooms for lab records, books, and anything Meera left behind.";
+    return;
+  }
+
   const doc = hit.object.userData.doc;
+  if (!doc) return;
   inspected += 1;
   caseTitle.textContent = doc.title;
   caseBody.textContent = doc.body;

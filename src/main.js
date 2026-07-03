@@ -335,26 +335,46 @@ function createCharacter({ name, position, color, ghostly = false }) {
   const group = new THREE.Group();
   group.name = name;
   group.position.set(...position);
+  const material = new THREE.MeshStandardMaterial({
+    color,
+    roughness: 0.74,
+    transparent: ghostly,
+    opacity: ghostly ? 0.42 : 1,
+    emissive: ghostly ? color : 0x000000,
+    emissiveIntensity: ghostly ? 0.28 : 0
+  });
 
-  const body = new THREE.Mesh(
-    new THREE.CapsuleGeometry(0.28, 0.82, 8, 16),
-    new THREE.MeshStandardMaterial({
-      color,
-      roughness: 0.74,
-      transparent: ghostly,
-      opacity: ghostly ? 0.42 : 1,
-      emissive: ghostly ? color : 0x000000,
-      emissiveIntensity: ghostly ? 0.28 : 0
-    })
-  );
+  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.28, 0.82, 8, 16), material);
   body.position.y = 1.05;
   body.castShadow = !ghostly;
   group.add(body);
 
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 16), body.material);
+  const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 16), material);
   head.position.y = 1.7;
   head.castShadow = !ghostly;
   group.add(head);
+
+  const shoulder = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.12, 0.18), material);
+  shoulder.position.y = 1.42;
+  shoulder.castShadow = !ghostly;
+  group.add(shoulder);
+
+  const armGeometry = new THREE.CapsuleGeometry(0.055, 0.62, 6, 10);
+  [-0.42, 0.42].forEach((x) => {
+    const arm = new THREE.Mesh(armGeometry, material);
+    arm.position.set(x, 1.1, 0);
+    arm.rotation.z = x < 0 ? -0.16 : 0.16;
+    arm.castShadow = !ghostly;
+    group.add(arm);
+  });
+
+  const legGeometry = new THREE.CapsuleGeometry(0.07, 0.64, 6, 10);
+  [-0.12, 0.12].forEach((x) => {
+    const leg = new THREE.Mesh(legGeometry, material);
+    leg.position.set(x, 0.38, 0);
+    leg.castShadow = !ghostly;
+    group.add(leg);
+  });
 
   scene.add(group);
   return group;

@@ -325,6 +325,12 @@ function updateMovement(delta) {
   const speed = sprint ? 5.4 : 3.0;
   const forward = Number(keys.has("KeyW")) - Number(keys.has("KeyS"));
   const strafe = Number(keys.has("KeyD")) - Number(keys.has("KeyA"));
+  const lookX = Number(keys.has("ArrowRight")) - Number(keys.has("ArrowLeft"));
+  const lookY = Number(keys.has("ArrowDown")) - Number(keys.has("ArrowUp"));
+  yaw -= lookX * delta * 1.7;
+  pitch = THREE.MathUtils.clamp(pitch - lookY * delta * 1.25, -1.1, 1.1);
+  camera.rotation.set(pitch, yaw, 0, "YXZ");
+
   const direction = new THREE.Vector3(strafe, 0, -forward).normalize().multiplyScalar(speed * delta);
   direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
   camera.position.add(direction);
@@ -394,7 +400,7 @@ function startGame({ lockPointer = true } = {}) {
   startScreen.classList.add("hidden");
   document.body.classList.add("started");
   if (lockPointer) canvas.requestPointerLock?.();
-  caption.textContent = "Find evidence. Follow the lights. Do not trust the silence.";
+  caption.textContent = "WASD move. Mouse or arrow keys look. E inspects. F toggles the flashlight.";
 }
 
 buildCorridor();
@@ -404,7 +410,7 @@ if (new URLSearchParams(window.location.search).has("vr")) {
 }
 renderer.setAnimationLoop(animate);
 
-startButton.addEventListener("click", startGame);
+startButton.addEventListener("click", () => startGame());
 if (new URLSearchParams(window.location.search).has("autostart")) {
   startScreen.classList.add("hidden");
   document.body.classList.add("started");

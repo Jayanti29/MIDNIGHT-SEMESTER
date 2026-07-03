@@ -225,6 +225,31 @@ meter {
   z-index: 5;
 }
 
+.fatal-error {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  width: min(520px, calc(100vw - 40px));
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(201, 165, 109, 0.36);
+  border-radius: 6px;
+  padding: 22px;
+  background: rgba(8, 7, 6, 0.92);
+  color: #f3eadc;
+  z-index: 20;
+}
+
+.fatal-error h2 {
+  margin: 0 0 10px;
+  font-size: 1.2rem;
+}
+
+.fatal-error p {
+  margin: 0;
+  color: #d6cbbb;
+  line-height: 1.5;
+}
+
 .speaker {
   margin: 0 0 6px;
   color: #c9a56d;

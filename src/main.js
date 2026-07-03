@@ -18,6 +18,7 @@ const vrToggle = document.querySelector("#vr-toggle");
 const dialogue = document.querySelector("#dialogue");
 const speaker = document.querySelector("#speaker");
 const line = document.querySelector("#line");
+const interactionPrompt = document.querySelector("#interaction-prompt");
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020303);
@@ -560,6 +561,27 @@ function updateState(delta) {
     const target = door.userData.open ? (door.userData.side === "left" ? -1.18 : 1.18) : 0;
     door.rotation.y = THREE.MathUtils.lerp(door.rotation.y, target, delta * 6);
   });
+
+  updateInteractionPrompt();
+}
+
+function getFocusedInteractable(maxDistance = 4) {
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
+  const hit = raycaster.intersectObjects(interactables, false)[0];
+  return hit && hit.distance <= maxDistance ? hit : null;
+}
+
+function updateInteractionPrompt() {
+  const hit = getFocusedInteractable();
+  if (!hit || !document.body.classList.contains("started")) {
+    interactionPrompt.hidden = true;
+    return;
+  }
+
+  const door = hit.object.userData.parentDoor;
+  interactionPrompt.hidden = false;
+  interactionPrompt.textContent = door ? "Press E - open door" : "Press E - inspect evidence";
 }
 
 function sayLine(name, text, duration = 5600) {
@@ -586,10 +608,8 @@ function playIntroDialogue() {
 }
 
 function inspectNearest() {
-  const raycaster = new THREE.Raycaster();
-  raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-  const hit = raycaster.intersectObjects(interactables, false)[0];
-  if (!hit || hit.distance > 4) {
+  const hit = getFocusedInteractable();
+  if (!hit) {
     caption.textContent = "Nothing close enough to inspect.";
     return;
   }

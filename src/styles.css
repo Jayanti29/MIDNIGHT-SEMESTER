@@ -182,6 +182,22 @@ meter {
   z-index: 7;
 }
 
+.interaction-prompt {
+  position: fixed;
+  left: 50%;
+  top: calc(50% + 28px);
+  transform: translateX(-50%);
+  border: 1px solid rgba(242, 232, 216, 0.24);
+  border-radius: 6px;
+  padding: 8px 12px;
+  background: rgba(6, 7, 7, 0.72);
+  color: #f3eadc;
+  font-size: 0.84rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  z-index: 5;
+}
+
 .speaker {
   margin: 0 0 6px;
   color: #c9a56d;
@@ -257,7 +273,8 @@ body:not(.started) .vr-toggle {
 body:not(.started) #hud,
 body:not(.started) #reticle,
 body:not(.started) #caption,
-body:not(.started) .dialogue {
+body:not(.started) .dialogue,
+body:not(.started) .interaction-prompt {
   opacity: 0 !important;
   pointer-events: none;
 }

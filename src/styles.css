@@ -193,6 +193,32 @@ meter {
   line-height: 1.55;
 }
 
+.task-log {
+  position: fixed;
+  left: 24px;
+  bottom: 24px;
+  width: min(320px, calc(100vw - 48px));
+  border: 1px solid rgba(222, 211, 191, 0.16);
+  border-radius: 6px;
+  padding: 14px 16px;
+  background: rgba(7, 8, 8, 0.62);
+  color: #d8d0c3;
+  font-size: 0.82rem;
+  z-index: 4;
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+
+body.started .task-log {
+  opacity: 1;
+}
+
+.task-log ol {
+  margin: 0;
+  padding-left: 18px;
+  line-height: 1.45;
+}
+
 .dialogue {
   position: fixed;
   left: 50%;
@@ -326,7 +352,8 @@ body:not(.started) #hud,
 body:not(.started) #reticle,
 body:not(.started) #caption,
 body:not(.started) .dialogue,
-body:not(.started) .interaction-prompt {
+body:not(.started) .interaction-prompt,
+body:not(.started) .task-log {
   opacity: 0 !important;
   pointer-events: none;
 }

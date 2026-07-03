@@ -12,6 +12,7 @@ const objectiveSteps = document.querySelectorAll("[data-step]");
 const caseFile = document.querySelector("#case-file");
 const caseTitle = document.querySelector("#case-title");
 const caseBody = document.querySelector("#case-body");
+const taskLogList = document.querySelector("#task-log-list");
 const caption = document.querySelector("#caption");
 const vignette = document.querySelector("#vignette");
 const vrToggle = document.querySelector("#vr-toggle");
@@ -66,6 +67,15 @@ let meeraWarned = false;
 
 function completeObjective(step) {
   document.querySelector(`[data-step="${step}"]`)?.classList.add("done");
+}
+
+function addTaskLog(message) {
+  const item = document.createElement("li");
+  item.textContent = message;
+  taskLogList.prepend(item);
+  while (taskLogList.children.length > 5) {
+    taskLogList.lastElementChild.remove();
+  }
 }
 
 async function setupVrEntry() {
@@ -646,6 +656,7 @@ function inspectNearest() {
     fear = Math.min(100, fear + 4);
     playDoorCreak();
     caption.textContent = door.userData.open ? "The door groans open." : "The latch clicks shut.";
+    addTaskLog(`${door.userData.open ? "Opened" : "Closed"} ${door.userData.label}.`);
     if (door.userData.open && camera.position.z < -12) {
       sayLine("Professor Kulkarni", "Some rooms were sealed after 2005. If a door opens by itself, step back.");
     }
@@ -668,6 +679,7 @@ function inspectNearest() {
   if (inspected >= 3) completeObjective("basement");
   caption.textContent = "Document added to case file.";
   sayLine("Aarav", `This belongs in the case file: ${doc.title}.`);
+  addTaskLog(`Recovered evidence: ${doc.title}.`);
   window.setTimeout(() => {
     caseFile.hidden = true;
   }, 7200);
@@ -687,6 +699,7 @@ function startGame({ lockPointer = true } = {}) {
   if (lockPointer) canvas.requestPointerLock?.();
   caption.textContent = "WASD move. Mouse or arrow keys look. E inspects. F toggles the flashlight.";
   completeObjective("start");
+  addTaskLog("Entered Block A after the midnight power reroute.");
   playTone(33, 1.4, 0.09, "sawtooth");
   playIntroDialogue();
 }

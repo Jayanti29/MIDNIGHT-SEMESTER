@@ -11,13 +11,28 @@ npm install
 npm run dev
 ```
 
+Open the local server URL printed by Vite, usually:
+
+```text
+http://localhost:5173/
+```
+
+The root `index.html` also supports direct browser opening for quick checks, but the dev server is the preferred path while building.
+
+## Build And Preview
+
+```bash
+npm run build
+npm run preview
+```
+
 ## Prototype Controls
 
 - `WASD` move
-- Mouse look after pointer lock
+- Mouse look after pointer lock, or arrow keys as fallback
 - `Shift` sprint
 - `F` toggle flashlight
-- `E` inspect nearby documents
+- `E` inspect evidence or open doors
 
 ## Creative Direction
 

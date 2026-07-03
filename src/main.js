@@ -19,6 +19,7 @@ const vrToggle = document.querySelector("#vr-toggle");
 const dialogue = document.querySelector("#dialogue");
 const speaker = document.querySelector("#speaker");
 const line = document.querySelector("#line");
+const nextLineButton = document.querySelector("#next-line");
 const interactionPrompt = document.querySelector("#interaction-prompt");
 const fatalError = document.querySelector("#fatal-error");
 
@@ -64,6 +65,7 @@ let audioCtx = null;
 let droneGain = null;
 let heartbeatTimer = 0;
 let meeraWarned = false;
+let storyQueue = [];
 
 function completeObjective(step) {
   document.querySelector(`[data-step="${step}"]`)?.classList.add("done");
@@ -650,17 +652,29 @@ function sayLine(name, text, duration = 5600) {
   }, duration);
 }
 
+function queueStory(lines) {
+  storyQueue = [...lines];
+  showNextStoryLine();
+}
+
+function showNextStoryLine() {
+  const next = storyQueue.shift();
+  if (!next) {
+    dialogue.hidden = true;
+    return;
+  }
+
+  sayLine(next[0], next[1], 12000);
+}
+
 function playIntroDialogue() {
   if (introPlayed) return;
   introPlayed = true;
-  const lines = [
+  queueStory([
     ["Aarav", "Gate control is offline. Why is Block A drawing backup power?"],
     ["Professor Kulkarni", "Aarav, listen carefully. Do not enter the basement. Restore the generator and leave."],
     ["Meera", "Forty-two hours. Still awake. Still here."]
-  ];
-  lines.forEach(([name, text], index) => {
-    window.setTimeout(() => sayLine(name, text, 4200), index * 4700);
-  });
+  ]);
 }
 
 function inspectNearest() {
@@ -759,6 +773,7 @@ document.addEventListener("keydown", (event) => {
 });
 
 document.addEventListener("keyup", (event) => keys.delete(event.code));
+nextLineButton.addEventListener("click", showNextStoryLine);
 
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;

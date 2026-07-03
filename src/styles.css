@@ -290,6 +290,13 @@ body.started .task-log {
   line-height: 1.45;
 }
 
+.next-line {
+  margin-top: 12px;
+  min-width: 82px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+}
+
 #reticle {
   position: fixed;
   left: 50%;

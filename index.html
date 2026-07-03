@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Midnight Semester</title>
+  </head>
+  <body>
+    <main id="app">
+      <canvas id="game"></canvas>
+      <section id="start-screen" class="overlay">
+        <div class="brand">
+          <p class="kicker">Ravenswood Institute of Technology</p>
+          <h1>Midnight Semester</h1>
+          <p class="subtitle">A VR-first psychological horror prototype.</p>
+        </div>
+        <button id="start-button" type="button">Enter Block A</button>
+      </section>
+      <section id="hud" aria-live="polite">
+        <div class="hud-panel compact">
+          <span class="label">Flashlight</span>
+          <span id="battery">100%</span>
+          <meter id="battery-meter" min="0" max="100" value="100"></meter>
+        </div>
+        <div class="hud-panel compact">
+          <span class="label">Fear</span>
+          <span id="fear">0%</span>
+          <meter id="fear-meter" min="0" max="100" value="0"></meter>
+        </div>
+        <div id="objective" class="hud-panel objective">
+          Find the generator route through the old hostel wing.
+        </div>
+      </section>
+      <section id="case-file" class="case-file" hidden>
+        <p class="kicker">Recovered Case File</p>
+        <h2 id="case-title">No document selected</h2>
+        <p id="case-body"></p>
+      </section>
+      <div id="reticle"></div>
+      <div id="vignette"></div>
+      <div id="caption">Click to lock pointer. WASD move, mouse look, Shift sprint, F flashlight, E inspect.</div>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

@@ -41,6 +41,7 @@ body,
 .overlay.hidden {
   pointer-events: none;
   opacity: 0;
+  visibility: hidden;
   transition: opacity 600ms ease;
 }
 
@@ -201,6 +202,33 @@ meter {
   font-size: 0.92rem;
   text-align: center;
   z-index: 4;
+  transition: opacity 240ms ease;
+}
+
+.vr-toggle {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  min-width: 112px;
+  padding: 11px 15px;
+  background: rgba(12, 14, 14, 0.72);
+  color: #f2e8d8;
+  border-color: rgba(242, 232, 216, 0.24);
+  box-shadow: 0 14px 46px rgba(0, 0, 0, 0.42);
+  z-index: 6;
+}
+
+body:not(.started) .vr-toggle {
+  right: clamp(32px, 6vw, 86px);
+  bottom: clamp(32px, 6vw, 86px);
+  transform: translateX(132px);
+}
+
+body:not(.started) #hud,
+body:not(.started) #reticle,
+body:not(.started) #caption {
+  opacity: 0 !important;
+  pointer-events: none;
 }
 
 @media (max-width: 760px) {

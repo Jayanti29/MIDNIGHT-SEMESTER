@@ -1,5 +1,4 @@
 import * as THREE from "three";
-import { VRButton } from "three/addons/webxr/VRButton.js";
 import "./styles.css";
 
 const canvas = document.querySelector("#game");
@@ -15,6 +14,7 @@ const caseTitle = document.querySelector("#case-title");
 const caseBody = document.querySelector("#case-body");
 const caption = document.querySelector("#caption");
 const vignette = document.querySelector("#vignette");
+const vrToggle = document.querySelector("#vr-toggle");
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020303);
@@ -31,7 +31,6 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
 renderer.xr.enabled = true;
-document.body.appendChild(VRButton.createButton(renderer));
 
 const clock = new THREE.Clock();
 const keys = new Set();
@@ -43,6 +42,34 @@ let battery = 100;
 let fear = 0;
 let flashlightOn = true;
 let inspected = 0;
+let xrSession = null;
+
+async function setupVrEntry() {
+  if (!navigator.xr || !vrToggle) return;
+
+  try {
+    vrToggle.hidden = false;
+    vrToggle.addEventListener("click", async () => {
+      if (xrSession) {
+        await xrSession.end();
+        return;
+      }
+
+      xrSession = await navigator.xr.requestSession("immersive-vr", {
+        optionalFeatures: ["local-floor", "bounded-floor", "hand-tracking"]
+      });
+      renderer.xr.setSession(xrSession);
+      vrToggle.textContent = "Exit VR";
+      xrSession.addEventListener("end", () => {
+        xrSession = null;
+        vrToggle.textContent = "Enter VR";
+      });
+      startGame({ lockPointer: false });
+    });
+  } catch (error) {
+    console.warn("VR entry unavailable in this browser.", error);
+  }
+}
 
 function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#776b5a", scale = 1 }) {
   const textureCanvas = document.createElement("canvas");
@@ -363,15 +390,18 @@ function animate() {
   renderer.render(scene, camera);
 }
 
-function startGame() {
+function startGame({ lockPointer = true } = {}) {
   startScreen.classList.add("hidden");
   document.body.classList.add("started");
-  canvas.requestPointerLock?.();
+  if (lockPointer) canvas.requestPointerLock?.();
   caption.textContent = "Find evidence. Follow the lights. Do not trust the silence.";
 }
 
 buildCorridor();
 addAtmosphere();
+if (new URLSearchParams(window.location.search).has("vr")) {
+  setupVrEntry();
+}
 renderer.setAnimationLoop(animate);
 
 startButton.addEventListener("click", startGame);

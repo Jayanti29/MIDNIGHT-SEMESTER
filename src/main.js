@@ -18,7 +18,7 @@ const vignette = document.querySelector("#vignette");
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020303);
-scene.fog = new THREE.FogExp2(0x070706, 0.034);
+scene.fog = new THREE.FogExp2(0x070706, 0.026);
 
 const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 180);
 camera.position.set(0, 1.7, 8);
@@ -29,7 +29,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 0.82;
+renderer.toneMappingExposure = 1.05;
 renderer.xr.enabled = true;
 document.body.appendChild(VRButton.createButton(renderer));
 
@@ -365,6 +365,7 @@ function animate() {
 
 function startGame() {
   startScreen.classList.add("hidden");
+  document.body.classList.add("started");
   canvas.requestPointerLock?.();
   caption.textContent = "Find evidence. Follow the lights. Do not trust the silence.";
 }
@@ -374,6 +375,11 @@ addAtmosphere();
 renderer.setAnimationLoop(animate);
 
 startButton.addEventListener("click", startGame);
+if (new URLSearchParams(window.location.search).has("autostart")) {
+  startScreen.classList.add("hidden");
+  document.body.classList.add("started");
+  caption.textContent = "Verification mode: playable scene loaded.";
+}
 document.addEventListener("click", () => {
   if (startScreen.classList.contains("hidden")) canvas.requestPointerLock?.();
 });

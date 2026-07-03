@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { VRButton } from "three/addons/webxr/VRButton.js";
 import "./styles.css";
 
 const canvas = document.querySelector("#game");
@@ -29,10 +30,13 @@ renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.82;
+renderer.xr.enabled = true;
+document.body.appendChild(VRButton.createButton(renderer));
 
 const clock = new THREE.Clock();
 const keys = new Set();
 const interactables = [];
+const flickerLights = [];
 let yaw = 0;
 let pitch = 0;
 let battery = 100;
@@ -40,14 +44,70 @@ let fear = 0;
 let flashlightOn = true;
 let inspected = 0;
 
+function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#776b5a", scale = 1 }) {
+  const textureCanvas = document.createElement("canvas");
+  textureCanvas.width = 1024;
+  textureCanvas.height = 1024;
+  const ctx = textureCanvas.getContext("2d");
+  ctx.fillStyle = base;
+  ctx.fillRect(0, 0, 1024, 1024);
+
+  for (let i = 0; i < 900; i += 1) {
+    const alpha = Math.random() * 0.16;
+    ctx.strokeStyle = i % 4 === 0 ? `rgba(255,245,220,${alpha})` : `rgba(0,0,0,${alpha})`;
+    ctx.beginPath();
+    const x = Math.random() * 1024;
+    const y = Math.random() * 1024;
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + (Math.random() - 0.5) * 160 * scale, y + Math.random() * 26 * scale);
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle = grain;
+  ctx.lineWidth = 3;
+  for (let y = 0; y < 1024; y += 92) {
+    ctx.beginPath();
+    ctx.moveTo(0, y + Math.random() * 18);
+    ctx.lineTo(1024, y + Math.random() * 22);
+    ctx.stroke();
+  }
+
+  ctx.strokeStyle = scratches;
+  ctx.lineWidth = 1;
+  for (let i = 0; i < 120; i += 1) {
+    ctx.beginPath();
+    const x = Math.random() * 1024;
+    const y = Math.random() * 1024;
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + Math.random() * 220 - 80, y + Math.random() * 90 - 45);
+    ctx.stroke();
+  }
+
+  const texture = new THREE.CanvasTexture(textureCanvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = 8;
+  return texture;
+}
+
+const floorTexture = proceduralTexture({ base: "#2b1f17", grain: "#4a3426", scratches: "#6a5541", scale: 1.5 });
+floorTexture.repeat.set(2.5, 18);
+const wallTexture = proceduralTexture({ base: "#514b40", grain: "#393329", scratches: "#746b5b", scale: 0.7 });
+wallTexture.repeat.set(2, 10);
+const woodTexture = proceduralTexture({ base: "#23150f", grain: "#4b2c1d", scratches: "#70513a", scale: 1.2 });
+woodTexture.repeat.set(1, 4);
+
 const materials = {
-  wall: new THREE.MeshStandardMaterial({ color: 0x514b40, roughness: 0.86, metalness: 0.02 }),
-  darkWood: new THREE.MeshStandardMaterial({ color: 0x22150f, roughness: 0.72 }),
-  floor: new THREE.MeshStandardMaterial({ color: 0x2a2018, roughness: 0.68 }),
+  wall: new THREE.MeshStandardMaterial({ color: 0x736a5a, map: wallTexture, roughness: 0.88, metalness: 0.02 }),
+  darkWood: new THREE.MeshStandardMaterial({ color: 0x4b2c1d, map: woodTexture, roughness: 0.74 }),
+  floor: new THREE.MeshStandardMaterial({ color: 0x6b4d35, map: floorTexture, roughness: 0.7 }),
   brass: new THREE.MeshStandardMaterial({ color: 0xaa7a36, roughness: 0.38, metalness: 0.68 }),
   paper: new THREE.MeshStandardMaterial({ color: 0xd4c0a0, roughness: 0.92 }),
   fabric: new THREE.MeshStandardMaterial({ color: 0x4f564c, roughness: 0.95 }),
-  hazard: new THREE.MeshStandardMaterial({ color: 0x7f1f1b, roughness: 0.7 })
+  hazard: new THREE.MeshStandardMaterial({ color: 0x7f1f1b, roughness: 0.7 }),
+  glass: new THREE.MeshStandardMaterial({ color: 0x93a0a0, roughness: 0.08, metalness: 0.04, transparent: true, opacity: 0.28 }),
+  emission: new THREE.MeshStandardMaterial({ color: 0xffd9a1, emissive: 0xffb25a, emissiveIntensity: 0.9 })
 };
 
 function box(name, size, position, material, cast = true, receive = true) {
@@ -102,7 +162,14 @@ function buildCorridor() {
     lamp.position.set(0, 3.35, z);
     lamp.castShadow = true;
     scene.add(lamp);
+    flickerLights.push({ light: lamp, base: lamp.intensity, phase: Math.random() * Math.PI * 2 });
     box("lamp shade", [1.1, 0.12, 0.55], [0, 3.28, z], materials.brass);
+    box("lamp glow", [0.72, 0.035, 0.26], [0, 3.2, z], materials.emission, false, false);
+  }
+
+  for (let z = 0; z > -42; z -= 14) {
+    box("rain window left", [0.035, 1.55, 1.9], [-3.84, 2.02, z - 4.8], materials.glass, false);
+    box("rain window right", [0.035, 1.55, 1.9], [3.84, 2.02, z - 8.2], materials.glass, false);
   }
 
   buildDormRoom();
@@ -165,6 +232,7 @@ function addAtmosphere() {
   camera.add(flashlight.target);
   scene.add(camera);
   camera.userData.flashlight = flashlight;
+  camera.userData.flashlightProp = buildFlashlightProp();
 
   const ghost = new THREE.Mesh(
     new THREE.PlaneGeometry(0.82, 2.2),
@@ -174,6 +242,55 @@ function addAtmosphere() {
   ghost.name = "Meera presence";
   scene.add(ghost);
   scene.userData.ghost = ghost;
+
+  const dustGeometry = new THREE.BufferGeometry();
+  const positions = [];
+  for (let i = 0; i < 950; i += 1) {
+    positions.push(
+      (Math.random() - 0.5) * 7.4,
+      Math.random() * 3.3 + 0.25,
+      Math.random() * -50 + 8
+    );
+  }
+  dustGeometry.setAttribute("position", new THREE.Float32BufferAttribute(positions, 3));
+  const dust = new THREE.Points(
+    dustGeometry,
+    new THREE.PointsMaterial({ color: 0xd7c3a0, size: 0.018, transparent: true, opacity: 0.36, depthWrite: false })
+  );
+  scene.add(dust);
+  scene.userData.dust = dust;
+}
+
+function buildFlashlightProp() {
+  const group = new THREE.Group();
+  group.position.set(0.34, -0.38, -0.72);
+  group.rotation.set(-0.15, 0.22, -0.08);
+
+  const body = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.08, 0.095, 0.55, 24),
+    new THREE.MeshStandardMaterial({ color: 0x232526, roughness: 0.36, metalness: 0.55 })
+  );
+  body.rotation.x = Math.PI / 2;
+  group.add(body);
+
+  const head = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.13, 0.1, 0.16, 24),
+    new THREE.MeshStandardMaterial({ color: 0x171818, roughness: 0.3, metalness: 0.72 })
+  );
+  head.rotation.x = Math.PI / 2;
+  head.position.z = -0.34;
+  group.add(head);
+
+  const gauge = new THREE.Mesh(
+    new THREE.BoxGeometry(0.12, 0.028, 0.018),
+    new THREE.MeshBasicMaterial({ color: 0x73d08a })
+  );
+  gauge.name = "battery gauge";
+  gauge.position.set(0, 0.085, -0.08);
+  group.add(gauge);
+  group.userData.gauge = gauge;
+  camera.add(group);
+  return group;
 }
 
 function updateMovement(delta) {
@@ -196,6 +313,9 @@ function updateState(delta) {
   fear = THREE.MathUtils.lerp(fear, depthFear + darknessFear + inspected * 5, delta * 0.9);
 
   camera.userData.flashlight.intensity = flashlightOn ? 3.4 * (battery / 100 + 0.25) : 0;
+  camera.userData.flashlightProp.visible = flashlightOn;
+  camera.userData.flashlightProp.userData.gauge.scale.x = Math.max(0.08, battery / 100);
+  camera.userData.flashlightProp.userData.gauge.material.color.set(battery > 35 ? 0x73d08a : 0xc9493c);
   batteryText.textContent = `${Math.round(battery)}%`;
   batteryMeter.value = battery;
   fearText.textContent = `${Math.round(fear)}%`;
@@ -205,6 +325,12 @@ function updateState(delta) {
   const ghost = scene.userData.ghost;
   ghost.lookAt(camera.position);
   ghost.material.opacity = Math.max(0, Math.sin(clock.elapsedTime * 1.7) * 0.16 + (fear - 42) / 210);
+  scene.userData.dust.rotation.y += delta * 0.018;
+
+  flickerLights.forEach(({ light, base, phase }) => {
+    const pulse = Math.sin(clock.elapsedTime * 7.5 + phase) > 0.92 ? 0.26 : 1;
+    light.intensity = THREE.MathUtils.lerp(light.intensity, base * pulse, delta * 8);
+  });
 }
 
 function inspectNearest() {
@@ -235,7 +361,6 @@ function animate() {
   updateMovement(delta);
   updateState(delta);
   renderer.render(scene, camera);
-  requestAnimationFrame(animate);
 }
 
 function startGame() {
@@ -246,7 +371,7 @@ function startGame() {
 
 buildCorridor();
 addAtmosphere();
-animate();
+renderer.setAnimationLoop(animate);
 
 startButton.addEventListener("click", startGame);
 document.addEventListener("click", () => {

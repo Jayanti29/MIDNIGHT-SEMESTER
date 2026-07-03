@@ -133,6 +133,9 @@ const materials = {
   brass: new THREE.MeshStandardMaterial({ color: 0xaa7a36, roughness: 0.38, metalness: 0.68 }),
   paper: new THREE.MeshStandardMaterial({ color: 0xd4c0a0, roughness: 0.92 }),
   fabric: new THREE.MeshStandardMaterial({ color: 0x4f564c, roughness: 0.95 }),
+  bookBlue: new THREE.MeshStandardMaterial({ color: 0x243f5e, roughness: 0.82 }),
+  bookRed: new THREE.MeshStandardMaterial({ color: 0x61231f, roughness: 0.84 }),
+  bookGreen: new THREE.MeshStandardMaterial({ color: 0x2f4c34, roughness: 0.84 }),
   hazard: new THREE.MeshStandardMaterial({ color: 0x7f1f1b, roughness: 0.7 }),
   glass: new THREE.MeshStandardMaterial({ color: 0x93a0a0, roughness: 0.08, metalness: 0.04, transparent: true, opacity: 0.28 }),
   emission: new THREE.MeshStandardMaterial({ color: 0xffd9a1, emissive: 0xffb25a, emissiveIntensity: 0.9 })
@@ -196,6 +199,61 @@ function createDoor({ side, z, label }) {
   return group;
 }
 
+function createBookStack(position, rotation = 0) {
+  const colors = [materials.bookBlue, materials.bookRed, materials.bookGreen, materials.paper];
+  for (let i = 0; i < 5; i += 1) {
+    const book = box(`book ${i}`, [0.48 - i * 0.025, 0.06, 0.32], [position[0], position[1] + i * 0.065, position[2]], colors[i % colors.length]);
+    book.rotation.y = rotation + (i - 2) * 0.04;
+  }
+}
+
+function createStudyTable(position, rotation = 0) {
+  const group = new THREE.Group();
+  group.position.set(...position);
+  group.rotation.y = rotation;
+
+  const top = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.14, 0.92), materials.darkWood);
+  top.position.y = 0.9;
+  top.castShadow = true;
+  top.receiveShadow = true;
+  group.add(top);
+
+  [[-0.74, -0.34], [0.74, -0.34], [-0.74, 0.34], [0.74, 0.34]].forEach(([x, z]) => {
+    const leg = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.9, 0.12), materials.darkWood);
+    leg.position.set(x, 0.42, z);
+    leg.castShadow = true;
+    group.add(leg);
+  });
+
+  scene.add(group);
+  createBookStack([position[0] - 0.34, position[1] + 1.0, position[2] + 0.08], rotation);
+  return group;
+}
+
+function createBookshelf(position, rotation = 0) {
+  const group = new THREE.Group();
+  group.position.set(...position);
+  group.rotation.y = rotation;
+  for (let shelf = 0; shelf < 4; shelf += 1) {
+    const plank = new THREE.Mesh(new THREE.BoxGeometry(1.8, 0.12, 0.32), materials.darkWood);
+    plank.position.y = 0.32 + shelf * 0.48;
+    plank.castShadow = true;
+    plank.receiveShadow = true;
+    group.add(plank);
+
+    for (let i = 0; i < 8; i += 1) {
+      const mat = [materials.bookBlue, materials.bookRed, materials.bookGreen, materials.paper][(i + shelf) % 4];
+      const book = new THREE.Mesh(new THREE.BoxGeometry(0.12, 0.32 + (i % 3) * 0.05, 0.24), mat);
+      book.position.set(-0.75 + i * 0.2, plank.position.y + 0.22, 0);
+      book.rotation.z = (i % 2 ? 0.06 : -0.04);
+      book.castShadow = true;
+      group.add(book);
+    }
+  }
+  scene.add(group);
+  return group;
+}
+
 function buildCorridor() {
   box("floor", [8, 0.18, 62], [0, -0.1, -18], materials.floor, false);
   box("ceiling", [8, 0.24, 62], [0, 3.8, -18], materials.wall, false);
@@ -226,6 +284,10 @@ function buildCorridor() {
     box("rain window right", [0.035, 1.55, 1.9], [3.84, 2.02, z - 8.2], materials.glass, false);
   }
 
+  createBookshelf([-3.48, 0, -12], Math.PI / 2);
+  createBookshelf([3.48, 0, -20], -Math.PI / 2);
+  createStudyTable([0.8, 0, -8.4], 0.18);
+  createStudyTable([-1.1, 0, -29], -0.3);
   buildDormRoom();
   buildDocuments();
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
@@ -244,6 +306,8 @@ function buildDormRoom() {
   box("desk right leg", [0.16, 1, 0.16], [1, 0.45, roomZ - 3.96], materials.darkWood);
   box("fallen chair", [0.9, 0.14, 0.9], [-1.7, 0.28, roomZ + 1.8], materials.darkWood).rotation.z = 0.6;
   box("blood mark", [0.9, 0.025, 1.9], [1.7, 0.04, roomZ + 2.8], materials.hazard, false);
+  createBookStack([-0.46, 1.17, roomZ - 4.42], 0.1);
+  createBookshelf([-5.1, 0, roomZ - 2.6], Math.PI / 2);
 }
 
 function buildDocuments() {

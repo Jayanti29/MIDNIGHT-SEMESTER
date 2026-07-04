@@ -237,6 +237,8 @@ let heartbeatTimer = 0;
 let footstepTimer = 0.35;
 let meeraWarned = false;
 let basementGateGroup = null;
+let blackoutTriggered = false;
+let isBlackoutActive = false;
 let storyQueue = [];
 let pointerLocked = false;
 let flashlightLight = null;
@@ -523,6 +525,67 @@ function createBuzzBuffer(ctx) {
   return buffer;
 }
 
+function createBlackoutCueBuffer(ctx) {
+  const duration = 3.5;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(2, numSamples, sampleRate);
+  const left = buffer.getChannelData(0);
+  const right = buffer.getChannelData(1);
+  
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-0.75 * t);
+    const freq = 160 * Math.exp(-2.2 * t);
+    const sweep = Math.sin(2 * Math.PI * freq * t) * 0.65;
+    
+    let spark = 0;
+    if (t < 1.2) {
+      const trigger = Math.sin(2 * Math.PI * 18 * t) > 0.85;
+      if (trigger) {
+        spark = (Math.random() * 2 - 1) * 0.45 * Math.sin(2 * Math.PI * 1200 * t);
+      }
+    }
+    left[i] = (sweep + spark) * envelope * 0.4;
+    
+    const tRight = Math.max(0, t - 0.02);
+    const freqR = 160 * Math.exp(-2.2 * tRight);
+    const sweepR = Math.sin(2 * Math.PI * freqR * tRight) * 0.65;
+    let sparkR = 0;
+    if (tRight < 1.2) {
+      const triggerR = Math.sin(2 * Math.PI * 18 * tRight) > 0.85;
+      if (triggerR) {
+        sparkR = (Math.random() * 2 - 1) * 0.45 * Math.sin(2 * Math.PI * 1200 * tRight);
+      }
+    }
+    right[i] = (sweepR + sparkR) * envelope * 0.4;
+  }
+  return buffer;
+}
+
+function triggerBlackoutSequence() {
+  isBlackoutActive = true;
+  if (audioManager) {
+    audioManager.playSound("blackout_cue", { volume: 1.0 });
+  }
+  
+  setFlashlight(false);
+  addTaskLog("Warning: Complete sector power failure detected.");
+  sayLine("Aarav", "What the... the power's cut?! Did the backup generator just fail?", 5500);
+  
+  window.setTimeout(() => {
+    flickerLights.forEach((lightObj, index) => {
+      lightObj.base = 0.25;
+      lightObj.light.color.setHex(index % 2 === 0 ? 0xb22822 : 0x228b22);
+    });
+    isBlackoutActive = false;
+    addTaskLog("Emergency power restored. Grid stability: 18%.");
+    if (audioManager) {
+      audioManager.playSound("flashlight_off", { volume: 0.5 });
+    }
+  }, 4200);
+}
+
 function createUiHoverBuffer(ctx) {
   const duration = 0.04;
   const sampleRate = ctx.sampleRate;
@@ -643,6 +706,9 @@ function initAudio() {
 
   const jumpscareBuffer = createJumpscareStingerBuffer(audioCtx);
   audioManager.buffers.set("jumpscare_stinger", jumpscareBuffer);
+
+  const blackoutBuffer = createBlackoutCueBuffer(audioCtx);
+  audioManager.buffers.set("blackout_cue", blackoutBuffer);
 
   const buzzBuffer = createBuzzBuffer(audioCtx);
   audioManager.buffers.set("electric_buzz", buzzBuffer);
@@ -1368,6 +1434,12 @@ function canOccupy(position) {
 
 function updateState(delta) {
   if (gameState === GameState.MENU) return;
+  
+  if (gameState === GameState.PLAYING && !blackoutTriggered && camera.position.z < -10) {
+    blackoutTriggered = true;
+    triggerBlackoutSequence();
+  }
+
   if (flashlightOn) battery = Math.max(0, battery - delta * 1.15);
   if (battery <= 0 && flashlightOn) setFlashlight(false);
   const depthFear = THREE.MathUtils.clamp((-camera.position.z - 6) * 1.7, 0, 58);
@@ -1427,8 +1499,12 @@ function updateState(delta) {
   scene.userData.dust.rotation.y += delta * 0.018;
 
   flickerLights.forEach(({ light, base, phase }) => {
-    const pulse = Math.sin(clock.elapsedTime * 7.5 + phase) > 0.92 ? 0.26 : 1;
-    light.intensity = THREE.MathUtils.lerp(light.intensity, base * pulse, delta * 8);
+    if (isBlackoutActive) {
+      light.intensity = THREE.MathUtils.lerp(light.intensity, 0, delta * 12);
+    } else {
+      const pulse = Math.sin(clock.elapsedTime * 7.5 + phase) > 0.92 ? 0.26 : 1;
+      light.intensity = THREE.MathUtils.lerp(light.intensity, base * pulse, delta * 8);
+    }
   });
 
   doors.forEach((door) => {
@@ -1693,6 +1769,8 @@ function resetGame() {
   battery = 100;
   stamina = 100;
   sprintExhausted = false;
+  blackoutTriggered = false;
+  isBlackoutActive = false;
   setFlashlight(true);
   inspected = 0;
   collectedEvidence.clear();
@@ -1709,6 +1787,11 @@ function resetGame() {
   
   document.querySelectorAll(".notebook-steps span").forEach(el => {
     el.classList.remove("done");
+  });
+
+  flickerLights.forEach((lightObj) => {
+    lightObj.base = 1.1;
+    lightObj.light.color.setHex(0xffc987);
   });
   
   objective.textContent = "Find the generator route through the old hostel wing.";

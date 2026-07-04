@@ -290,6 +290,7 @@ const AiState = {
 let meeraState = AiState.INACTIVE;
 let meeraPatrolDir = -1;
 let meeraSpeed = 1.0;
+let activeCheckpoint = null;
 let storyQueue = [];
 let pointerLocked = false;
 let flashlightLight = null;
@@ -1297,6 +1298,7 @@ function buildCorridor() {
   registerCollider(gateFrame);
   interactables.push(gateLeft, gateRight);
   initBatteries();
+  buildCheckpointConsole([2.8, 0, -18.5], "Emergency Terminal");
 }
 
 function buildDormRoom() {
@@ -1391,6 +1393,29 @@ function initBatteries() {
   batteryItems.push(buildBatteryMesh([1.8, 0.2, 2.0], "Battery Pack"));
   batteryItems.push(buildBatteryMesh([-5.5, 0.8, -18.4], "Spare Battery"));
   batteryItems.push(buildBatteryMesh([2.6, 0.68, -35.2], "Emergency Battery"));
+}
+
+function buildCheckpointConsole(position, name) {
+  const group = new THREE.Group();
+  group.name = name;
+  group.position.set(...position);
+  
+  const base = box("terminal base", [0.45, 0.95, 0.45], [0, 0.47, 0], materials.darkWood, true, true, true);
+  group.add(base);
+  
+  const screen = new THREE.Mesh(
+    new THREE.BoxGeometry(0.35, 0.28, 0.08),
+    materials.emission
+  );
+  screen.position.set(0, 1.05, 0.04);
+  screen.rotation.x = -0.35;
+  group.add(screen);
+  
+  tagInteractable(screen, "checkpoint", name);
+  screen.userData.parentConsole = group;
+  
+  scene.add(group);
+  return group;
 }
 
 function addAtmosphere() {
@@ -1891,6 +1916,27 @@ function inspectNearest() {
     }
     return;
   }
+
+  if (type === "checkpoint") {
+    const parent = hit.object.userData.parentConsole;
+    if (parent) {
+      activeCheckpoint = {
+        position: [parent.position.x - 1.0, 1.7, parent.position.z],
+        battery: battery,
+        collectedEvidence: Array.from(collectedEvidence),
+        collectedDocuments: Array.from(collectedDocuments.entries()),
+        inspected: inspected,
+        blackoutTriggered: blackoutTriggered
+      };
+      caption.textContent = "Progress checkpoint saved.";
+      sayLine("Aarav", "A backup power console. The terminal says security log saved.");
+      if (audioManager) {
+        audioManager.playSound("ui_select", { volume: 0.25 });
+      }
+      addTaskLog("Checkpoint reached: System logs saved.");
+    }
+    return;
+  }
 }
 
 function animate() {
@@ -1985,21 +2031,43 @@ function triggerGameOver(reason) {
 }
 
 function resetGame() {
-  fear = 0;
-  battery = 100;
-  stamina = 100;
-  sprintExhausted = false;
-  blackoutTriggered = false;
-  isBlackoutActive = false;
-  setFlashlight(true);
-  inspected = 0;
-  collectedEvidence.clear();
-  collectedDocuments.clear();
-  
-  camera.position.set(0, 1.7, 8);
-  camera.rotation.set(0, 0, 0);
-  yaw = 0;
-  pitch = 0;
+  if (activeCheckpoint) {
+    fear = 0;
+    battery = activeCheckpoint.battery;
+    stamina = 100;
+    sprintExhausted = false;
+    blackoutTriggered = activeCheckpoint.blackoutTriggered;
+    isBlackoutActive = false;
+    setFlashlight(battery > 0);
+    inspected = activeCheckpoint.inspected;
+    
+    collectedEvidence.clear();
+    activeCheckpoint.collectedEvidence.forEach(e => collectedEvidence.add(e));
+    
+    collectedDocuments.clear();
+    activeCheckpoint.collectedDocuments.forEach(([k, v]) => collectedDocuments.set(k, v));
+    
+    camera.position.set(...activeCheckpoint.position);
+    camera.rotation.set(0, 0, 0);
+    yaw = 0;
+    pitch = 0;
+  } else {
+    fear = 0;
+    battery = 100;
+    stamina = 100;
+    sprintExhausted = false;
+    blackoutTriggered = false;
+    isBlackoutActive = false;
+    setFlashlight(true);
+    inspected = 0;
+    collectedEvidence.clear();
+    collectedDocuments.clear();
+    
+    camera.position.set(0, 1.7, 8);
+    camera.rotation.set(0, 0, 0);
+    yaw = 0;
+    pitch = 0;
+  }
   
   if (inventoryPanel) inventoryPanel.classList.remove("open");
   if (settingsPanel) settingsPanel.classList.remove("open");
@@ -2009,25 +2077,43 @@ function resetGame() {
     el.classList.remove("done");
   });
 
-  flickerLights.forEach((lightObj) => {
-    lightObj.base = 1.1;
-    lightObj.light.color.setHex(0xffc987);
+  flickerLights.forEach((lightObj, index) => {
+    if (blackoutTriggered) {
+      lightObj.base = 0.25;
+      lightObj.light.color.setHex(index % 2 === 0 ? 0xb22822 : 0x228b22);
+    } else {
+      lightObj.base = 1.1;
+      lightObj.light.color.setHex(0xffc987);
+    }
   });
 
   doors.forEach((door) => {
     door.userData.open = false;
     door.rotation.y = 0;
     door.userData.locked = door.userData.label.includes("Room 32 left") || door.userData.label.includes("Room 29 right");
+    
+    // Auto-unlock if checkpoints say we should
+    if (door.userData.label.includes("Room 32 left") && inspected >= 1) {
+      door.userData.locked = false;
+    }
+    if (door.userData.label.includes("Room 29 right") && inspected >= 2) {
+      door.userData.locked = false;
+    }
   });
 
   evidenceItems.forEach((mesh) => {
-    mesh.visible = true;
-    if (!interactables.includes(mesh)) {
-      interactables.push(mesh);
+    const isCollected = collectedEvidence.has(mesh.name);
+    mesh.visible = !isCollected;
+    if (isCollected) {
+      const idx = interactables.indexOf(mesh);
+      if (idx !== -1) interactables.splice(idx, 1);
+    } else {
+      if (!interactables.includes(mesh)) interactables.push(mesh);
     }
   });
 
   batteryItems.forEach((group) => {
+    // If checkpoint states exist, just restore them all for simplicity
     group.visible = true;
     const body = group.children[0];
     body.visible = true;
@@ -2044,7 +2130,7 @@ function resetGame() {
   }
   
   updateObjectivesSystem();
-  addTaskLog("System status restored. Re-entering Block A.");
+  addTaskLog(activeCheckpoint ? "System status restored to last terminal checkpoint." : "System status restored. Re-entering Block A.");
 }
 
 buildCorridor();

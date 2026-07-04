@@ -51,6 +51,10 @@ const collectedDocuments = new Map();
 const gameoverScreen = document.querySelector("#gameover-screen");
 const gameoverReason = document.querySelector("#gameover-reason");
 const restartButton = document.querySelector("#restart-button");
+const winScreen = document.querySelector("#win-screen");
+const winDetail = document.querySelector("#win-detail");
+const winStats = document.querySelector("#win-stats");
+const playAgainButton = document.querySelector("#play-again-button");
 
 const loadingManager = new THREE.LoadingManager();
 
@@ -298,7 +302,8 @@ const GameState = Object.freeze({
   MENU: "menu",
   PLAYING: "playing",
   PAUSED: "paused",
-  GAMEOVER: "gameover"
+  GAMEOVER: "gameover",
+  WIN: "win"
 });
 let gameState = GameState.MENU;
 
@@ -347,13 +352,21 @@ class GameStateManager {
       }
     }
 
+    if (winScreen) {
+      if (nextState === GameState.WIN) {
+        winScreen.classList.add("open");
+      } else {
+        winScreen.classList.remove("open");
+      }
+    }
+
     this.onStateChange(nextState, prevState);
   }
 
   onStateChange(nextState, prevState) {
     if (nextState === GameState.PLAYING) {
       if (!clock.running) clock.start();
-    } else if (nextState === GameState.PAUSED || nextState === GameState.MENU || nextState === GameState.GAMEOVER) {
+    } else if (nextState === GameState.PAUSED || nextState === GameState.MENU || nextState === GameState.GAMEOVER || nextState === GameState.WIN) {
       clock.stop();
       keys.clear();
     }
@@ -1859,12 +1872,20 @@ function inspectNearest() {
 
   if (type === "basement_gate") {
     if (inspected >= 3) {
-      caption.textContent = "You unlock the basement gate and escape block A.";
-      addTaskLog("Unlocked the basement access.");
-      sayLine("Aarav", "The gate is open. I can get down to the generator room now.");
+      caption.textContent = "The gate yields — a cold draft rises from the basement stairwell.";
+      addTaskLog("Basement gate unlocked. Escape achieved.");
+      completeObjective("basement");
+      queueStory([
+        ["Aarav", "The chain falls. Three years of evidence — and the lab was right here."],
+        ["Aarav", "I have to file this with the department. Meera deserves that much."],
+        ["Aarav", "Let's get out before she comes back."]
+      ]);
+      window.setTimeout(() => {
+        triggerWin();
+      }, 9800);
     } else {
-      caption.textContent = "The gate is chained shut. I need to find all the missing documents first.";
-      sayLine("Aarav", "It's locked. Professor Kulkarni said the keys were returned, but maybe there's another way...");
+      caption.textContent = "The gate is chained shut. Find all three missing documents first.";
+      sayLine("Aarav", "It's locked. I need to find everything Meera left behind.");
     }
     return;
   }
@@ -2028,6 +2049,28 @@ function triggerGameOver(reason) {
   if (gameoverReason) gameoverReason.textContent = reason;
   playTone(55, 2.0, 0.4, "sawtooth");
   addTaskLog("Fatal: Aarav collapsed due to extreme heart strain.");
+}
+
+function triggerWin() {
+  setGameState(GameState.WIN);
+  document.exitPointerLock?.();
+  
+  const evidenceCount = collectedEvidence.size;
+  const totalTime = Math.round(clock.elapsedTime);
+  const mins = Math.floor(totalTime / 60);
+  const secs = totalTime % 60;
+  
+  if (winDetail) {
+    winDetail.textContent = `Aarav sealed ${evidenceCount} of 3 evidence files and escaped Block A through the basement gate before dawn.`;
+  }
+  if (winStats) {
+    winStats.textContent = `Escape time: ${mins}m ${secs}s — Fear at exit: ${Math.round(fear)}%`;
+  }
+  
+  playTone(220, 1.8, 0.28, "sine");
+  window.setTimeout(() => playTone(277, 1.8, 0.18, "sine"), 420);
+  window.setTimeout(() => playTone(330, 2.2, 0.22, "sine"), 840);
+  addTaskLog("Aarav escaped through the basement. Evidence filed.");
 }
 
 function resetGame() {
@@ -2289,6 +2332,12 @@ settingFov.addEventListener("input", (event) => {
 
 closeInventory.addEventListener("click", toggleInventory);
 restartButton.addEventListener("click", () => {
+  resetGame();
+  startGame({ lockPointer: true });
+});
+
+playAgainButton?.addEventListener("click", () => {
+  activeCheckpoint = null;
   resetGame();
   startGame({ lockPointer: true });
 });

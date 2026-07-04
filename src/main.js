@@ -383,6 +383,20 @@ function completeObjective(step) {
   document.querySelector(`[data-step="${step}"]`)?.classList.add("done");
 }
 
+function updateObjectivesSystem() {
+  if (inspected === 0) {
+    objective.textContent = "Search the corridor for Dr. Verma's Memo.";
+  } else if (inspected === 1) {
+    completeObjective("start");
+    objective.textContent = "Use Memo details to unlock Room 32 Left door and find the Watchman's Logbook.";
+  } else if (inspected === 2) {
+    objective.textContent = "Use the Logbook card to unlock Room 29 Right door and locate Meera's ID.";
+  } else if (inspected >= 3) {
+    completeObjective("evidence");
+    objective.textContent = "Basement access chains unlocked! Find the gate at the end of the corridor.";
+  }
+}
+
 function addTaskLog(message) {
   const item = document.createElement("li");
   item.textContent = message;
@@ -1748,11 +1762,7 @@ function inspectNearest() {
     caseBody.textContent = doc.body;
     caseFile.classList.add("open");
     playWhisper();
-    objective.textContent = inspected >= 3
-      ? "Case file complete. Reach the basement access at the end of the wing."
-      : "Evidence recovered. Keep searching Block A for the sealed lab trail.";
-    if (inspected >= 1) completeObjective("evidence");
-    if (inspected >= 3) completeObjective("basement");
+    updateObjectivesSystem();
     caption.textContent = "Document added to case file.";
     sayLine("Aarav", `This belongs in the case file: ${doc.title}.`);
     addTaskLog(`Recovered evidence: ${doc.title}.`);
@@ -1777,7 +1787,7 @@ function startGame({ lockPointer = true } = {}) {
   setGameState(GameState.PLAYING);
   if (lockPointer) requestPointerLock();
   caption.textContent = "WASD move. Mouse or arrow keys look. E inspects. F toggles the flashlight.";
-  completeObjective("start");
+  updateObjectivesSystem();
   addTaskLog("Entered Block A after the midnight power reroute.");
   playTone(33, 1.4, 0.09, "sawtooth");
   playIntroDialogue();
@@ -1897,7 +1907,7 @@ function resetGame() {
     }
   });
   
-  objective.textContent = "Find the generator route through the old hostel wing.";
+  updateObjectivesSystem();
   addTaskLog("System status restored. Re-entering Block A.");
 }
 

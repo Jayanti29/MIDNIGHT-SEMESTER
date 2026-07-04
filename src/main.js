@@ -68,6 +68,7 @@ let droneGain = null;
 let heartbeatTimer = 0;
 let meeraWarned = false;
 let storyQueue = [];
+let pointerLocked = false;
 
 function completeObjective(step) {
   document.querySelector(`[data-step="${step}"]`)?.classList.add("done");
@@ -735,12 +736,27 @@ function startGame({ lockPointer = true } = {}) {
   initAudio();
   startScreen.classList.add("hidden");
   document.body.classList.add("started");
-  if (lockPointer) canvas.requestPointerLock?.();
+  if (lockPointer) requestPointerLock();
   caption.textContent = "WASD move. Mouse or arrow keys look. E inspects. F toggles the flashlight.";
   completeObjective("start");
   addTaskLog("Entered Block A after the midnight power reroute.");
   playTone(33, 1.4, 0.09, "sawtooth");
   playIntroDialogue();
+}
+
+function requestPointerLock() {
+  if (document.pointerLockElement === canvas) return;
+  try {
+    const request = canvas.requestPointerLock?.();
+    if (request?.catch) {
+      request.catch(() => {
+        caption.textContent = "Click the game view again to enable mouse look.";
+      });
+    }
+  } catch (error) {
+    console.warn("Pointer lock request failed.", error);
+    caption.textContent = "Mouse look was blocked. Use arrow keys or click the game again.";
+  }
 }
 
 buildCorridor();
@@ -757,11 +773,23 @@ if (new URLSearchParams(window.location.search).has("autostart")) {
   caption.textContent = "Verification mode: playable scene loaded.";
 }
 document.addEventListener("click", () => {
-  if (startScreen.classList.contains("hidden")) canvas.requestPointerLock?.();
+  if (startScreen.classList.contains("hidden")) requestPointerLock();
+});
+
+document.addEventListener("pointerlockchange", () => {
+  pointerLocked = document.pointerLockElement === canvas;
+  if (pointerLocked) {
+    caption.textContent = "Mouse look enabled. WASD move, E interact, F flashlight.";
+  }
+});
+
+document.addEventListener("pointerlockerror", () => {
+  pointerLocked = false;
+  caption.textContent = "Mouse look was blocked. Click the game view or use arrow keys.";
 });
 
 document.addEventListener("mousemove", (event) => {
-  if (document.pointerLockElement !== canvas) return;
+  if (!pointerLocked) return;
   yaw -= event.movementX * 0.0022;
   pitch -= event.movementY * 0.002;
   pitch = THREE.MathUtils.clamp(pitch, -1.1, 1.1);

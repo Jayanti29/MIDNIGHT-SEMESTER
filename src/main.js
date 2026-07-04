@@ -282,6 +282,14 @@ let meeraWarned = false;
 let basementGateGroup = null;
 let blackoutTriggered = false;
 let isBlackoutActive = false;
+const AiState = {
+  INACTIVE: "inactive",
+  PATROL: "patrol",
+  CHASE: "chase"
+};
+let meeraState = AiState.INACTIVE;
+let meeraPatrolDir = -1;
+let meeraSpeed = 1.0;
 let storyQueue = [];
 let pointerLocked = false;
 let flashlightLight = null;
@@ -1601,16 +1609,51 @@ function updateState(delta) {
   scene.userData.kulkarni?.lookAt(camera.position.x, 1.2, camera.position.z);
   if (scene.userData.meeraCharacter) {
     const meera = scene.userData.meeraCharacter;
-    meera.lookAt(camera.position.x, 1.2, camera.position.z);
-    const active = camera.position.z < -18 || fear > 38;
-    meera.visible = active;
-    if (active) {
-      const target = new THREE.Vector3(camera.position.x * 0.35, 0, camera.position.z - 5.6);
-      meera.position.lerp(target, delta * (0.08 + fear / 460));
-      if (!meeraWarned) {
-        meeraWarned = true;
-        sayLine("Meera", "You opened the wrong wing.");
+    const distToPlayer = meera.position.distanceTo(camera.position);
+    
+    if (meeraState === AiState.INACTIVE) {
+      if (camera.position.z < -16 || fear > 28) {
+        meeraState = AiState.PATROL;
+        meera.position.set(0, 0, -35);
+        meera.visible = true;
+      } else {
+        meera.visible = false;
+      }
+    }
+    
+    if (meeraState !== AiState.INACTIVE) {
+      meera.lookAt(camera.position.x, meera.position.y, camera.position.z);
+      
+      const playerDetected = (flashlightOn && distToPlayer < 15) || (distToPlayer < 7) || (sprintExhausted === false && keys.has("ShiftLeft") && distToPlayer < 11);
+      
+      if (playerDetected && meeraState === AiState.PATROL) {
+        meeraState = AiState.CHASE;
         playJumpscareStinger();
+        addTaskLog("Warning: Threat is pursuing you!");
+      }
+      
+      if (meeraState === AiState.PATROL) {
+        meeraSpeed = 1.2;
+        meera.position.z += meeraPatrolDir * meeraSpeed * delta;
+        if (meera.position.z < -45) {
+          meeraPatrolDir = 1;
+        } else if (meera.position.z > -16) {
+          meeraPatrolDir = -1;
+        }
+        meera.position.x = THREE.MathUtils.lerp(meera.position.x, 0, delta * 3);
+      } else if (meeraState === AiState.CHASE) {
+        meeraSpeed = 1.6 + (fear / 160);
+        const toPlayer = new THREE.Vector3().subVectors(camera.position, meera.position);
+        toPlayer.y = 0;
+        toPlayer.normalize();
+        meera.position.addScaledVector(toPlayer, meeraSpeed * delta);
+        
+        fear = Math.min(100, fear + delta * 3.6);
+        
+        if (distToPlayer > 18) {
+          meeraState = AiState.PATROL;
+          addTaskLog("Lost the ghost threat.");
+        }
       }
     }
   }
@@ -1982,6 +2025,13 @@ function resetGame() {
       interactables.push(body);
     }
   });
+
+  meeraState = AiState.INACTIVE;
+  meeraPatrolDir = -1;
+  if (scene.userData.meeraCharacter) {
+    scene.userData.meeraCharacter.position.set(2.6, 0, -34.5);
+    scene.userData.meeraCharacter.visible = false;
+  }
   
   updateObjectivesSystem();
   addTaskLog("System status restored. Re-entering Block A.");

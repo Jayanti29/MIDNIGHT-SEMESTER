@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 44/500**
+Commit counter: **Commit 45/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -47,3 +47,4 @@ Commit counter: **Commit 44/500**
 - **Commit 42/500**: Completed Phase 4 Task 42. Implemented door lock and unlock logic on Rooms 32 and 29 tied directly to evidence progression thresholds, and resetting all doors on restart.
 - **Commit 43/500**: Completed Phase 4 Task 43. Built a sequential objective progression system that dynamically updates Aarav's Journal checklist and active quest description as evidence is gathered.
 - **Commit 44/500**: Completed Phase 4 Task 44. Implemented spare battery cylinder pickups that recharge the flashlight battery level by 45% on interaction, resetting visibility on restart.
+- **Commit 45/500**: Completed Phase 4 Task 45. Programmed a basic AI threat state machine (Inactive, Patrol, Chase) for Meera Iyer's ghost based on proximity, flashlights, and sprinting sounds.

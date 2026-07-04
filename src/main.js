@@ -80,6 +80,20 @@ const GameState = Object.freeze({
   GAMEOVER: "gameover"
 });
 let gameState = GameState.MENU;
+const loadingManager = new THREE.LoadingManager();
+
+loadingManager.onError = (url) => {
+  console.error(`Asset failed to load: ${url}`);
+  caption.textContent = "An asset failed to load. Check the console for details.";
+};
+
+window.addEventListener("error", (event) => {
+  console.error("Runtime error:", event.message, event.error);
+});
+
+window.addEventListener("unhandledrejection", (event) => {
+  console.error("Unhandled promise rejection:", event.reason);
+});
 
 function setGameState(nextState) {
   gameState = nextState;

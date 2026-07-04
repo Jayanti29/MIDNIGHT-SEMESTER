@@ -1655,6 +1655,16 @@ function updateState(delta) {
           addTaskLog("Lost the ghost threat.");
         }
       }
+      
+      if (distToPlayer < 4.5 && meeraState === AiState.CHASE) {
+        fear = Math.min(100, fear + delta * 24);
+        camera.position.x += (Math.random() - 0.5) * 0.045;
+        camera.position.y += (Math.random() - 0.5) * 0.045;
+      }
+      
+      if (distToPlayer < 1.15) {
+        triggerGameOver("Aarav was caught by Meera's presence inside the old wing.");
+      }
     }
   }
   scene.userData.dust.rotation.y += delta * 0.018;

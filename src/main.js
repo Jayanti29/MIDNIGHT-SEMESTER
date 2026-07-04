@@ -269,8 +269,12 @@ class GameStateManager {
     if (pauseMenu) {
       if (nextState === GameState.PAUSED) {
         pauseMenu.classList.add("open");
+        if (audioCtx && audioManager) audioManager.playSound("ui_pause_open", { volume: 0.85 });
       } else {
         pauseMenu.classList.remove("open");
+        if (prevState === GameState.PAUSED && audioCtx && audioManager) {
+          audioManager.playSound("ui_pause_close", { volume: 0.8 });
+        }
       }
     }
     
@@ -501,6 +505,84 @@ function createDoorLatchBuffer(ctx) {
   return buffer;
 }
 
+function createUiHoverBuffer(ctx) {
+  const duration = 0.04;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-120 * t);
+    data[i] = Math.sin(2 * Math.PI * 2200 * t) * envelope * 0.05;
+  }
+  return buffer;
+}
+
+function createUiSelectBuffer(ctx) {
+  const duration = 0.15;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-22 * t);
+    const tone1 = Math.sin(2 * Math.PI * 440 * t);
+    const tone2 = Math.sin(2 * Math.PI * 554.37 * t) * 0.5;
+    data[i] = (tone1 + tone2) * envelope * 0.08;
+  }
+  return buffer;
+}
+
+function createUiPauseOpenBuffer(ctx) {
+  const duration = 0.35;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-8 * t);
+    const freq = 180 * Math.exp(-6 * t);
+    data[i] = Math.sin(2 * Math.PI * freq * t) * envelope * 0.15;
+  }
+  return buffer;
+}
+
+function createUiPauseCloseBuffer(ctx) {
+  const duration = 0.25;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-12 * t);
+    const freq = 120 + t * 400;
+    data[i] = Math.sin(2 * Math.PI * freq * t) * envelope * 0.12;
+  }
+  return buffer;
+}
+
+function setupUiSounds() {
+  document.querySelectorAll("button").forEach(btn => {
+    if (btn.dataset.hasUiSounds) return;
+    btn.dataset.hasUiSounds = "true";
+    
+    btn.addEventListener("mouseenter", () => {
+      if (audioCtx && audioManager) {
+        audioManager.playSound("ui_hover", { volume: 0.18 });
+      }
+    });
+    btn.addEventListener("click", () => {
+      if (audioCtx && audioManager) {
+        audioManager.playSound("ui_select", { volume: 0.35 });
+      }
+    });
+  });
+}
+
 function setFlashlight(state) {
   const previous = flashlightOn;
   flashlightOn = state && battery > 0;
@@ -540,6 +622,11 @@ function initAudio() {
 
   const whisperBuffer = createWhisperBuffer(audioCtx);
   audioManager.buffers.set("evidence_whisper", whisperBuffer);
+
+  audioManager.buffers.set("ui_hover", createUiHoverBuffer(audioCtx));
+  audioManager.buffers.set("ui_select", createUiSelectBuffer(audioCtx));
+  audioManager.buffers.set("ui_pause_open", createUiPauseOpenBuffer(audioCtx));
+  audioManager.buffers.set("ui_pause_close", createUiPauseCloseBuffer(audioCtx));
 
   heartbeatTimer = window.setInterval(() => {
     if (!document.body.classList.contains("started")) return;
@@ -1427,6 +1514,7 @@ function animate() {
 
 function startGame({ lockPointer = true } = {}) {
   initAudio();
+  setupUiSounds();
   startScreen.classList.add("hidden");
   setGameState(GameState.PLAYING);
   if (lockPointer) requestPointerLock();
@@ -1497,6 +1585,7 @@ function populateInventory() {
     });
     inventoryList.appendChild(btn);
   });
+  setupUiSounds();
 }
 
 function triggerGameOver(reason) {

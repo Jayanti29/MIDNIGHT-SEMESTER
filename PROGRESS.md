@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 43/500**
+Commit counter: **Commit 44/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -25,7 +25,7 @@ Commit counter: **Commit 43/500**
 - **Commit 20/500**: Completed Phase 2 Task 20. Added Game Over overlay with collapse logic triggered at 100% fear and reset/restart capabilities.
 - **Commit 21/500**: Completed Phase 2 Task 21. Built a dual-layer subtitle caption system displaying nameplates and supporting automatic timeouts or manual click-to-progress conversation queuing.
 - **Commit 22/500**: Completed Phase 2 Task 22. Styled case file pickup cards as physical cardboard manila folders with red restricted stamps and dark text.
-- **Commit 23/500**: Completed Phase 2 Task 23. Refined responsiveness across viewports down to 480px, adjusting font sizes, padding, and positioning for mobile comfort.
+- **Commit 23/500**: Completed Phase 2 Task 22. Refined responsiveness across viewports down to 480px, adjusting font sizes, padding, and positioning for mobile comfort.
 - **Commit 24/500**: Completed Phase 2 Task 24. Added smooth slide-up and fade transition animations for the dialogue subtitles and case file card overlays.
 - **Commit 25/500**: Completed Phase 2 Task 25. Executed manual review and testing validation of full UI/UX flow from menu to gameplay, pause, resume, and gameover restart state loops.
 - **Commit 26/500**: Completed Phase 3 Task 26. Instantiated and attached THREE.AudioListener to the PerspectiveCamera, wired to dynamically update from the Master Volume setting.
@@ -46,3 +46,4 @@ Commit counter: **Commit 43/500**
 - **Commit 41/500**: Completed Phase 4 Task 41. Implemented evidence pickup despawn/hide mechanics, removing the collected document from the raycast array and restoring all assets on game reset.
 - **Commit 42/500**: Completed Phase 4 Task 42. Implemented door lock and unlock logic on Rooms 32 and 29 tied directly to evidence progression thresholds, and resetting all doors on restart.
 - **Commit 43/500**: Completed Phase 4 Task 43. Built a sequential objective progression system that dynamically updates Aarav's Journal checklist and active quest description as evidence is gathered.
+- **Commit 44/500**: Completed Phase 4 Task 44. Implemented spare battery cylinder pickups that recharge the flashlight battery level by 45% on interaction, resetting visibility on restart.

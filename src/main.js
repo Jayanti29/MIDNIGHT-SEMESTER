@@ -255,6 +255,7 @@ const keys = new Set();
 const interactables = [];
 const doors = [];
 const evidenceItems = [];
+const batteryItems = [];
 const flickerLights = [];
 const playerRadius = 0.32;
 let yaw = 0;
@@ -1287,6 +1288,7 @@ function buildCorridor() {
   scene.add(basementGateGroup);
   registerCollider(gateFrame);
   interactables.push(gateLeft, gateRight);
+  initBatteries();
 }
 
 function buildDormRoom() {
@@ -1337,6 +1339,50 @@ function buildDocuments() {
     evidenceItems.push(mesh);
     interactables.push(mesh);
   });
+}
+
+function buildBatteryMesh(position, name) {
+  const group = new THREE.Group();
+  group.name = name;
+  group.position.set(...position);
+  
+  const body = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.06, 0.06, 0.22, 12),
+    materials.darkWood
+  );
+  body.rotation.x = Math.PI / 2;
+  body.castShadow = true;
+  group.add(body);
+  
+  const stripe = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.062, 0.062, 0.08, 12),
+    materials.emission
+  );
+  stripe.rotation.x = Math.PI / 2;
+  group.add(stripe);
+  
+  const terminal = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.02, 0.02, 0.04, 12),
+    materials.brass
+  );
+  terminal.position.z = 0.12;
+  terminal.rotation.x = Math.PI / 2;
+  group.add(terminal);
+
+  tagInteractable(body, "battery", name);
+  body.userData.parentBattery = group;
+  
+  scene.add(group);
+  return group;
+}
+
+function initBatteries() {
+  batteryItems.forEach(b => scene.remove(b));
+  batteryItems.length = 0;
+  
+  batteryItems.push(buildBatteryMesh([1.8, 0.2, 2.0], "Battery Pack"));
+  batteryItems.push(buildBatteryMesh([-5.5, 0.8, -18.4], "Spare Battery"));
+  batteryItems.push(buildBatteryMesh([2.6, 0.68, -35.2], "Emergency Battery"));
 }
 
 function addAtmosphere() {
@@ -1771,6 +1817,27 @@ function inspectNearest() {
     }, 7200);
     return;
   }
+
+  if (type === "battery") {
+    const parent = hit.object.userData.parentBattery;
+    if (parent) {
+      battery = Math.min(100, battery + 45);
+      parent.visible = false;
+      
+      const idx = interactables.indexOf(hit.object);
+      if (idx !== -1) {
+        interactables.splice(idx, 1);
+      }
+      
+      caption.textContent = "Flashlight battery recharged (+45%).";
+      sayLine("Aarav", "This battery still has charge. Good.");
+      if (audioManager) {
+        audioManager.playSound("ui_select", { volume: 0.25 });
+      }
+      addTaskLog("Picked up spare battery.");
+    }
+    return;
+  }
 }
 
 function animate() {
@@ -1904,6 +1971,15 @@ function resetGame() {
     mesh.visible = true;
     if (!interactables.includes(mesh)) {
       interactables.push(mesh);
+    }
+  });
+
+  batteryItems.forEach((group) => {
+    group.visible = true;
+    const body = group.children[0];
+    body.visible = true;
+    if (!interactables.includes(body)) {
+      interactables.push(body);
     }
   });
   

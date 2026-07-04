@@ -1014,10 +1014,17 @@ function sayLine(name, text, duration = 5600) {
   speaker.textContent = name;
   line.textContent = text;
   dialogue.hidden = false;
-  window.clearTimeout(activeLineTimer);
-  activeLineTimer = window.setTimeout(() => {
-    dialogue.hidden = true;
-  }, duration);
+  
+  if (storyQueue.length > 0) {
+    nextLineButton.style.display = "inline-block";
+    window.clearTimeout(activeLineTimer);
+  } else {
+    nextLineButton.style.display = "none";
+    window.clearTimeout(activeLineTimer);
+    activeLineTimer = window.setTimeout(() => {
+      dialogue.hidden = true;
+    }, duration);
+  }
 }
 
 function queueStory(lines) {

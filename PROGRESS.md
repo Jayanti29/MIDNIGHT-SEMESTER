@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 19/500**
+Commit counter: **Commit 20/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -22,3 +22,4 @@ Commit counter: **Commit 19/500**
 - **Commit 17/500**: Completed Phase 2 Task 17. Implemented complete Case File Archive inventory system toggled via 'I' or 'Tab' to read collected documents.
 - **Commit 18/500**: Completed Phase 2 Task 18. Programmed dynamic crosshair scaling and golden glow transitions when hovering over interactable objects.
 - **Commit 19/500**: Completed Phase 2 Task 19. Added animated loading screen with progress bar for shader compilation and asset loading.
+- **Commit 20/500**: Completed Phase 2 Task 20. Added Game Over overlay with collapse logic triggered at 100% fear and reset/restart capabilities.

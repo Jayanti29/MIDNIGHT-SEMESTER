@@ -46,6 +46,9 @@ const inventoryDetailTitle = document.querySelector("#inventory-detail-title");
 const inventoryDetailBody = document.querySelector("#inventory-detail-body");
 const closeInventory = document.querySelector("#close-inventory");
 const collectedDocuments = new Map();
+const gameoverScreen = document.querySelector("#gameover-screen");
+const gameoverReason = document.querySelector("#gameover-reason");
+const restartButton = document.querySelector("#restart-button");
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020303);
@@ -887,6 +890,9 @@ function updateState(delta) {
   const depthFear = THREE.MathUtils.clamp((-camera.position.z - 6) * 1.7, 0, 58);
   const darknessFear = flashlightOn ? 0 : 24;
   fear = THREE.MathUtils.lerp(fear, depthFear + darknessFear + inspected * 5, delta * 0.9);
+  if (fear >= 100 && gameState === GameState.PLAYING) {
+    triggerGameOver("Aarav's heart could not take the terror. The dark claimed him.");
+  }
 
   if (flashlightOn && flashlightLight.parent !== camera) {
     camera.add(flashlightLight);
@@ -1182,6 +1188,41 @@ function populateInventory() {
   });
 }
 
+function triggerGameOver(reason) {
+  setGameState(GameState.GAMEOVER);
+  document.exitPointerLock?.();
+  if (gameoverReason) gameoverReason.textContent = reason;
+  playTone(55, 2.0, 0.4, "sawtooth");
+  addTaskLog("Fatal: Aarav collapsed due to extreme heart strain.");
+}
+
+function resetGame() {
+  fear = 0;
+  battery = 100;
+  stamina = 100;
+  sprintExhausted = false;
+  flashlightOn = true;
+  inspected = 0;
+  collectedEvidence.clear();
+  collectedDocuments.clear();
+  
+  camera.position.set(0, 1.7, 8);
+  camera.rotation.set(0, 0, 0);
+  yaw = 0;
+  pitch = 0;
+  
+  if (inventoryPanel) inventoryPanel.classList.remove("open");
+  if (settingsPanel) settingsPanel.classList.remove("open");
+  if (gameoverScreen) gameoverScreen.classList.remove("open");
+  
+  document.querySelectorAll(".notebook-steps span").forEach(el => {
+    el.classList.remove("done");
+  });
+  
+  objective.textContent = "Find the generator route through the old hostel wing.";
+  addTaskLog("System status restored. Re-entering Block A.");
+}
+
 buildCorridor();
 addAtmosphere();
 if (new URLSearchParams(window.location.search).has("vr")) {
@@ -1318,6 +1359,10 @@ settingFov.addEventListener("input", (event) => {
 });
 
 closeInventory.addEventListener("click", toggleInventory);
+restartButton.addEventListener("click", () => {
+  resetGame();
+  startGame({ lockPointer: true });
+});
 
 quitToMenu.addEventListener("click", () => {
   setGameState(GameState.MENU);

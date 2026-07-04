@@ -136,17 +136,31 @@ function setGameState(nextState) {
 const loadingManager = new THREE.LoadingManager();
 
 loadingManager.onError = (url) => {
-  console.error(`Asset failed to load: ${url}`);
+  console.error(`Asset failed to load via LoadingManager: ${url}`);
   caption.textContent = "An asset failed to load. Check the console for details.";
 };
 
 window.addEventListener("error", (event) => {
+  // Capture resource errors (like <img>, <audio> loading failures)
+  if (event.target && (event.target.tagName === "IMG" || event.target.tagName === "AUDIO" || event.target.tagName === "VIDEO" || event.target.tagName === "SOURCE")) {
+    console.error(`Asset failed to load: ${event.target.src || event.target.currentSrc}`);
+    caption.textContent = `Warning: Asset failed to load: ${event.target.src || event.target.currentSrc}`;
+    return;
+  }
   console.error("Runtime error:", event.message, event.error);
-});
+}, true); // Use capture phase to intercept resource errors
 
 window.addEventListener("unhandledrejection", (event) => {
   console.error("Unhandled promise rejection:", event.reason);
 });
+
+// Handle WebGL context loss safely
+canvas.addEventListener("webglcontextlost", (event) => {
+  event.preventDefault();
+  console.error("WebGL Context Lost!");
+  caption.textContent = "Fatal: Graphics context lost. Please reload the page.";
+  setGameState(GameState.MENU);
+}, false);
 
 
 function completeObjective(step) {

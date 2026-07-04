@@ -57,6 +57,9 @@ scene.fog = new THREE.FogExp2(0x070706, 0.026);
 const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 180);
 camera.position.set(0, 1.7, 8);
 
+const audioListener = new THREE.AudioListener();
+camera.add(audioListener);
+
 let renderer;
 try {
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
@@ -1349,6 +1352,9 @@ settingMasterVolume.addEventListener("input", (event) => {
   masterVolume = parseFloat(event.target.value);
   localStorage.setItem("setting-master-volume", masterVolume);
   caption.textContent = `Master Volume: ${Math.round(masterVolume * 100)}%`;
+  if (audioListener) {
+    audioListener.setMasterVolume(masterVolume);
+  }
 });
 
 settingMouseSensitivity.addEventListener("input", (event) => {

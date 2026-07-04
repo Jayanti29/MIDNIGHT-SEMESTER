@@ -53,6 +53,7 @@ const interactables = [];
 const doors = [];
 const evidenceItems = [];
 const flickerLights = [];
+const playerRadius = 0.32;
 let yaw = 0;
 let pitch = 0;
 let battery = 100;
@@ -561,9 +562,22 @@ function updateMovement(delta) {
 
   const direction = new THREE.Vector3(strafe, 0, -forward).normalize().multiplyScalar(speed * delta);
   direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
-  camera.position.add(direction);
-  camera.position.x = THREE.MathUtils.clamp(camera.position.x, -3.25, 3.25);
-  camera.position.z = THREE.MathUtils.clamp(camera.position.z, -41, 8.5);
+  const candidate = camera.position.clone().add(direction);
+  if (canOccupy(candidate)) {
+    camera.position.copy(candidate);
+  } else {
+    const xOnly = camera.position.clone().add(new THREE.Vector3(direction.x, 0, 0));
+    const zOnly = camera.position.clone().add(new THREE.Vector3(0, 0, direction.z));
+    if (canOccupy(xOnly)) camera.position.copy(xOnly);
+    if (canOccupy(zOnly)) camera.position.copy(zOnly);
+  }
+  camera.position.y = 1.7;
+}
+
+function canOccupy(position) {
+  const inCorridor = Math.abs(position.x) <= 3.55 - playerRadius && position.z <= 8.5 && position.z >= -41;
+  const inDorm = Math.abs(position.x) <= 6.15 - playerRadius && position.z <= -29 && position.z >= -41;
+  return inCorridor || inDorm;
 }
 
 function updateState(delta) {

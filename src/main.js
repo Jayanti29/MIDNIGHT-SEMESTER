@@ -234,6 +234,7 @@ let introPlayed = false;
 let audioCtx = null;
 let droneGain = null;
 let heartbeatTimer = 0;
+let footstepTimer = 0.35;
 let meeraWarned = false;
 let storyQueue = [];
 let pointerLocked = false;
@@ -401,6 +402,38 @@ function createProceduralDroneBuffer(ctx, durationSeconds = 12) {
   return buffer;
 }
 
+function createConcreteStepBuffer(ctx) {
+  const duration = 0.28;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-18 * t);
+    const sine = Math.sin(2 * Math.PI * 120 * Math.exp(-22 * t) * t);
+    const noise = (Math.random() * 2 - 1) * 0.15;
+    data[i] = (sine * 0.65 + noise) * envelope * 0.22;
+  }
+  return buffer;
+}
+
+function createTileStepBuffer(ctx) {
+  const duration = 0.22;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-28 * t);
+    const sine = Math.sin(2 * Math.PI * 340 * Math.exp(-32 * t) * t);
+    const noise = (Math.random() * 2 - 1) * 0.1;
+    data[i] = (sine * 0.8 + noise) * envelope * 0.14;
+  }
+  return buffer;
+}
+
 function initAudio() {
   if (audioCtx) return;
   audioCtx = new AudioContext();
@@ -408,6 +441,11 @@ function initAudio() {
   const droneBuffer = createProceduralDroneBuffer(audioCtx, 12);
   audioManager.buffers.set("ambient_drone", droneBuffer);
   audioManager.playSound("ambient_drone", { loop: true, volume: 0.85 });
+
+  const concreteBuffer = createConcreteStepBuffer(audioCtx);
+  const tileBuffer = createTileStepBuffer(audioCtx);
+  audioManager.buffers.set("step_concrete", concreteBuffer);
+  audioManager.buffers.set("step_tile", tileBuffer);
 
   heartbeatTimer = window.setInterval(() => {
     if (!document.body.classList.contains("started")) return;
@@ -964,6 +1002,20 @@ function updateMovement(delta) {
     if (canOccupy(zOnly)) camera.position.copy(zOnly);
   }
   camera.position.y = 1.7;
+
+  // Footstep audio triggering logic
+  if (moving) {
+    const stepInterval = sprint ? 0.34 : 0.56;
+    footstepTimer += delta;
+    if (footstepTimer >= stepInterval) {
+      footstepTimer = 0;
+      const inDorm = Math.abs(camera.position.x) > 3.0 && (camera.position.z <= -29 && camera.position.z >= -41);
+      const stepSound = inDorm ? "step_tile" : "step_concrete";
+      audioManager.playSound(stepSound, { volume: sprint ? 0.65 : 0.42 });
+    }
+  } else {
+    footstepTimer = 0.35; // prime for immediate feedback on next move
+  }
 }
 
 function canOccupy(position) {

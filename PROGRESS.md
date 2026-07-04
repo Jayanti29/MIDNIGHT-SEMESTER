@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 28/500**
+Commit counter: **Commit 29/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -31,3 +31,4 @@ Commit counter: **Commit 28/500**
 - **Commit 26/500**: Completed Phase 3 Task 26. Instantiated and attached THREE.AudioListener to the PerspectiveCamera, wired to dynamically update from the Master Volume setting.
 - **Commit 27/500**: Completed Phase 3 Task 27. Programmed AudioManager module supporting promise-based loading, buffer caching, non-positional UI, and THREE.PositionalAudio spatial sources.
 - **Commit 28/500**: Completed Phase 3 Task 28. Created procedural ambient hum/wind stereo sound buffer and routed it looping through the AudioManager.
+- **Commit 29/500**: Completed Phase 3 Task 29. Programmed surface-aware footsteps triggering procedurally synthesized concrete or wood/tile step sound buffers based on player position.

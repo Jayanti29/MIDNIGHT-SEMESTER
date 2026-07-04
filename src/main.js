@@ -924,14 +924,23 @@ function updateInteractionPrompt() {
 
   const type = hit.object.userData.interactionType;
   interactionPrompt.hidden = false;
+  
   if (type === "door") {
-    interactionPrompt.textContent = "Press E - open door";
+    const door = hit.object.userData.parentDoor;
+    const label = door ? door.userData.label : "door";
+    const isOpen = door ? door.userData.open : false;
+    interactionPrompt.textContent = `[E] ${isOpen ? "Close" : "Open"} ${label}`;
   } else if (type === "basement_gate") {
-    interactionPrompt.textContent = inspected >= 3 ? "Press E - open basement gate" : "Press E - inspect locked gate";
+    if (inspected >= 3) {
+      interactionPrompt.textContent = "[E] Open Basement Gate";
+    } else {
+      interactionPrompt.textContent = "Basement Gate (Locked - 3 Evidence required)";
+    }
   } else if (type === "evidence") {
-    interactionPrompt.textContent = "Press E - inspect evidence";
+    const label = hit.object.userData.interactionLabel || "Evidence";
+    interactionPrompt.textContent = `[E] Inspect ${label}`;
   } else {
-    interactionPrompt.textContent = `Press E - ${hit.object.userData.interactionLabel || "interact"}`;
+    interactionPrompt.textContent = `[E] ${hit.object.userData.interactionLabel || "Interact"}`;
   }
 }
 

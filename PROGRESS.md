@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 21/500**
+Commit counter: **Commit 22/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -24,3 +24,4 @@ Commit counter: **Commit 21/500**
 - **Commit 19/500**: Completed Phase 2 Task 19. Added animated loading screen with progress bar for shader compilation and asset loading.
 - **Commit 20/500**: Completed Phase 2 Task 20. Added Game Over overlay with collapse logic triggered at 100% fear and reset/restart capabilities.
 - **Commit 21/500**: Completed Phase 2 Task 21. Built a dual-layer subtitle caption system displaying nameplates and supporting automatic timeouts or manual click-to-progress conversation queuing.
+- **Commit 22/500**: Completed Phase 2 Task 22. Styled case file pickup cards as physical cardboard manila folders with red restricted stamps and dark text.

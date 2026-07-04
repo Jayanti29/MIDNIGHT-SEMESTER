@@ -89,6 +89,20 @@ button {
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.46);
 }
 
+.main-menu {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.main-menu button {
+  background: rgba(20, 18, 16, 0.78);
+}
+
+.main-menu #start-button {
+  background: rgba(178, 40, 34, 0.88);
+}
+
 #hud {
   position: fixed;
   inset: 24px 24px auto;

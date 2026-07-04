@@ -3,6 +3,8 @@ import * as THREE from "three";
 const canvas = document.querySelector("#game");
 const startScreen = document.querySelector("#start-screen");
 const startButton = document.querySelector("#start-button");
+const menuSettings = document.querySelector("#menu-settings");
+const menuQuit = document.querySelector("#menu-quit");
 const batteryText = document.querySelector("#battery");
 const batteryMeter = document.querySelector("#battery-meter");
 const fearText = document.querySelector("#fear");
@@ -839,6 +841,12 @@ if (new URLSearchParams(window.location.search).has("vr")) {
 renderer.setAnimationLoop(animate);
 
 startButton.addEventListener("click", () => startGame());
+menuSettings.addEventListener("click", () => {
+  caption.textContent = "Settings panel arrives in Task 13.";
+});
+menuQuit.addEventListener("click", () => {
+  caption.textContent = "Quit is disabled in browser preview. Close the tab to exit.";
+});
 if (new URLSearchParams(window.location.search).has("autostart")) {
   startScreen.classList.add("hidden");
   setGameState(GameState.PLAYING);

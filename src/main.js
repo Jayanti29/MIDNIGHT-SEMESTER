@@ -314,11 +314,11 @@ class GameStateManager {
     if (pauseMenu) {
       if (nextState === GameState.PAUSED) {
         pauseMenu.classList.add("open");
-        if (audioCtx && audioManager) audioManager.playSound("ui_pause_open", { volume: 0.85 });
+        if (audioCtx && audioManager) audioManager.playSound("ui_pause_open", { volume: 0.45 });
       } else {
         pauseMenu.classList.remove("open");
         if (prevState === GameState.PAUSED && audioCtx && audioManager) {
-          audioManager.playSound("ui_pause_close", { volume: 0.8 });
+          audioManager.playSound("ui_pause_close", { volume: 0.40 });
         }
       }
     }
@@ -623,7 +623,7 @@ function triggerBlackoutSequence() {
     isBlackoutActive = false;
     addTaskLog("Emergency power restored. Grid stability: 18%.");
     if (audioManager) {
-      audioManager.playSound("flashlight_off", { volume: 0.5 });
+      audioManager.playSound("flashlight_off", { volume: 0.35 });
     }
   }, 4200);
 }
@@ -695,12 +695,12 @@ function setupUiSounds() {
     
     btn.addEventListener("mouseenter", () => {
       if (audioCtx && audioManager) {
-        audioManager.playSound("ui_hover", { volume: 0.18 });
+        audioManager.playSound("ui_hover", { volume: 0.12 });
       }
     });
     btn.addEventListener("click", () => {
       if (audioCtx && audioManager) {
-        audioManager.playSound("ui_select", { volume: 0.35 });
+        audioManager.playSound("ui_select", { volume: 0.25 });
       }
     });
   });
@@ -711,7 +711,7 @@ function setFlashlight(state) {
   flashlightOn = state && battery > 0;
   if (previous !== flashlightOn) {
     const clickSound = flashlightOn ? "flashlight_on" : "flashlight_off";
-    if (audioManager) audioManager.playSound(clickSound, { volume: 0.7 });
+    if (audioManager) audioManager.playSound(clickSound, { volume: 0.42 });
     caption.textContent = flashlightOn ? "Flashlight on." : "Flashlight off.";
   }
 }
@@ -738,7 +738,7 @@ function initAudio() {
 
   const droneBuffer = createProceduralDroneBuffer(audioCtx, 12);
   audioManager.buffers.set("ambient_drone", droneBuffer);
-  audioManager.playSound("ambient_drone", { loop: true, volume: 0.85 });
+  audioManager.playSound("ambient_drone", { loop: true, volume: 0.45, category: "ambient" });
 
   const concreteBuffer = createConcreteStepBuffer(audioCtx);
   const tileBuffer = createTileStepBuffer(audioCtx);
@@ -776,7 +776,8 @@ function initAudio() {
         loop: true,
         refDistance: 1.2,
         maxDistance: 14,
-        volume: 0.15
+        volume: 0.12,
+        category: "ambient"
       });
     }
   });
@@ -788,7 +789,8 @@ function initAudio() {
       loop: true,
       refDistance: 1.5,
       maxDistance: 16,
-      volume: 0.25
+      volume: 0.20,
+      category: "ambient"
     });
   }
 
@@ -826,7 +828,7 @@ function playDoorCreak(targetMesh, isOpen) {
       targetMesh: targetMesh,
       refDistance: 1.6,
       maxDistance: 22,
-      volume: isOpen ? 0.95 : 0.65
+      volume: isOpen ? 0.52 : 0.35
     });
   }
 }
@@ -859,7 +861,7 @@ function createWhisperBuffer(ctx) {
 
 function playWhisper() {
   if (audioManager) {
-    audioManager.playSound("evidence_whisper", { volume: 0.95 });
+    audioManager.playSound("evidence_whisper", { volume: 0.58 });
   }
 }
 
@@ -1439,7 +1441,7 @@ function updateMovement(delta) {
       footstepTimer = 0;
       const inDorm = Math.abs(camera.position.x) > 3.0 && (camera.position.z <= -29 && camera.position.z >= -41);
       const stepSound = inDorm ? "step_tile" : "step_concrete";
-      audioManager.playSound(stepSound, { volume: sprint ? 0.65 : 0.42 });
+      audioManager.playSound(stepSound, { volume: sprint ? 0.32 : 0.18 });
     }
   } else {
     footstepTimer = 0.35; // prime for immediate feedback on next move

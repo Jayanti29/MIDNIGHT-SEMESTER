@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 39/500**
+Commit counter: **Commit 40/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -42,3 +42,4 @@ Commit counter: **Commit 39/500**
 - **Commit 37/500**: Completed Phase 3 Task 37. Added SFX and Ambient Volume range sliders in the Settings panel, wiring them to dynamically recalculate category levels across all active AudioManager sounds.
 - **Commit 38/500**: Completed Phase 3 Task 38. Programmed dynamic audio ducking in AudioManager to temporarily lower ambient background loops when foreground dialogue or jumpscare stingers are active.
 - **Commit 39/500**: Completed Phase 3 Task 39. Configured global click and keydown listeners to resume the AudioContext upon user gesture, resolving browser autoplay restrictions.
+- **Commit 40/500**: Completed Phase 3 Task 40. Conducted full audio mix balance audit, adjusting volumes for ambient hum, footsteps, flashlight click, door latch/creak, whisper, and UI nodes to achieve clean separation and wide dynamic range.

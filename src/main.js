@@ -749,7 +749,7 @@ function updateState(delta) {
     camera.remove(flashlightLight.target);
   }
   flashlightLight.intensity = flashlightOn ? 3.4 * (battery / 100 + 0.25) : 0;
-  camera.userData.flashlightProp.visible = flashlightOn;
+  camera.userData.flashlightProp.visible = true;
   camera.userData.flashlightProp.userData.gauge.scale.x = Math.max(0.08, battery / 100);
   camera.userData.flashlightProp.userData.gauge.material.color.set(battery > 35 ? 0x73d08a : 0xc9493c);
   batteryText.textContent = `${Math.round(battery)}%`;

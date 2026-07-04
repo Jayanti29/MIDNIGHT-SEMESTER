@@ -1712,6 +1712,13 @@ function inspectNearest() {
   if (type === "evidence") {
     const doc = hit.object.userData.doc;
     if (!doc) return;
+    
+    hit.object.visible = false;
+    const idx = interactables.indexOf(hit.object);
+    if (idx !== -1) {
+      interactables.splice(idx, 1);
+    }
+
     collectedDocuments.set(doc.title, doc.body);
     collectedEvidence.add(doc.title);
     inspected = collectedEvidence.size;
@@ -1853,6 +1860,13 @@ function resetGame() {
   flickerLights.forEach((lightObj) => {
     lightObj.base = 1.1;
     lightObj.light.color.setHex(0xffc987);
+  });
+
+  evidenceItems.forEach((mesh) => {
+    mesh.visible = true;
+    if (!interactables.includes(mesh)) {
+      interactables.push(mesh);
+    }
   });
   
   objective.textContent = "Find the generator route through the old hostel wing.";

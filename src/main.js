@@ -73,6 +73,19 @@ let meeraWarned = false;
 let storyQueue = [];
 let pointerLocked = false;
 let flashlightLight = null;
+const GameState = Object.freeze({
+  MENU: "menu",
+  PLAYING: "playing",
+  PAUSED: "paused",
+  GAMEOVER: "gameover"
+});
+let gameState = GameState.MENU;
+
+function setGameState(nextState) {
+  gameState = nextState;
+  document.body.dataset.state = nextState;
+  document.body.classList.toggle("started", nextState === GameState.PLAYING || nextState === GameState.PAUSED);
+}
 
 function completeObjective(step) {
   document.querySelector(`[data-step="${step}"]`)?.classList.add("done");
@@ -777,7 +790,7 @@ function animate() {
 function startGame({ lockPointer = true } = {}) {
   initAudio();
   startScreen.classList.add("hidden");
-  document.body.classList.add("started");
+  setGameState(GameState.PLAYING);
   if (lockPointer) requestPointerLock();
   caption.textContent = "WASD move. Mouse or arrow keys look. E inspects. F toggles the flashlight.";
   completeObjective("start");
@@ -811,7 +824,7 @@ renderer.setAnimationLoop(animate);
 startButton.addEventListener("click", () => startGame());
 if (new URLSearchParams(window.location.search).has("autostart")) {
   startScreen.classList.add("hidden");
-  document.body.classList.add("started");
+  setGameState(GameState.PLAYING);
   caption.textContent = "Verification mode: playable scene loaded.";
 }
 document.addEventListener("click", () => {

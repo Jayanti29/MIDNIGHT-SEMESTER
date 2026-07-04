@@ -654,20 +654,18 @@ function updateState(delta) {
 function getFocusedInteractable(maxDistance = 4) {
   const raycaster = new THREE.Raycaster();
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-  const hit = raycaster.intersectObjects(interactables, false)[0];
-  if (hit && hit.distance <= maxDistance) return hit;
+  const raycastHit = raycaster.intersectObjects(interactables, false)
+    .find((hit) => hit.distance <= maxDistance);
+  const proximityHits = [
+    ...doors.map((door) => ({ object: door, distance: door.position.distanceTo(camera.position), kind: "door" })),
+    ...evidenceItems.map((item) => ({ object: item, distance: item.position.distanceTo(camera.position), kind: "evidence" }))
+  ]
+    .filter((candidate) => candidate.distance <= maxDistance)
+    .sort((a, b) => a.distance - b.distance);
 
-  const nearestDoor = doors
-    .map((door) => ({ object: door, distance: door.position.distanceTo(camera.position), kind: "door" }))
-    .filter((candidate) => candidate.distance <= 3.2)
-    .sort((a, b) => a.distance - b.distance)[0];
-  if (nearestDoor) return nearestDoor;
-
-  const nearestEvidence = evidenceItems
-    .map((item) => ({ object: item, distance: item.position.distanceTo(camera.position), kind: "evidence" }))
-    .filter((candidate) => candidate.distance <= 3.4)
-    .sort((a, b) => a.distance - b.distance)[0];
-  return nearestEvidence || null;
+  if (!raycastHit) return proximityHits[0] || null;
+  const nearest = proximityHits[0];
+  return nearest && nearest.distance + 0.35 < raycastHit.distance ? nearest : raycastHit;
 }
 
 function updateInteractionPrompt() {
@@ -724,7 +722,7 @@ function inspectNearest() {
     return;
   }
 
-  const door = hit.object.userData.parentDoor;
+  const door = hit.object.userData.parentDoor || (hit.kind === "door" ? hit.object : null);
   if (door) {
     door.userData.open = !door.userData.open;
     fear = Math.min(100, fear + 4);

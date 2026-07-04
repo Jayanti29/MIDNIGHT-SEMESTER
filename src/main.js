@@ -1013,7 +1013,7 @@ function updateInteractionPrompt() {
 function sayLine(name, text, duration = 5600) {
   speaker.textContent = name;
   line.textContent = text;
-  dialogue.hidden = false;
+  dialogue.classList.add("open");
   
   if (storyQueue.length > 0) {
     nextLineButton.style.display = "inline-block";
@@ -1022,7 +1022,7 @@ function sayLine(name, text, duration = 5600) {
     nextLineButton.style.display = "none";
     window.clearTimeout(activeLineTimer);
     activeLineTimer = window.setTimeout(() => {
-      dialogue.hidden = true;
+      dialogue.classList.remove("open");
     }, duration);
   }
 }
@@ -1035,7 +1035,7 @@ function queueStory(lines) {
 function showNextStoryLine() {
   const next = storyQueue.shift();
   if (!next) {
-    dialogue.hidden = true;
+    dialogue.classList.remove("open");
     return;
   }
 
@@ -1097,7 +1097,7 @@ function inspectNearest() {
     inspected = collectedEvidence.size;
     caseTitle.textContent = doc.title;
     caseBody.textContent = doc.body;
-    caseFile.hidden = false;
+    caseFile.classList.add("open");
     playWhisper();
     objective.textContent = inspected >= 3
       ? "Case file complete. Reach the basement access at the end of the wing."
@@ -1108,7 +1108,7 @@ function inspectNearest() {
     sayLine("Aarav", `This belongs in the case file: ${doc.title}.`);
     addTaskLog(`Recovered evidence: ${doc.title}.`);
     window.setTimeout(() => {
-      caseFile.hidden = true;
+      caseFile.classList.remove("open");
     }, 7200);
     return;
   }

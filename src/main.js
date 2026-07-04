@@ -434,6 +434,52 @@ function createTileStepBuffer(ctx) {
   return buffer;
 }
 
+function createFlashlightClickOnBuffer(ctx) {
+  const duration = 0.08;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-60 * t);
+    const clickNoise = (Math.random() * 2 - 1) * 0.3;
+    const metalRing = Math.sin(2 * Math.PI * 1800 * t) * 0.45;
+    data[i] = (clickNoise + metalRing) * envelope * 0.15;
+  }
+  return buffer;
+}
+
+function createFlashlightClickOffBuffer(ctx) {
+  const duration = 0.08;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-50 * t);
+    const clickNoise = (Math.random() * 2 - 1) * 0.25;
+    const metalRing = Math.sin(2 * Math.PI * 1400 * t) * 0.35;
+    data[i] = (clickNoise + metalRing) * envelope * 0.12;
+  }
+  return buffer;
+}
+
+function setFlashlight(state) {
+  const previous = flashlightOn;
+  flashlightOn = state && battery > 0;
+  if (previous !== flashlightOn) {
+    const clickSound = flashlightOn ? "flashlight_on" : "flashlight_off";
+    if (audioManager) audioManager.playSound(clickSound, { volume: 0.7 });
+    caption.textContent = flashlightOn ? "Flashlight on." : "Flashlight off.";
+  }
+}
+
+function toggleFlashlight() {
+  setFlashlight(!flashlightOn);
+}
+
 function initAudio() {
   if (audioCtx) return;
   audioCtx = new AudioContext();
@@ -446,6 +492,11 @@ function initAudio() {
   const tileBuffer = createTileStepBuffer(audioCtx);
   audioManager.buffers.set("step_concrete", concreteBuffer);
   audioManager.buffers.set("step_tile", tileBuffer);
+
+  const clickOnBuffer = createFlashlightClickOnBuffer(audioCtx);
+  const clickOffBuffer = createFlashlightClickOffBuffer(audioCtx);
+  audioManager.buffers.set("flashlight_on", clickOnBuffer);
+  audioManager.buffers.set("flashlight_off", clickOffBuffer);
 
   heartbeatTimer = window.setInterval(() => {
     if (!document.body.classList.contains("started")) return;
@@ -1062,7 +1113,7 @@ function canOccupy(position) {
 function updateState(delta) {
   if (gameState === GameState.MENU) return;
   if (flashlightOn) battery = Math.max(0, battery - delta * 1.15);
-  if (battery <= 0) flashlightOn = false;
+  if (battery <= 0 && flashlightOn) setFlashlight(false);
   const depthFear = THREE.MathUtils.clamp((-camera.position.z - 6) * 1.7, 0, 58);
   const darknessFear = flashlightOn ? 0 : 24;
   fear = THREE.MathUtils.lerp(fear, depthFear + darknessFear + inspected * 5, delta * 0.9);
@@ -1384,7 +1435,7 @@ function resetGame() {
   battery = 100;
   stamina = 100;
   sprintExhausted = false;
-  flashlightOn = true;
+  setFlashlight(true);
   inspected = 0;
   collectedEvidence.clear();
   collectedDocuments.clear();
@@ -1492,8 +1543,7 @@ document.addEventListener("keydown", (event) => {
   if (gameState !== GameState.PLAYING) return;
   keys.add(event.code);
   if (event.code === "KeyF") {
-    flashlightOn = !flashlightOn && battery > 0;
-    caption.textContent = flashlightOn ? "Flashlight on." : "Flashlight off.";
+    toggleFlashlight();
   }
   if (event.code === "KeyE") inspectNearest();
 });
@@ -1503,8 +1553,7 @@ nextLineButton.addEventListener("click", showNextStoryLine);
 actionInteract.addEventListener("click", inspectNearest);
 actionFlashlight.addEventListener("click", () => {
   if (gameState !== GameState.PLAYING) return;
-  flashlightOn = !flashlightOn && battery > 0;
-  caption.textContent = flashlightOn ? "Flashlight on." : "Flashlight off.";
+  toggleFlashlight();
 });
 resumeButton.addEventListener("click", togglePause);
 pauseSettings.addEventListener("click", () => {

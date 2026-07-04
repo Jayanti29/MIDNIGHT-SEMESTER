@@ -369,17 +369,45 @@ async function setupVrEntry() {
   }
 }
 
+function createProceduralDroneBuffer(ctx, durationSeconds = 12) {
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * durationSeconds;
+  const buffer = ctx.createBuffer(2, numSamples, sampleRate);
+  
+  const left = buffer.getChannelData(0);
+  const right = buffer.getChannelData(1);
+  let lastOut = 0;
+  
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    
+    // Low frequency drone harmonic combination
+    const drone1 = Math.sin(2 * Math.PI * 55 * t);
+    const drone2 = Math.sin(2 * Math.PI * 82.5 * t) * 0.4;
+    const drone3 = Math.sin(2 * Math.PI * 110 * t) * 0.2;
+    const hum = drone1 + drone2 + drone3;
+    
+    // Spooky ambient wind / brown noise
+    const white = Math.random() * 2 - 1;
+    const brownNoise = (lastOut + (0.02 * white)) / 1.02;
+    lastOut = brownNoise;
+    
+    // slow breathing mod loop
+    const mod = Math.sin(2 * Math.PI * 0.08 * t) * 0.25 + 0.75;
+    
+    left[i] = (hum * 0.4 + brownNoise * 6.0) * mod * 0.08;
+    right[i] = (hum * 0.35 + brownNoise * 6.0) * mod * 0.08;
+  }
+  return buffer;
+}
+
 function initAudio() {
   if (audioCtx) return;
   audioCtx = new AudioContext();
 
-  const drone = audioCtx.createOscillator();
-  drone.type = "sawtooth";
-  drone.frequency.value = 42;
-  droneGain = audioCtx.createGain();
-  droneGain.gain.value = 0.035;
-  drone.connect(droneGain).connect(audioCtx.destination);
-  drone.start();
+  const droneBuffer = createProceduralDroneBuffer(audioCtx, 12);
+  audioManager.buffers.set("ambient_drone", droneBuffer);
+  audioManager.playSound("ambient_drone", { loop: true, volume: 0.85 });
 
   heartbeatTimer = window.setInterval(() => {
     if (!document.body.classList.contains("started")) return;

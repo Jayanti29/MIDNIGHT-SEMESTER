@@ -724,6 +724,18 @@ function initAudio() {
   if (audioCtx) return;
   audioCtx = new AudioContext();
 
+  if (audioCtx.state === "suspended") {
+    const resume = () => {
+      if (audioCtx.state === "suspended") {
+        audioCtx.resume();
+      }
+      window.removeEventListener("click", resume);
+      window.removeEventListener("keydown", resume);
+    };
+    window.addEventListener("click", resume);
+    window.addEventListener("keydown", resume);
+  }
+
   const droneBuffer = createProceduralDroneBuffer(audioCtx, 12);
   audioManager.buffers.set("ambient_drone", droneBuffer);
   audioManager.playSound("ambient_drone", { loop: true, volume: 0.85 });

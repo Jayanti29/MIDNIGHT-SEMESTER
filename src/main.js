@@ -72,6 +72,7 @@ let heartbeatTimer = 0;
 let meeraWarned = false;
 let storyQueue = [];
 let pointerLocked = false;
+let flashlightLight = null;
 
 function completeObjective(step) {
   document.querySelector(`[data-step="${step}"]`)?.classList.add("done");
@@ -489,6 +490,7 @@ function addAtmosphere() {
   camera.add(flashlight);
   camera.add(flashlight.target);
   scene.add(camera);
+  flashlightLight = flashlight;
   camera.userData.flashlight = flashlight;
   camera.userData.flashlightProp = buildFlashlightProp();
 
@@ -597,7 +599,15 @@ function updateState(delta) {
   const darknessFear = flashlightOn ? 0 : 24;
   fear = THREE.MathUtils.lerp(fear, depthFear + darknessFear + inspected * 5, delta * 0.9);
 
-  camera.userData.flashlight.intensity = flashlightOn ? 3.4 * (battery / 100 + 0.25) : 0;
+  if (flashlightOn && flashlightLight.parent !== camera) {
+    camera.add(flashlightLight);
+    camera.add(flashlightLight.target);
+  }
+  if (!flashlightOn && flashlightLight.parent === camera) {
+    camera.remove(flashlightLight);
+    camera.remove(flashlightLight.target);
+  }
+  flashlightLight.intensity = flashlightOn ? 3.4 * (battery / 100 + 0.25) : 0;
   camera.userData.flashlightProp.visible = flashlightOn;
   camera.userData.flashlightProp.userData.gauge.scale.x = Math.max(0.08, battery / 100);
   camera.userData.flashlightProp.userData.gauge.material.color.set(battery > 35 ? 0x73d08a : 0xc9493c);

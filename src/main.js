@@ -237,6 +237,13 @@ function box(name, size, position, material, cast = true, receive = true) {
   return mesh;
 }
 
+function tagInteractable(object, type, label) {
+  object.userData.interactable = true;
+  object.userData.interactionType = type;
+  object.userData.interactionLabel = label;
+  return object;
+}
+
 function addLabel(text, position, size = 0.34) {
   const canvasLabel = document.createElement("canvas");
   canvasLabel.width = 1024;
@@ -271,12 +278,14 @@ function createDoor({ side, z, label }) {
   panel.castShadow = true;
   panel.receiveShadow = true;
   panel.userData.parentDoor = group;
+  tagInteractable(panel, "door", label);
   group.add(panel);
 
   const knob = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), materials.brass);
   knob.name = `${label} knob`;
   knob.position.set(-direction * 0.12, -0.06, 0.36);
   knob.userData.parentDoor = group;
+  tagInteractable(knob, "door", label);
   group.add(knob);
 
   const sign = addLabel(label.replace(" door", "").toUpperCase(), [direction * 3.48, 1.92, z], 0.16);
@@ -472,6 +481,7 @@ function buildDocuments() {
   docs.forEach((doc) => {
     const mesh = box(doc.title, [0.78, 0.025, 0.52], doc.position, materials.paper);
     mesh.userData.doc = doc;
+    tagInteractable(mesh, "evidence", doc.title);
     evidenceItems.push(mesh);
     interactables.push(mesh);
   });

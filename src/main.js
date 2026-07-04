@@ -623,6 +623,9 @@ function initAudio() {
   const whisperBuffer = createWhisperBuffer(audioCtx);
   audioManager.buffers.set("evidence_whisper", whisperBuffer);
 
+  const jumpscareBuffer = createJumpscareStingerBuffer(audioCtx);
+  audioManager.buffers.set("jumpscare_stinger", jumpscareBuffer);
+
   audioManager.buffers.set("ui_hover", createUiHoverBuffer(audioCtx));
   audioManager.buffers.set("ui_select", createUiSelectBuffer(audioCtx));
   audioManager.buffers.set("ui_pause_open", createUiPauseOpenBuffer(audioCtx));
@@ -691,6 +694,49 @@ function createWhisperBuffer(ctx) {
 function playWhisper() {
   if (audioManager) {
     audioManager.playSound("evidence_whisper", { volume: 0.95 });
+  }
+}
+
+function createJumpscareStingerBuffer(ctx) {
+  const duration = 2.4;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(2, numSamples, sampleRate);
+  const left = buffer.getChannelData(0);
+  const right = buffer.getChannelData(1);
+  
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-1.4 * t);
+    
+    // FM synth high frequency screaming screech
+    const fm = Math.sin(2 * Math.PI * 40 * t) * 120;
+    const screamer = Math.sin(2 * Math.PI * (2800 + fm) * t) * 0.35;
+    
+    // Sub bass impact boom
+    const subFreq = 90 * Math.exp(-2.8 * t);
+    const subBoom = Math.sin(2 * Math.PI * subFreq * t) * 0.5;
+    
+    // Brutal white noise impact transient
+    const noiseEnv = Math.exp(-6.5 * t);
+    const noise = (Math.random() * 2 - 1) * 0.6 * noiseEnv;
+    
+    left[i] = (screamer + subBoom + noise) * envelope * 0.28;
+    
+    const tRight = Math.max(0, t - 0.015);
+    const fmR = Math.sin(2 * Math.PI * 40 * tRight) * 120;
+    const screamerR = Math.sin(2 * Math.PI * (2800 + fmR) * tRight) * 0.35;
+    const noiseR = (Math.random() * 2 - 1) * 0.6 * Math.exp(-6.5 * tRight);
+    right[i] = (screamerR + subBoom + noiseR) * envelope * 0.28;
+  }
+  return buffer;
+}
+
+function playJumpscareStinger() {
+  if (audioManager) {
+    audioManager.playSound("jumpscare_stinger", { volume: 1.0 });
+    fear = Math.min(100, fear + 24);
+    caption.textContent = "A cold chill runs down Aarav's spine. Something is close.";
   }
 }
 
@@ -1328,7 +1374,7 @@ function updateState(delta) {
       if (!meeraWarned) {
         meeraWarned = true;
         sayLine("Meera", "You opened the wrong wing.");
-        playWhisper();
+        playJumpscareStinger();
       }
     }
   }

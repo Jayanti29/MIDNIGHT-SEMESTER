@@ -848,14 +848,24 @@ function updateState(delta) {
     camera.remove(flashlightLight);
     camera.remove(flashlightLight.target);
   }
-  flashlightLight.intensity = flashlightOn ? 3.4 * (battery / 100 + 0.25) : 0;
+  let targetIntensity = 3.4 * (battery / 100 + 0.1);
+  if (flashlightOn) {
+    if (battery < 35 && battery > 0) {
+      // Low battery flickering
+      const lowFlicker = Math.sin(clock.elapsedTime * 22) > 0.3 ? 1.0 : (Math.random() > 0.45 ? 0.18 : 0.02);
+      targetIntensity *= lowFlicker;
+    }
+    flashlightLight.intensity = targetIntensity;
+  } else {
+    flashlightLight.intensity = 0;
+  }
   camera.userData.flashlightProp.visible = true;
   camera.userData.flashlightProp.userData.gauge.scale.x = Math.max(0.08, battery / 100);
   camera.userData.flashlightProp.userData.gauge.material.color.set(battery > 35 ? 0x73d08a : 0xc9493c);
-  batteryText.textContent = `${Math.round(battery)}%`;
-  batteryMeter.value = battery;
-  fearText.textContent = `${Math.round(fear)}%`;
-  fearMeter.value = fear;
+  if (batteryText) batteryText.textContent = `${Math.round(battery)}%`;
+  if (batteryMeter) batteryMeter.value = battery;
+  if (fearText) fearText.textContent = `${Math.round(fear)}%`;
+  if (fearMeter) fearMeter.value = fear;
   vignette.style.opacity = String(0.35 + fear / 145);
 
   const ghost = scene.userData.ghost;

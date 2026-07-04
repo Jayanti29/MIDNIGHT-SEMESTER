@@ -31,7 +31,8 @@
         </nav>
       </section>
       <section id="hud" aria-live="polite">
-        <div class="hud-panel compact">
+        <!-- Diegetic battery feedback used instead of HUD meter -->
+        <div class="hud-panel compact" style="display: none;" aria-hidden="true">
           <span class="label">Flashlight</span>
           <span id="battery">100%</span>
           <meter id="battery-meter" min="0" max="100" value="100"></meter>

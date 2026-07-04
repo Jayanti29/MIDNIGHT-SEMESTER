@@ -110,6 +110,7 @@ class AudioManager {
     this.loader = new THREE.AudioLoader(loadingManager);
     this.buffers = new Map();
     this.activeSounds = new Map();
+    this.duckTimer = null;
   }
 
   loadSound(name, url) {
@@ -185,6 +186,28 @@ class AudioManager {
         const base = sound.userData.baseVolume !== undefined ? sound.userData.baseVolume : 1.0;
         const factor = cat === "ambient" ? ambientVolume : sfxVolume;
         sound.setVolume(base * factor);
+      }
+    });
+  }
+
+  duckAmbient(duration = 2500, duckFactor = 0.25) {
+    this.activeSounds.forEach((sound) => {
+      if (sound.userData && sound.userData.category === "ambient") {
+        const base = sound.userData.baseVolume !== undefined ? sound.userData.baseVolume : 1.0;
+        sound.setVolume(base * ambientVolume * duckFactor);
+      }
+    });
+    window.clearTimeout(this.duckTimer);
+    this.duckTimer = window.setTimeout(() => {
+      this.unduckAmbient();
+    }, duration);
+  }
+
+  unduckAmbient() {
+    this.activeSounds.forEach((sound) => {
+      if (sound.userData && sound.userData.category === "ambient") {
+        const base = sound.userData.baseVolume !== undefined ? sound.userData.baseVolume : 1.0;
+        sound.setVolume(base * ambientVolume);
       }
     });
   }
@@ -866,6 +889,7 @@ function createJumpscareStingerBuffer(ctx) {
 function playJumpscareStinger() {
   if (audioManager) {
     audioManager.playSound("jumpscare_stinger", { volume: 1.0 });
+    audioManager.duckAmbient(3200, 0.15);
     fear = Math.min(100, fear + 24);
     caption.textContent = "A cold chill runs down Aarav's spine. Something is close.";
   }
@@ -1592,6 +1616,10 @@ function sayLine(name, text, duration = 5600) {
   speaker.textContent = name;
   line.textContent = text;
   dialogue.classList.add("open");
+  
+  if (audioManager) {
+    audioManager.duckAmbient(duration, 0.35);
+  }
   
   if (storyQueue.length > 0) {
     nextLineButton.style.display = "inline-block";

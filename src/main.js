@@ -60,6 +60,8 @@ let battery = 100;
 let fear = 0;
 let flashlightOn = true;
 let inspected = 0;
+let stamina = 100;
+let sprintExhausted = false;
 const collectedEvidence = new Set();
 let xrSession = null;
 let activeLineTimer = 0;
@@ -550,10 +552,18 @@ function buildFlashlightProp() {
 }
 
 function updateMovement(delta) {
-  const sprint = keys.has("ShiftLeft") || keys.has("ShiftRight");
-  const speed = sprint ? 5.4 : 3.0;
   const forward = Number(keys.has("KeyW")) - Number(keys.has("KeyS"));
   const strafe = Number(keys.has("KeyD")) - Number(keys.has("KeyA"));
+  const wantsSprint = keys.has("ShiftLeft") || keys.has("ShiftRight");
+  const moving = forward !== 0 || strafe !== 0;
+  const sprint = wantsSprint && moving && stamina > 0;
+  stamina = THREE.MathUtils.clamp(stamina + (sprint ? -34 : 22) * delta, 0, 100);
+  if (stamina <= 0 && !sprintExhausted) {
+    sprintExhausted = true;
+    caption.textContent = "Aarav is winded. Release Shift to recover.";
+  }
+  if (!wantsSprint && stamina > 35) sprintExhausted = false;
+  const speed = sprint ? 5.4 : 3.0;
   const lookX = Number(keys.has("ArrowRight")) - Number(keys.has("ArrowLeft"));
   const lookY = Number(keys.has("ArrowDown")) - Number(keys.has("ArrowUp"));
   yaw -= lookX * delta * 1.7;

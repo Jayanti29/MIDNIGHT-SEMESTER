@@ -35,6 +35,13 @@ const closeSettings = document.querySelector("#close-settings");
 const settingMasterVolume = document.querySelector("#setting-master-volume");
 const settingMouseSensitivity = document.querySelector("#setting-mouse-sensitivity");
 const settingFov = document.querySelector("#setting-fov");
+const inventoryPanel = document.querySelector("#inventory-panel");
+const inventoryList = document.querySelector("#inventory-list");
+const inventoryDetail = document.querySelector("#inventory-detail");
+const inventoryDetailTitle = document.querySelector("#inventory-detail-title");
+const inventoryDetailBody = document.querySelector("#inventory-detail-body");
+const closeInventory = document.querySelector("#close-inventory");
+const collectedDocuments = new Map();
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020303);
@@ -123,6 +130,8 @@ class GameStateManager {
     
     const settingsPanel = document.querySelector("#settings-panel");
     if (settingsPanel) settingsPanel.classList.remove("open");
+    
+    if (inventoryPanel) inventoryPanel.classList.remove("open");
     
     const gameoverScreen = document.querySelector("#gameover-screen");
     if (gameoverScreen) {
@@ -1029,6 +1038,7 @@ function inspectNearest() {
   if (type === "evidence") {
     const doc = hit.object.userData.doc;
     if (!doc) return;
+    collectedDocuments.set(doc.title, doc.body);
     collectedEvidence.add(doc.title);
     inspected = collectedEvidence.size;
     caseTitle.textContent = doc.title;
@@ -1092,6 +1102,45 @@ function togglePause() {
   }
 }
 
+function toggleInventory() {
+  if (gameState !== GameState.PLAYING && gameState !== GameState.PAUSED) return;
+  const isOpen = inventoryPanel.classList.contains("open");
+  if (isOpen) {
+    inventoryPanel.classList.remove("open");
+    if (gameState === GameState.PLAYING) {
+      requestPointerLock();
+    }
+  } else {
+    populateInventory();
+    document.exitPointerLock?.();
+    inventoryPanel.classList.add("open");
+    if (pauseMenu) pauseMenu.classList.remove("open");
+    if (settingsPanel) settingsPanel.classList.remove("open");
+  }
+}
+
+function populateInventory() {
+  inventoryList.innerHTML = "";
+  if (collectedDocuments.size === 0) {
+    inventoryList.innerHTML = '<p class="empty-notice">No evidence collected yet. Search classrooms and dorms.</p>';
+    inventoryDetail.hidden = true;
+    return;
+  }
+  
+  collectedDocuments.forEach((body, title) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "inventory-item-btn";
+    btn.textContent = title;
+    btn.addEventListener("click", () => {
+      inventoryDetailTitle.textContent = title;
+      inventoryDetailBody.textContent = body;
+      inventoryDetail.hidden = false;
+    });
+    inventoryList.appendChild(btn);
+  });
+}
+
 buildCorridor();
 addAtmosphere();
 if (new URLSearchParams(window.location.search).has("vr")) {
@@ -1148,10 +1197,33 @@ document.addEventListener("mousemove", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  // Graceful Escape/Inventory closure first
+  if (event.code === "Escape" || event.code === "KeyI" || event.code === "Tab") {
+    if (inventoryPanel && inventoryPanel.classList.contains("open")) {
+      event.preventDefault();
+      toggleInventory();
+      return;
+    }
+    if (settingsPanel && settingsPanel.classList.contains("open")) {
+      event.preventDefault();
+      closeSettings.click();
+      return;
+    }
+  }
+
   if (event.code === "Escape" && (gameState === GameState.PLAYING || gameState === GameState.PAUSED)) {
     togglePause();
     return;
   }
+
+  if (event.code === "KeyI" || event.code === "Tab") {
+    if (gameState === GameState.PLAYING || gameState === GameState.PAUSED) {
+      event.preventDefault();
+      toggleInventory();
+      return;
+    }
+  }
+
   if (gameState !== GameState.PLAYING) return;
   keys.add(event.code);
   if (event.code === "KeyF") {
@@ -1203,6 +1275,8 @@ settingFov.addEventListener("input", (event) => {
   localStorage.setItem("setting-fov", fovVal);
   caption.textContent = `Field of View: ${fovVal}°`;
 });
+
+closeInventory.addEventListener("click", toggleInventory);
 
 quitToMenu.addEventListener("click", () => {
   setGameState(GameState.MENU);

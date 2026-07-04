@@ -80,6 +80,18 @@
         <label>Field Of View <input id="setting-fov" type="range" min="60" max="90" step="1" value="72" /></label>
         <button id="close-settings" type="button">Close</button>
       </section>
+      <section id="inventory-panel" class="modal-menu" style="width: min(560px, calc(100vw - 48px));">
+        <p class="kicker">Case File Archive</p>
+        <h2>Recovered Documents</h2>
+        <div id="inventory-list" class="inventory-list">
+          <p class="empty-notice">No evidence collected yet. Search the classrooms and dorm rooms.</p>
+        </div>
+        <div id="inventory-detail" class="inventory-detail" hidden>
+          <h3 id="inventory-detail-title">Document Title</h3>
+          <p id="inventory-detail-body">Document body text...</p>
+        </div>
+        <button id="close-inventory" type="button" style="margin-top: 14px;">Close</button>
+      </section>
       <section id="dialogue" class="dialogue" aria-live="polite" hidden>
         <p id="speaker" class="speaker"></p>
         <p id="line"></p>

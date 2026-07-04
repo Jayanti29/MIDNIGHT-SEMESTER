@@ -540,18 +540,77 @@ body:not(.started) .quick-actions {
     grid-template-columns: 1fr 1fr;
   }
 
-  .objective {
+  .notebook-prop {
     grid-column: 1 / -1;
     max-width: none;
-  }
-
-  .objectives-list {
-    grid-column: 1 / -1;
-    min-width: 0;
   }
 
   .dialogue {
     bottom: 68px;
     font-size: 0.9rem;
   }
+}
+
+/* Inventory Styles */
+.inventory-list {
+  display: grid;
+  gap: 8px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.inventory-item-btn {
+  width: 100%;
+  text-align: left;
+  background: rgba(222, 211, 191, 0.08);
+  border: 1px solid rgba(222, 211, 191, 0.15);
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 0.88rem;
+  color: #e8ded1;
+  font-family: inherit;
+  font-weight: 500;
+  min-width: 0;
+  box-shadow: none;
+  transition: all 0.2s ease;
+}
+
+.inventory-item-btn:hover {
+  background: rgba(201, 165, 109, 0.2);
+  border-color: #c9a56d;
+  color: #fff;
+  transform: translateX(3px);
+  box-shadow: none;
+}
+
+.inventory-detail {
+  margin-top: 16px;
+  padding: 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border-left: 3px solid #c9a56d;
+  border-radius: 4px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.inventory-detail h3 {
+  margin: 0 0 8px;
+  font-size: 1.05rem;
+  color: #c9a56d;
+  font-family: Georgia, serif;
+}
+
+.inventory-detail p {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #d6d0c5;
+}
+
+.empty-notice {
+  font-size: 0.88rem;
+  color: #a49b8b;
+  font-style: italic;
+  margin: 10px 0;
 }

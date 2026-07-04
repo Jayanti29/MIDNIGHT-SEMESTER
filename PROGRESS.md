@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 16/500**
+Commit counter: **Commit 17/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -19,3 +19,4 @@ Commit counter: **Commit 16/500**
 - **Commit 14/500**: Completed Phase 2 Task 14. Refined interaction prompt overlay to display context-sensitive object names and lock/unlock status near the crosshair.
 - **Commit 15/500**: Completed Phase 2 Task 15. Implemented diegetic flashlight battery feedback including light dimming, low battery flickering, and a physical gauge.
 - **Commit 16/500**: Completed Phase 2 Task 16. Replaced objective lists with a styled in-world journal/notebook prop displaying current task and checklist.
+- **Commit 17/500**: Completed Phase 2 Task 17. Implemented complete Case File Archive inventory system toggled via 'I' or 'Tab' to read collected documents.

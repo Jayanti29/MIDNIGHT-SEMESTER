@@ -168,39 +168,93 @@ meter {
   accent-color: #c9a56d;
 }
 
-.objective {
-  max-width: 390px;
-  padding: 12px 14px;
-  color: #e8ded1;
-  line-height: 1.35;
+.notebook-prop {
+  background: #fcf9f2;
+  color: #2b2319;
+  border-left: 10px solid #543f2f; /* Brown spine */
+  border-radius: 4px;
+  padding: 18px 20px 18px 24px;
+  max-width: 310px;
+  min-width: 230px;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.65), inset 0 0 30px rgba(0, 0, 0, 0.04);
+  font-family: Georgia, Times, serif;
+  transform: rotate(-1.5deg);
+  border-top: 1px solid rgba(0,0,0,0.06);
+  border-bottom: 2px solid rgba(0,0,0,0.18);
+  border-right: 1px solid rgba(0,0,0,0.1);
+  position: relative;
+  pointer-events: auto; /* allow clicking if needed */
 }
 
-.objectives-list {
+/* Binder rings effect */
+.notebook-prop::before {
+  content: "• • • • •";
+  position: absolute;
+  left: -2px;
+  top: 14px;
+  font-size: 1.1rem;
+  color: #8c8170;
+  line-height: 24px;
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.7), -0.5px -0.5px 0 rgba(0,0,0,0.4);
+  writing-mode: vertical-rl;
+  text-orientation: upright;
+  height: calc(100% - 28px);
+  pointer-events: none;
+}
+
+.notebook-header {
+  font-size: 0.7rem;
+  color: #7c6d59;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  border-bottom: 1px solid rgba(124, 109, 89, 0.28);
+  padding-bottom: 4px;
+  margin-bottom: 12px;
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 800;
+}
+
+.notebook-current-objective {
+  font-size: 0.95rem;
+  font-style: italic;
+  line-height: 1.48;
+  color: #3b3226;
+  margin-bottom: 14px;
+}
+
+.notebook-steps {
   display: grid;
   gap: 7px;
-  min-width: 190px;
-  padding: 11px 13px;
-  color: #aaa196;
-  font-size: 0.78rem;
+  font-size: 0.82rem;
+  color: #5a4f40;
+  padding-top: 10px;
+  border-top: 1px dotted rgba(0, 0, 0, 0.25);
+  font-family: Inter, system-ui, sans-serif;
+  font-weight: 500;
 }
 
-.objectives-list span::before {
-  content: "";
-  display: inline-block;
-  width: 7px;
-  height: 7px;
+.notebook-steps span {
+  display: flex;
+  align-items: center;
+}
+
+.notebook-steps span::before {
+  content: "☐";
+  font-size: 1rem;
   margin-right: 8px;
-  border: 1px solid currentColor;
-  border-radius: 50%;
+  color: #7c6d59;
 }
 
-.objectives-list span.done {
-  color: #d8be84;
+.notebook-steps span.done {
+  color: #a49b8c;
+  text-decoration: line-through;
 }
 
-.objectives-list span.done::before {
-  background: currentColor;
+.notebook-steps span.done::before {
+  content: "☑";
+  color: #c9a56d;
 }
+
 
 .case-file {
   position: fixed;

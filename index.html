@@ -42,13 +42,17 @@
           <span id="fear">0%</span>
           <meter id="fear-meter" min="0" max="100" value="0"></meter>
         </div>
-        <div id="objective" class="hud-panel objective">
-          Find the generator route through the old hostel wing.
-        </div>
-        <div id="objectives-list" class="hud-panel objectives-list">
-          <span data-step="start">Enter Block A</span>
-          <span data-step="evidence">Collect evidence</span>
-          <span data-step="basement">Reach basement access</span>
+        <!-- In-World Journal / Notebook Prop for Objectives -->
+        <div id="journal-notebook" class="notebook-prop">
+          <div class="notebook-header">Aarav's Journal</div>
+          <div id="objective" class="notebook-current-objective">
+            Find the generator route through the old hostel wing.
+          </div>
+          <div id="objectives-list" class="notebook-steps">
+            <span data-step="start">Enter Block A</span>
+            <span data-step="evidence">Collect evidence</span>
+            <span data-step="basement">Reach basement access</span>
+          </div>
         </div>
       </section>
       <button id="vr-toggle" class="vr-toggle" type="button" hidden>Enter VR</button>

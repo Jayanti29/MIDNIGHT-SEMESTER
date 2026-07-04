@@ -67,6 +67,14 @@
         <button id="pause-settings" type="button">Settings</button>
         <button id="quit-to-menu" type="button">Quit to Menu</button>
       </section>
+      <section id="settings-panel" class="modal-menu" hidden>
+        <p class="kicker">Settings</p>
+        <h2>Comfort And Audio</h2>
+        <label>Master Volume <input id="setting-master-volume" type="range" min="0" max="1" step="0.01" value="0.8" /></label>
+        <label>Mouse Sensitivity <input id="setting-mouse-sensitivity" type="range" min="0.5" max="3" step="0.1" value="1" /></label>
+        <label>Field Of View <input id="setting-fov" type="range" min="60" max="90" step="1" value="72" /></label>
+        <button id="close-settings" type="button">Close</button>
+      </section>
       <section id="dialogue" class="dialogue" aria-live="polite" hidden>
         <p id="speaker" class="speaker"></p>
         <p id="line"></p>

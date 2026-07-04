@@ -253,6 +253,18 @@ body.started .task-log {
   margin: 0 0 8px;
 }
 
+.modal-menu label {
+  display: grid;
+  gap: 6px;
+  color: #d8d0c3;
+  font-size: 0.9rem;
+}
+
+.modal-menu input[type="range"] {
+  width: 100%;
+  accent-color: #c9a56d;
+}
+
 .dialogue {
   position: fixed;
   left: 50%;

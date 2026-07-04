@@ -1311,6 +1311,7 @@ function buildCorridor() {
   registerCollider(gateFrame);
   interactables.push(gateLeft, gateRight);
   initBatteries();
+  initLoreNotes();
   buildCheckpointConsole([2.8, 0, -18.5], "Emergency Terminal");
 }
 
@@ -1429,6 +1430,51 @@ function buildCheckpointConsole(position, name) {
   
   scene.add(group);
   return group;
+}
+
+function buildLoreNote(position, rotation, text, label) {
+  const noteGroup = new THREE.Group();
+  noteGroup.name = label;
+  noteGroup.position.set(...position);
+  noteGroup.rotation.y = rotation;
+  
+  const paper = new THREE.Mesh(
+    new THREE.BoxGeometry(0.34, 0.24, 0.008),
+    materials.paper
+  );
+  paper.castShadow = true;
+  noteGroup.add(paper);
+
+  tagInteractable(paper, "lore_note", label);
+  paper.userData.loreText = text;
+  paper.userData.loreLabel = label;
+
+  scene.add(noteGroup);
+  interactables.push(paper);
+  return noteGroup;
+}
+
+function initLoreNotes() {
+  buildLoreNote(
+    [-3.42, 1.46, -5.8], Math.PI / 2,
+    "Note pinned by maintenance: \"Block A backup grid rerouted to Laboratory Room 2A. Do not adjust fuses. \u2014 Chief Warden, 2019.\"",
+    "Maintenance Fuse Notice"
+  );
+  buildLoreNote(
+    [3.42, 1.56, -14.2], -Math.PI / 2,
+    "Torn page from a notebook: \"Subject M has stopped eating. She says something counts on the walls at night. We continue.\"",
+    "Torn Lab Page"
+  );
+  buildLoreNote(
+    [-3.42, 1.46, -26.8], Math.PI / 2,
+    "Handwritten scrawl on a door frame: \"The metronome doesn\'t need power. It never did. \u2014 M.I.\"",
+    "Meera's Wall Scrawl"
+  );
+  buildLoreNote(
+    [3.42, 1.58, -38.4], -Math.PI / 2,
+    "Safety notice, partially burned: \"All Applied Cognition experiments suspended pending ethics review. Files to be sealed until 2025. Access revoked. \u2014 Dean\'s Office, 2005.\"",
+    "Burned Safety Notice"
+  );
 }
 
 function addAtmosphere() {
@@ -1956,6 +2002,16 @@ function inspectNearest() {
       }
       addTaskLog("Checkpoint reached: System logs saved.");
     }
+    return;
+  }
+
+  if (type === "lore_note") {
+    const text = hit.object.userData.loreText;
+    const lbl = hit.object.userData.loreLabel;
+    if (!text) return;
+    caption.textContent = `\u201c${text}\u201d`;
+    sayLine("Aarav", `Found something pinned here: ${lbl}.`);
+    addTaskLog(`Read environmental log: ${lbl}.`);
     return;
   }
 }

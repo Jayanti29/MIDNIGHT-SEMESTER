@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 47/500**
+Commit counter: **Commit 49/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -50,3 +50,5 @@ Commit counter: **Commit 47/500**
 - **Commit 45/500**: Completed Phase 4 Task 45. Programmed a basic AI threat state machine (Inactive, Patrol, Chase) for Meera Iyer's ghost based on proximity, flashlights, and sprinting sounds.
 - **Commit 46/500**: Completed Phase 4 Task 46. Implemented player warning feedback (camera shake, speed-based fear spikes) inside the threat proximity zone and wired GameOver triggers on catch collisions.
 - **Commit 47/500**: Completed Phase 4 Task 48. Built a checkpoint save pedestal at the corridor midpoint, persisting Aarav's position, battery level, collected documents, and objectives to restore from on GameOver reset loops.
+- **Commit 48/500**: Completed Phase 4 Tasks 49+50. Implemented win condition — basement gate triggers 3-line escape cinematic, WIN game state, and a styled completion screen with run stats. Ghost catch now properly triggers GAMEOVER state with a custom reason message.
+- **Commit 49/500**: Completed Phase 4 Task 51. Placed 4 wall-pinned lore notes (maintenance notice, torn lab page, Meera's scrawl, burned dean's notice) as readable environmental storytelling triggers throughout the corridor.

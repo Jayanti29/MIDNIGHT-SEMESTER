@@ -32,6 +32,9 @@ const actionFlashlight = document.querySelector("#action-flashlight");
 const fatalError = document.querySelector("#fatal-error");
 const reticle = document.querySelector("#reticle");
 const settingsPanel = document.querySelector("#settings-panel");
+const loadingScreen = document.querySelector("#loading-screen");
+const loadingProgress = document.querySelector("#loading-progress");
+const loadingStatus = document.querySelector("#loading-status");
 const closeSettings = document.querySelector("#close-settings");
 const settingMasterVolume = document.querySelector("#setting-master-volume");
 const settingMouseSensitivity = document.querySelector("#setting-mouse-sensitivity");
@@ -164,10 +167,45 @@ function setGameState(nextState) {
 
 const loadingManager = new THREE.LoadingManager();
 
+loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+  const percent = Math.min(100, Math.round((itemsLoaded / itemsTotal) * 100));
+  if (loadingProgress) loadingProgress.style.width = `${percent}%`;
+  if (loadingStatus) loadingStatus.textContent = `Loading asset: ${percent}%`;
+};
+
+loadingManager.onLoad = () => {
+  setTimeout(() => {
+    if (loadingScreen) {
+      loadingScreen.classList.add("hidden");
+      setTimeout(() => { loadingScreen.style.display = "none"; }, 600);
+    }
+  }, 400);
+};
+
 loadingManager.onError = (url) => {
   console.error(`Asset failed to load via LoadingManager: ${url}`);
   caption.textContent = "An asset failed to load. Check the console for details.";
 };
+
+// Simulated loading compiling shaders on boot
+(function simulateBootLoad() {
+  let percent = 0;
+  const interval = setInterval(() => {
+    percent += Math.random() * 12 + 6;
+    if (percent >= 100) {
+      percent = 100;
+      clearInterval(interval);
+      setTimeout(() => {
+        if (loadingScreen) {
+          loadingScreen.classList.add("hidden");
+          setTimeout(() => { loadingScreen.style.display = "none"; }, 600);
+        }
+      }, 350);
+    }
+    if (loadingProgress) loadingProgress.style.width = `${percent}%`;
+    if (loadingStatus) loadingStatus.textContent = `Compiling shaders... ${Math.round(percent)}%`;
+  }, 90);
+})();
 
 window.addEventListener("error", (event) => {
   // Capture resource errors (like <img>, <audio> loading failures)

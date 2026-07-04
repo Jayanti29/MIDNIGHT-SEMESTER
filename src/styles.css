@@ -625,3 +625,45 @@ body:not(.started) .quick-actions {
   font-style: italic;
   margin: 10px 0;
 }
+
+/* Loading Overlay Styles */
+.loading-overlay {
+  z-index: 100;
+  background: #030404;
+  align-content: center;
+  justify-content: center;
+}
+
+.center-brand {
+  margin: auto;
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+}
+
+.progress-bar-container {
+  width: clamp(200px, 40vw, 320px);
+  height: 6px;
+  background: rgba(240, 236, 228, 0.06);
+  border-radius: 4px;
+  margin: 16px 0;
+  overflow: hidden;
+  border: 1px solid rgba(240, 236, 228, 0.1);
+}
+
+#loading-progress {
+  width: 0%;
+  height: 100%;
+  background: #b22822;
+  box-shadow: 0 0 10px rgba(178, 40, 34, 0.6);
+  transition: width 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+#loading-status {
+  font-size: 0.78rem;
+  color: #a49b8b;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin: 0;
+}

@@ -16,6 +16,16 @@
   <body>
     <main id="app">
       <canvas id="game" aria-label="First-person 3D horror game scene"></canvas>
+      <section id="loading-screen" class="overlay loading-overlay">
+        <div class="brand center-brand">
+          <p class="kicker">Entering Block A</p>
+          <h2>Loading Project Assets...</h2>
+          <div class="progress-bar-container">
+            <div id="loading-progress"></div>
+          </div>
+          <p id="loading-status">Compiling shaders... 0%</p>
+        </div>
+      </section>
       <section id="start-screen" class="overlay">
         <div class="brand">
           <p class="kicker">Ravenswood Institute of Technology</p>

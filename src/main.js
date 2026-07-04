@@ -15,6 +15,10 @@ const caseFile = document.querySelector("#case-file");
 const caseTitle = document.querySelector("#case-title");
 const caseBody = document.querySelector("#case-body");
 const taskLogList = document.querySelector("#task-log-list");
+const pauseMenu = document.querySelector("#pause-menu");
+const resumeButton = document.querySelector("#resume-button");
+const pauseSettings = document.querySelector("#pause-settings");
+const quitToMenu = document.querySelector("#quit-to-menu");
 const caption = document.querySelector("#caption");
 const vignette = document.querySelector("#vignette");
 const vrToggle = document.querySelector("#vr-toggle");
@@ -101,6 +105,7 @@ function setGameState(nextState) {
   gameState = nextState;
   document.body.dataset.state = nextState;
   document.body.classList.toggle("started", nextState === GameState.PLAYING || nextState === GameState.PAUSED);
+  pauseMenu.hidden = nextState !== GameState.PAUSED;
 }
 
 function completeObjective(step) {
@@ -833,6 +838,18 @@ function requestPointerLock() {
   }
 }
 
+function togglePause() {
+  if (gameState === GameState.PLAYING) {
+    document.exitPointerLock?.();
+    setGameState(GameState.PAUSED);
+    return;
+  }
+  if (gameState === GameState.PAUSED) {
+    setGameState(GameState.PLAYING);
+    requestPointerLock();
+  }
+}
+
 buildCorridor();
 addAtmosphere();
 if (new URLSearchParams(window.location.search).has("vr")) {
@@ -877,6 +894,10 @@ document.addEventListener("mousemove", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  if (event.code === "Escape" && (gameState === GameState.PLAYING || gameState === GameState.PAUSED)) {
+    togglePause();
+    return;
+  }
   keys.add(event.code);
   if (gameState !== GameState.PLAYING) return;
   if (event.code === "KeyF") {
@@ -892,6 +913,15 @@ actionInteract.addEventListener("click", inspectNearest);
 actionFlashlight.addEventListener("click", () => {
   flashlightOn = !flashlightOn && battery > 0;
   caption.textContent = flashlightOn ? "Flashlight on." : "Flashlight off.";
+});
+resumeButton.addEventListener("click", togglePause);
+pauseSettings.addEventListener("click", () => {
+  caption.textContent = "Settings panel arrives in Task 13.";
+});
+quitToMenu.addEventListener("click", () => {
+  setGameState(GameState.MENU);
+  startScreen.classList.remove("hidden");
+  pauseMenu.hidden = true;
 });
 
 window.addEventListener("resize", () => {

@@ -233,6 +233,26 @@ body.started .task-log {
   line-height: 1.45;
 }
 
+.modal-menu {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  display: grid;
+  gap: 12px;
+  width: min(420px, calc(100vw - 48px));
+  transform: translate(-50%, -50%);
+  border: 1px solid rgba(222, 211, 191, 0.2);
+  border-radius: 6px;
+  padding: 24px;
+  background: rgba(8, 7, 6, 0.9);
+  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.64);
+  z-index: 15;
+}
+
+.modal-menu h2 {
+  margin: 0 0 8px;
+}
+
 .dialogue {
   position: fixed;
   left: 50%;

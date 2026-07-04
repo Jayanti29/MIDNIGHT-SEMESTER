@@ -466,6 +466,41 @@ function createFlashlightClickOffBuffer(ctx) {
   return buffer;
 }
 
+function createDoorCreakBuffer(ctx) {
+  const duration = 1.6;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = t < 0.2 ? t / 0.2 : Math.exp(-2.2 * (t - 0.2));
+    const slipFrequency = 14 + t * 45;
+    const click = Math.sin(2 * Math.PI * slipFrequency * t) > 0.94 ? 1.0 : -1.0;
+    const squeakFreq = 950 + Math.sin(2 * Math.PI * 1.5 * t) * 150;
+    const squeak = Math.sin(2 * Math.PI * squeakFreq * t) * 0.16;
+    const noise = (Math.random() * 2 - 1) * 0.08;
+    data[i] = (click * 0.25 + squeak + noise) * envelope * 0.15;
+  }
+  return buffer;
+}
+
+function createDoorLatchBuffer(ctx) {
+  const duration = 0.2;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-32 * t);
+    const clickNoise = (Math.random() * 2 - 1) * 0.35;
+    const clickTone = Math.sin(2 * Math.PI * 980 * t) * 0.2;
+    data[i] = (clickNoise + clickTone) * envelope * 0.16;
+  }
+  return buffer;
+}
+
 function setFlashlight(state) {
   const previous = flashlightOn;
   flashlightOn = state && battery > 0;
@@ -498,6 +533,11 @@ function initAudio() {
   audioManager.buffers.set("flashlight_on", clickOnBuffer);
   audioManager.buffers.set("flashlight_off", clickOffBuffer);
 
+  const doorCreakBuffer = createDoorCreakBuffer(audioCtx);
+  const doorLatchBuffer = createDoorLatchBuffer(audioCtx);
+  audioManager.buffers.set("door_creak", doorCreakBuffer);
+  audioManager.buffers.set("door_latch", doorLatchBuffer);
+
   heartbeatTimer = window.setInterval(() => {
     if (!document.body.classList.contains("started")) return;
     playTone(64, 0.11, 0.04 + fear / 900, "sine");
@@ -519,9 +559,17 @@ function playTone(frequency, duration = 0.3, volume = 0.08, type = "sine") {
   oscillator.stop(audioCtx.currentTime + duration + 0.03);
 }
 
-function playDoorCreak() {
-  playTone(96, 0.55, 0.08, "sawtooth");
-  window.setTimeout(() => playTone(68, 0.45, 0.055, "triangle"), 90);
+function playDoorCreak(targetMesh, isOpen) {
+  if (audioManager && targetMesh) {
+    const soundName = isOpen ? "door_creak" : "door_latch";
+    audioManager.playSound(soundName, {
+      positional: true,
+      targetMesh: targetMesh,
+      refDistance: 1.6,
+      maxDistance: 22,
+      volume: isOpen ? 0.95 : 0.65
+    });
+  }
 }
 
 function playWhisper() {
@@ -1293,7 +1341,7 @@ function inspectNearest() {
     if (door) {
       door.userData.open = !door.userData.open;
       fear = Math.min(100, fear + 4);
-      playDoorCreak();
+      playDoorCreak(door, door.userData.open);
       caption.textContent = door.userData.open ? "The door groans open." : "The latch clicks shut.";
       addTaskLog(`${door.userData.open ? "Opened" : "Closed"} ${door.userData.label}.`);
       if (door.userData.open && camera.position.z < -12) {

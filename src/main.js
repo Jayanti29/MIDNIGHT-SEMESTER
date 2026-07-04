@@ -795,18 +795,24 @@ function updateState(delta) {
 function getFocusedInteractable(maxDistance = 4) {
   const raycaster = new THREE.Raycaster();
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
-  const raycastHit = raycaster.intersectObjects(interactables, false)
-    .find((hit) => hit.distance <= maxDistance);
-  const proximityHits = [
-    ...doors.map((door) => ({ object: door, distance: door.position.distanceTo(camera.position), kind: "door" })),
-    ...evidenceItems.map((item) => ({ object: item, distance: item.position.distanceTo(camera.position), kind: "evidence" }))
-  ]
-    .filter((candidate) => candidate.distance <= maxDistance)
-    .sort((a, b) => a.distance - b.distance);
-
-  if (!raycastHit) return proximityHits[0] || null;
-  const nearest = proximityHits[0];
-  return nearest && nearest.distance + 0.35 < raycastHit.distance ? nearest : raycastHit;
+  const hits = raycaster.intersectObjects(scene.children, true);
+  
+  // Find the closest hit within maxDistance
+  const hit = hits.find(h => h.distance <= maxDistance);
+  if (!hit) return null;
+  
+  // Traverse up to find if this object or any parent is interactable
+  let current = hit.object;
+  while (current) {
+    if (current.userData && current.userData.interactable) {
+      return {
+        object: current,
+        distance: hit.distance
+      };
+    }
+    current = current.parent;
+  }
+  return null;
 }
 
 function updateInteractionPrompt() {
@@ -816,7 +822,7 @@ function updateInteractionPrompt() {
     return;
   }
 
-  const door = hit.object.userData.parentDoor || (hit.kind === "door" ? hit.object : null);
+  const door = hit.object.userData.parentDoor || (hit.object.userData.interactionType === "door" ? hit.object : null);
   interactionPrompt.hidden = false;
   interactionPrompt.textContent = door ? "Press E - open door" : "Press E - inspect evidence";
 }
@@ -864,7 +870,7 @@ function inspectNearest() {
     return;
   }
 
-  const door = hit.object.userData.parentDoor || (hit.kind === "door" ? hit.object : null);
+  const door = hit.object.userData.parentDoor || (hit.object.userData.interactionType === "door" ? hit.object : null);
   if (door) {
     door.userData.open = !door.userData.open;
     fear = Math.min(100, fear + 4);

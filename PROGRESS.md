@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 26/500**
+Commit counter: **Commit 27/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -29,3 +29,4 @@ Commit counter: **Commit 26/500**
 - **Commit 24/500**: Completed Phase 2 Task 24. Added smooth slide-up and fade transition animations for the dialogue subtitles and case file card overlays.
 - **Commit 25/500**: Completed Phase 2 Task 25. Executed manual review and testing validation of full UI/UX flow from menu to gameplay, pause, resume, and gameover restart state loops.
 - **Commit 26/500**: Completed Phase 3 Task 26. Instantiated and attached THREE.AudioListener to the PerspectiveCamera, wired to dynamically update from the Master Volume setting.
+- **Commit 27/500**: Completed Phase 3 Task 27. Programmed AudioManager module supporting promise-based loading, buffer caching, non-positional UI, and THREE.PositionalAudio spatial sources.

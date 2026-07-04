@@ -50,6 +50,48 @@ const gameoverScreen = document.querySelector("#gameover-screen");
 const gameoverReason = document.querySelector("#gameover-reason");
 const restartButton = document.querySelector("#restart-button");
 
+const loadingManager = new THREE.LoadingManager();
+
+loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+  const percent = Math.min(100, Math.round((itemsLoaded / itemsTotal) * 100));
+  if (loadingProgress) loadingProgress.style.width = `${percent}%`;
+  if (loadingStatus) loadingStatus.textContent = `Loading asset: ${percent}%`;
+};
+
+loadingManager.onLoad = () => {
+  setTimeout(() => {
+    if (loadingScreen) {
+      loadingScreen.classList.add("hidden");
+      setTimeout(() => { loadingScreen.style.display = "none"; }, 600);
+    }
+  }, 400);
+};
+
+loadingManager.onError = (url) => {
+  console.error(`Asset failed to load via LoadingManager: ${url}`);
+  caption.textContent = "An asset failed to load. Check the console for details.";
+};
+
+// Simulated loading compiling shaders on boot
+(function simulateBootLoad() {
+  let percent = 0;
+  const interval = setInterval(() => {
+    percent += Math.random() * 12 + 6;
+    if (percent >= 100) {
+      percent = 100;
+      clearInterval(interval);
+      setTimeout(() => {
+        if (loadingScreen) {
+          loadingScreen.classList.add("hidden");
+          setTimeout(() => { loadingScreen.style.display = "none"; }, 600);
+        }
+      }, 350);
+    }
+    if (loadingProgress) loadingProgress.style.width = `${percent}%`;
+    if (loadingStatus) loadingStatus.textContent = `Compiling shaders... ${Math.round(percent)}%`;
+  }, 90);
+})();
+
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020303);
 scene.fog = new THREE.FogExp2(0x070706, 0.026);
@@ -59,6 +101,99 @@ camera.position.set(0, 1.7, 8);
 
 const audioListener = new THREE.AudioListener();
 camera.add(audioListener);
+
+class AudioManager {
+  constructor(listener) {
+    this.listener = listener;
+    this.loader = new THREE.AudioLoader(loadingManager);
+    this.buffers = new Map();
+    this.activeSounds = new Map();
+  }
+
+  loadSound(name, url) {
+    return new Promise((resolve, reject) => {
+      this.loader.load(
+        url,
+        (buffer) => {
+          this.buffers.set(name, buffer);
+          console.log(`Audio buffer loaded: ${name} (${url})`);
+          resolve(buffer);
+        },
+        undefined,
+        (err) => {
+          console.error(`Failed to load audio: ${url}`, err);
+          reject(err);
+        }
+      );
+    });
+  }
+
+  playSound(name, options = {}) {
+    const buffer = this.buffers.get(name);
+    if (!buffer) {
+      console.warn(`Audio buffer not loaded: ${name}`);
+      return null;
+    }
+
+    const loop = options.loop || false;
+    const volume = options.volume !== undefined ? options.volume : 1.0;
+    const positional = options.positional || false;
+    const targetMesh = options.targetMesh || null;
+    
+    let sound;
+    if (positional && targetMesh) {
+      sound = new THREE.PositionalAudio(this.listener);
+      sound.setBuffer(buffer);
+      sound.setRefDistance(options.refDistance || 1.2);
+      sound.setMaxDistance(options.maxDistance || 18);
+      targetMesh.add(sound);
+    } else {
+      sound = new THREE.Audio(this.listener);
+      sound.setBuffer(buffer);
+    }
+
+    sound.setLoop(loop);
+    sound.setVolume(volume);
+    sound.play();
+
+    this.activeSounds.set(name, sound);
+    
+    if (!loop) {
+      sound.onEnded = () => {
+        if (sound.parent) {
+          sound.parent.remove(sound);
+        }
+        if (this.activeSounds.get(name) === sound) {
+          this.activeSounds.delete(name);
+        }
+      };
+    }
+
+    return sound;
+  }
+
+  stopSound(name) {
+    const sound = this.activeSounds.get(name);
+    if (sound) {
+      if (sound.isPlaying) {
+        sound.stop();
+      }
+      if (sound.parent) {
+        sound.parent.remove(sound);
+      }
+      this.activeSounds.delete(name);
+    }
+  }
+
+  setVolume(name, volume) {
+    const sound = this.activeSounds.get(name);
+    if (sound) {
+      sound.setVolume(volume);
+    }
+  }
+}
+
+const audioManager = new AudioManager(audioListener);
 
 let renderer;
 try {
@@ -170,48 +305,6 @@ const stateManager = new GameStateManager();
 function setGameState(nextState) {
   stateManager.transitionTo(nextState);
 }
-
-const loadingManager = new THREE.LoadingManager();
-
-loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
-  const percent = Math.min(100, Math.round((itemsLoaded / itemsTotal) * 100));
-  if (loadingProgress) loadingProgress.style.width = `${percent}%`;
-  if (loadingStatus) loadingStatus.textContent = `Loading asset: ${percent}%`;
-};
-
-loadingManager.onLoad = () => {
-  setTimeout(() => {
-    if (loadingScreen) {
-      loadingScreen.classList.add("hidden");
-      setTimeout(() => { loadingScreen.style.display = "none"; }, 600);
-    }
-  }, 400);
-};
-
-loadingManager.onError = (url) => {
-  console.error(`Asset failed to load via LoadingManager: ${url}`);
-  caption.textContent = "An asset failed to load. Check the console for details.";
-};
-
-// Simulated loading compiling shaders on boot
-(function simulateBootLoad() {
-  let percent = 0;
-  const interval = setInterval(() => {
-    percent += Math.random() * 12 + 6;
-    if (percent >= 100) {
-      percent = 100;
-      clearInterval(interval);
-      setTimeout(() => {
-        if (loadingScreen) {
-          loadingScreen.classList.add("hidden");
-          setTimeout(() => { loadingScreen.style.display = "none"; }, 600);
-        }
-      }, 350);
-    }
-    if (loadingProgress) loadingProgress.style.width = `${percent}%`;
-    if (loadingStatus) loadingStatus.textContent = `Compiling shaders... ${Math.round(percent)}%`;
-  }, 90);
-})();
 
 window.addEventListener("error", (event) => {
   // Capture resource errors (like <img>, <audio> loading failures)

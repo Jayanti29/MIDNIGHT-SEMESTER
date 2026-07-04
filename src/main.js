@@ -529,6 +529,32 @@ function buildCorridor() {
   registerCollider(scene.userData.kulkarni);
   scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [2.6, 0, -34.5], color: 0xc9d5cf, ghostly: true });
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
+
+  // Basement Gate (Visual entry point for winning the game)
+  const gateGroup = new THREE.Group();
+  gateGroup.name = "basement gate group";
+  gateGroup.position.set(0, 0, -48);
+  
+  const gateFrame = new THREE.Mesh(new THREE.BoxGeometry(3.6, 3.8, 0.28), materials.darkWood);
+  gateFrame.position.set(0, 1.9, 0);
+  gateFrame.name = "basement gate frame";
+  gateGroup.add(gateFrame);
+
+  const gateLeft = new THREE.Mesh(new THREE.BoxGeometry(1.6, 3.4, 0.1), materials.brass);
+  gateLeft.position.set(-0.8, 1.7, 0.05);
+  gateLeft.name = "basement gate left door";
+  tagInteractable(gateLeft, "basement_gate", "Basement Gate Left");
+  gateGroup.add(gateLeft);
+  
+  const gateRight = new THREE.Mesh(new THREE.BoxGeometry(1.6, 3.4, 0.1), materials.brass);
+  gateRight.position.set(0.8, 1.7, 0.05);
+  gateRight.name = "basement gate right door";
+  tagInteractable(gateRight, "basement_gate", "Basement Gate Right");
+  gateGroup.add(gateRight);
+
+  scene.add(gateGroup);
+  registerCollider(gateFrame);
+  interactables.push(gateLeft, gateRight);
 }
 
 function buildDormRoom() {
@@ -822,9 +848,17 @@ function updateInteractionPrompt() {
     return;
   }
 
-  const door = hit.object.userData.parentDoor || (hit.object.userData.interactionType === "door" ? hit.object : null);
+  const type = hit.object.userData.interactionType;
   interactionPrompt.hidden = false;
-  interactionPrompt.textContent = door ? "Press E - open door" : "Press E - inspect evidence";
+  if (type === "door") {
+    interactionPrompt.textContent = "Press E - open door";
+  } else if (type === "basement_gate") {
+    interactionPrompt.textContent = inspected >= 3 ? "Press E - open basement gate" : "Press E - inspect locked gate";
+  } else if (type === "evidence") {
+    interactionPrompt.textContent = "Press E - inspect evidence";
+  } else {
+    interactionPrompt.textContent = `Press E - ${hit.object.userData.interactionLabel || "interact"}`;
+  }
 }
 
 function sayLine(name, text, duration = 5600) {
@@ -870,39 +904,57 @@ function inspectNearest() {
     return;
   }
 
-  const door = hit.object.userData.parentDoor || (hit.object.userData.interactionType === "door" ? hit.object : null);
-  if (door) {
-    door.userData.open = !door.userData.open;
-    fear = Math.min(100, fear + 4);
-    playDoorCreak();
-    caption.textContent = door.userData.open ? "The door groans open." : "The latch clicks shut.";
-    addTaskLog(`${door.userData.open ? "Opened" : "Closed"} ${door.userData.label}.`);
-    if (door.userData.open && camera.position.z < -12) {
-      sayLine("Professor Kulkarni", "Some rooms were sealed after 2005. If a door opens by itself, step back.");
+  const type = hit.object.userData.interactionType;
+  if (type === "door") {
+    const door = hit.object.userData.parentDoor;
+    if (door) {
+      door.userData.open = !door.userData.open;
+      fear = Math.min(100, fear + 4);
+      playDoorCreak();
+      caption.textContent = door.userData.open ? "The door groans open." : "The latch clicks shut.";
+      addTaskLog(`${door.userData.open ? "Opened" : "Closed"} ${door.userData.label}.`);
+      if (door.userData.open && camera.position.z < -12) {
+        sayLine("Professor Kulkarni", "Some rooms were sealed after 2005. If a door opens by itself, step back.");
+      }
+      objective.textContent = "Search rooms for lab records, books, and anything Meera left behind.";
     }
-    objective.textContent = "Search rooms for lab records, books, and anything Meera left behind.";
     return;
   }
 
-  const doc = hit.object.userData.doc;
-  if (!doc) return;
-  collectedEvidence.add(doc.title);
-  inspected = collectedEvidence.size;
-  caseTitle.textContent = doc.title;
-  caseBody.textContent = doc.body;
-  caseFile.hidden = false;
-  playWhisper();
-  objective.textContent = inspected >= 3
-    ? "Case file complete. Reach the basement access at the end of the wing."
-    : "Evidence recovered. Keep searching Block A for the sealed lab trail.";
-  if (inspected >= 1) completeObjective("evidence");
-  if (inspected >= 3) completeObjective("basement");
-  caption.textContent = "Document added to case file.";
-  sayLine("Aarav", `This belongs in the case file: ${doc.title}.`);
-  addTaskLog(`Recovered evidence: ${doc.title}.`);
-  window.setTimeout(() => {
-    caseFile.hidden = true;
-  }, 7200);
+  if (type === "basement_gate") {
+    if (inspected >= 3) {
+      caption.textContent = "You unlock the basement gate and escape block A.";
+      addTaskLog("Unlocked the basement access.");
+      sayLine("Aarav", "The gate is open. I can get down to the generator room now.");
+    } else {
+      caption.textContent = "The gate is chained shut. I need to find all the missing documents first.";
+      sayLine("Aarav", "It's locked. Professor Kulkarni said the keys were returned, but maybe there's another way...");
+    }
+    return;
+  }
+
+  if (type === "evidence") {
+    const doc = hit.object.userData.doc;
+    if (!doc) return;
+    collectedEvidence.add(doc.title);
+    inspected = collectedEvidence.size;
+    caseTitle.textContent = doc.title;
+    caseBody.textContent = doc.body;
+    caseFile.hidden = false;
+    playWhisper();
+    objective.textContent = inspected >= 3
+      ? "Case file complete. Reach the basement access at the end of the wing."
+      : "Evidence recovered. Keep searching Block A for the sealed lab trail.";
+    if (inspected >= 1) completeObjective("evidence");
+    if (inspected >= 3) completeObjective("basement");
+    caption.textContent = "Document added to case file.";
+    sayLine("Aarav", `This belongs in the case file: ${doc.title}.`);
+    addTaskLog(`Recovered evidence: ${doc.title}.`);
+    window.setTimeout(() => {
+      caseFile.hidden = true;
+    }, 7200);
+    return;
+  }
 }
 
 function animate() {

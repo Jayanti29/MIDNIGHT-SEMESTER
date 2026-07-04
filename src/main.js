@@ -236,6 +236,7 @@ let droneGain = null;
 let heartbeatTimer = 0;
 let footstepTimer = 0.35;
 let meeraWarned = false;
+let basementGateGroup = null;
 let storyQueue = [];
 let pointerLocked = false;
 let flashlightLight = null;
@@ -505,6 +506,23 @@ function createDoorLatchBuffer(ctx) {
   return buffer;
 }
 
+function createBuzzBuffer(ctx) {
+  const duration = 1.0;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const mainHum = Math.sin(2 * Math.PI * 50 * t);
+    const buzz1 = Math.sin(2 * Math.PI * 150 * t) * 0.45;
+    const buzz2 = Math.sin(2 * Math.PI * 350 * t) * 0.25;
+    const flicker = Math.random() > 0.985 ? (Math.random() * 2 - 1) * 0.8 : 0;
+    data[i] = (mainHum + buzz1 + buzz2 + flicker) * 0.08;
+  }
+  return buffer;
+}
+
 function createUiHoverBuffer(ctx) {
   const duration = 0.04;
   const sampleRate = ctx.sampleRate;
@@ -625,6 +643,34 @@ function initAudio() {
 
   const jumpscareBuffer = createJumpscareStingerBuffer(audioCtx);
   audioManager.buffers.set("jumpscare_stinger", jumpscareBuffer);
+
+  const buzzBuffer = createBuzzBuffer(audioCtx);
+  audioManager.buffers.set("electric_buzz", buzzBuffer);
+
+  // Play spatial buzzing hum on a couple of the corridor lights
+  flickerLights.forEach((lightObj, index) => {
+    if (index % 2 === 0) {
+      audioManager.playSound("electric_buzz", {
+        positional: true,
+        targetMesh: lightObj.light,
+        loop: true,
+        refDistance: 1.2,
+        maxDistance: 14,
+        volume: 0.15
+      });
+    }
+  });
+
+  if (basementGateGroup) {
+    audioManager.playSound("electric_buzz", {
+      positional: true,
+      targetMesh: basementGateGroup,
+      loop: true,
+      refDistance: 1.5,
+      maxDistance: 16,
+      volume: 0.25
+    });
+  }
 
   audioManager.buffers.set("ui_hover", createUiHoverBuffer(audioCtx));
   audioManager.buffers.set("ui_select", createUiSelectBuffer(audioCtx));
@@ -1079,28 +1125,28 @@ function buildCorridor() {
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 
   // Basement Gate (Visual entry point for winning the game)
-  const gateGroup = new THREE.Group();
-  gateGroup.name = "basement gate group";
-  gateGroup.position.set(0, 0, -48);
+  basementGateGroup = new THREE.Group();
+  basementGateGroup.name = "basement gate group";
+  basementGateGroup.position.set(0, 0, -48);
   
   const gateFrame = new THREE.Mesh(new THREE.BoxGeometry(3.6, 3.8, 0.28), materials.darkWood);
   gateFrame.position.set(0, 1.9, 0);
   gateFrame.name = "basement gate frame";
-  gateGroup.add(gateFrame);
+  basementGateGroup.add(gateFrame);
 
   const gateLeft = new THREE.Mesh(new THREE.BoxGeometry(1.6, 3.4, 0.1), materials.brass);
   gateLeft.position.set(-0.8, 1.7, 0.05);
   gateLeft.name = "basement gate left door";
   tagInteractable(gateLeft, "basement_gate", "Basement Gate Left");
-  gateGroup.add(gateLeft);
+  basementGateGroup.add(gateLeft);
   
   const gateRight = new THREE.Mesh(new THREE.BoxGeometry(1.6, 3.4, 0.1), materials.brass);
   gateRight.position.set(0.8, 1.7, 0.05);
   gateRight.name = "basement gate right door";
   tagInteractable(gateRight, "basement_gate", "Basement Gate Right");
-  gateGroup.add(gateRight);
+  basementGateGroup.add(gateRight);
 
-  scene.add(gateGroup);
+  scene.add(basementGateGroup);
   registerCollider(gateFrame);
   interactables.push(gateLeft, gateRight);
 }

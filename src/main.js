@@ -841,11 +841,7 @@ function requestPointerLock() {
 function togglePause() {
   if (gameState === GameState.PLAYING) {
     document.exitPointerLock?.();
-    setGameState(GameState.PAUSED);
-    return;
-  }
-  if (gameState === GameState.PAUSED) {
-    setGameState(GameState.PLAYING);
+  } else if (gameState === GameState.PAUSED) {
     requestPointerLock();
   }
 }
@@ -869,7 +865,7 @@ if (new URLSearchParams(window.location.search).has("autostart")) {
   setGameState(GameState.PLAYING);
   caption.textContent = "Verification mode: playable scene loaded.";
 }
-document.addEventListener("click", () => {
+canvas.addEventListener("click", () => {
   if (gameState === GameState.PLAYING) requestPointerLock();
 });
 
@@ -877,12 +873,23 @@ document.addEventListener("pointerlockchange", () => {
   pointerLocked = document.pointerLockElement === canvas;
   if (pointerLocked) {
     caption.textContent = "Mouse look enabled. WASD move, E interact, F flashlight.";
+    if (gameState === GameState.PAUSED) {
+      setGameState(GameState.PLAYING);
+    }
+  } else {
+    caption.textContent = "Mouse look disabled. Click the game view to resume.";
+    if (gameState === GameState.PLAYING) {
+      setGameState(GameState.PAUSED);
+    }
   }
 });
 
 document.addEventListener("pointerlockerror", () => {
   pointerLocked = false;
   caption.textContent = "Mouse look was blocked. Click the game view or use arrow keys.";
+  if (gameState === GameState.PLAYING) {
+    setGameState(GameState.PAUSED);
+  }
 });
 
 document.addEventListener("mousemove", (event) => {

@@ -577,6 +577,7 @@ function buildFlashlightProp() {
 }
 
 function updateMovement(delta) {
+  if (gameState !== GameState.PLAYING) return;
   const forward = Number(keys.has("KeyW")) - Number(keys.has("KeyS"));
   const strafe = Number(keys.has("KeyD")) - Number(keys.has("KeyA"));
   const wantsSprint = keys.has("ShiftLeft") || keys.has("ShiftRight");
@@ -616,6 +617,7 @@ function canOccupy(position) {
 }
 
 function updateState(delta) {
+  if (gameState === GameState.MENU) return;
   if (flashlightOn) battery = Math.max(0, battery - delta * 1.15);
   if (battery <= 0) flashlightOn = false;
   const depthFear = THREE.MathUtils.clamp((-camera.position.z - 6) * 1.7, 0, 58);
@@ -739,6 +741,7 @@ function playIntroDialogue() {
 }
 
 function inspectNearest() {
+  if (gameState !== GameState.PLAYING) return;
   const hit = getFocusedInteractable();
   if (!hit) {
     caption.textContent = "Nothing close enough to inspect.";
@@ -828,7 +831,7 @@ if (new URLSearchParams(window.location.search).has("autostart")) {
   caption.textContent = "Verification mode: playable scene loaded.";
 }
 document.addEventListener("click", () => {
-  if (startScreen.classList.contains("hidden")) requestPointerLock();
+  if (gameState === GameState.PLAYING) requestPointerLock();
 });
 
 document.addEventListener("pointerlockchange", () => {
@@ -844,7 +847,7 @@ document.addEventListener("pointerlockerror", () => {
 });
 
 document.addEventListener("mousemove", (event) => {
-  if (!pointerLocked) return;
+  if (!pointerLocked || gameState !== GameState.PLAYING) return;
   yaw -= event.movementX * 0.0022;
   pitch -= event.movementY * 0.002;
   pitch = THREE.MathUtils.clamp(pitch, -1.1, 1.1);
@@ -853,6 +856,7 @@ document.addEventListener("mousemove", (event) => {
 
 document.addEventListener("keydown", (event) => {
   keys.add(event.code);
+  if (gameState !== GameState.PLAYING) return;
   if (event.code === "KeyF") {
     flashlightOn = !flashlightOn && battery > 0;
     caption.textContent = flashlightOn ? "Flashlight on." : "Flashlight off.";

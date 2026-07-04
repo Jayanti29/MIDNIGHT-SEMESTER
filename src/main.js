@@ -1039,7 +1039,8 @@ function createDoor({ side, z, label }) {
   const group = new THREE.Group();
   group.name = label;
   group.position.set(direction * 3.62, 1.18, z);
-  group.userData = { type: "door", open: false, side, label };
+  const locked = label.includes("Room 32 left") || label.includes("Room 29 right");
+  group.userData = { type: "door", open: false, side, label, locked };
 
   const panel = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.35, 1.18), materials.darkWood);
   panel.name = `${label} panel`;
@@ -1684,6 +1685,27 @@ function inspectNearest() {
   if (type === "door") {
     const door = hit.object.userData.parentDoor;
     if (door) {
+      if (door.userData.locked) {
+        if (door.userData.label.includes("Room 32 left") && inspected >= 1) {
+          door.userData.locked = false;
+          caption.textContent = "You unlock Room 32 using the credentials from Dr. Verma's memo.";
+          addTaskLog("Unlocked Room 32 Left Door.");
+          sayLine("Aarav", "Okay, it's open. Let's see what's in here.");
+          if (audioManager) audioManager.playSound("door_latch", { volume: 0.35 });
+        } else if (door.userData.label.includes("Room 29 right") && inspected >= 2) {
+          door.userData.locked = false;
+          caption.textContent = "You unlock Room 29 using the access card from the Watchman's Logbook.";
+          addTaskLog("Unlocked Room 29 Right Door.");
+          sayLine("Aarav", "The right wing dorm is unlocked. I should check the study tables.");
+          if (audioManager) audioManager.playSound("door_latch", { volume: 0.35 });
+        } else {
+          caption.textContent = "The door is locked from the inside. Find more documents first.";
+          sayLine("Aarav", "Locked tight. I must have missed something down the hall.");
+          if (audioManager) audioManager.playSound("door_latch", { volume: 0.35 });
+        }
+        return;
+      }
+
       door.userData.open = !door.userData.open;
       fear = Math.min(100, fear + 4);
       playDoorCreak(door, door.userData.open);
@@ -1860,6 +1882,12 @@ function resetGame() {
   flickerLights.forEach((lightObj) => {
     lightObj.base = 1.1;
     lightObj.light.color.setHex(0xffc987);
+  });
+
+  doors.forEach((door) => {
+    door.userData.open = false;
+    door.rotation.y = 0;
+    door.userData.locked = door.userData.label.includes("Room 32 left") || door.userData.label.includes("Room 29 right");
   });
 
   evidenceItems.forEach((mesh) => {

@@ -261,13 +261,30 @@ const materials = {
   emission: new THREE.MeshStandardMaterial({ color: 0xffd9a1, emissive: 0xffb25a, emissiveIntensity: 0.9 })
 };
 
-function box(name, size, position, material, cast = true, receive = true) {
+const colliders = [];
+
+function registerCollider(object) {
+  if (!object) return;
+  const box3 = new THREE.Box3().setFromObject(object);
+  colliders.push({
+    xMin: box3.min.x,
+    xMax: box3.max.x,
+    zMin: box3.min.z,
+    zMax: box3.max.z,
+    name: object.name || "obstacle"
+  });
+}
+
+function box(name, size, position, material, cast = true, receive = true, isCollider = false) {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
   mesh.name = name;
   mesh.position.set(...position);
   mesh.castShadow = cast;
   mesh.receiveShadow = receive;
   scene.add(mesh);
+  if (isCollider) {
+    registerCollider(mesh);
+  }
   return mesh;
 }
 
@@ -341,6 +358,7 @@ function createBookStack(position, rotation = 0) {
 
 function createStudyTable(position, rotation = 0) {
   const group = new THREE.Group();
+  group.name = "study table";
   group.position.set(...position);
   group.rotation.y = rotation;
 
@@ -359,11 +377,13 @@ function createStudyTable(position, rotation = 0) {
 
   scene.add(group);
   createBookStack([position[0] - 0.34, position[1] + 1.0, position[2] + 0.08], rotation);
+  registerCollider(group);
   return group;
 }
 
 function createBookshelf(position, rotation = 0) {
   const group = new THREE.Group();
+  group.name = "bookshelf";
   group.position.set(...position);
   group.rotation.y = rotation;
   for (let shelf = 0; shelf < 4; shelf += 1) {
@@ -383,6 +403,7 @@ function createBookshelf(position, rotation = 0) {
     }
   }
   scene.add(group);
+  registerCollider(group);
   return group;
 }
 
@@ -435,15 +456,48 @@ function createCharacter({ name, position, color, ghostly = false }) {
   return group;
 }
 
+function buildSegmentedWall(x, side) {
+  const wallStart = 13;
+  const wallEnd = -49;
+  const doorWidth = 1.18;
+  const doorZList = [];
+  for (let z = 5; z > -46; z -= 7) {
+    const doorZ = side === "left" ? z - 2.4 : z + 0.6;
+    doorZList.push(doorZ);
+  }
+  doorZList.sort((a, b) => b - a);
+
+  let currentZ = wallStart;
+  doorZList.forEach((doorZ) => {
+    const segStart = currentZ;
+    const segEnd = doorZ + doorWidth / 2;
+    const length = segStart - segEnd;
+    if (length > 0.05) {
+      const centerZ = segStart - length / 2;
+      box(`${side} wall segment`, [0.28, 4, length], [x, 1.85, centerZ], materials.wall, false, true, true);
+    }
+    // Top arch above the door: height from 2.35 to 3.8
+    box(`${side} arch segment`, [0.28, 1.45, doorWidth], [x, 3.08, doorZ], materials.wall, false, true, false);
+
+    currentZ = doorZ - doorWidth / 2;
+  });
+
+  const length = currentZ - wallEnd;
+  if (length > 0.05) {
+    const centerZ = currentZ - length / 2;
+    box(`${side} wall segment`, [0.28, 4, length], [x, 1.85, centerZ], materials.wall, false, true, true);
+  }
+}
+
 function buildCorridor() {
   box("floor", [8, 0.18, 62], [0, -0.1, -18], materials.floor, false);
   box("ceiling", [8, 0.24, 62], [0, 3.8, -18], materials.wall, false);
-  box("left wall", [0.28, 4, 62], [-4, 1.85, -18], materials.wall, false);
-  box("right wall", [0.28, 4, 62], [4, 1.85, -18], materials.wall, false);
+  buildSegmentedWall(-4, "left");
+  buildSegmentedWall(4, "right");
 
   for (let z = 5; z > -46; z -= 7) {
-    box("wood panel left", [0.34, 1.15, 3.5], [-3.82, 0.78, z], materials.darkWood);
-    box("wood panel right", [0.34, 1.15, 3.5], [3.82, 0.78, z - 2.6], materials.darkWood);
+    box("wood panel left", [0.34, 1.15, 3.5], [-3.82, 0.78, z], materials.darkWood, true, true, true);
+    box("wood panel right", [0.34, 1.15, 3.5], [3.82, 0.78, z - 2.6], materials.darkWood, true, true, true);
     createDoor({ side: "left", z: z - 2.4, label: `Room ${Math.abs(Math.round(z - 2.4))} left door` });
     createDoor({ side: "right", z: z + 0.6, label: `Room ${Math.abs(Math.round(z + 0.6))} right door` });
     box("frame left", [0.22, 2.66, 1.42], [-3.54, 1.32, z - 2.4], materials.brass);
@@ -472,6 +526,7 @@ function buildCorridor() {
   buildDormRoom();
   buildDocuments();
   scene.userData.kulkarni = createCharacter({ name: "Professor Kulkarni", position: [-2.4, 0, -15.5], color: 0x3f5f69 });
+  registerCollider(scene.userData.kulkarni);
   scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [2.6, 0, -34.5], color: 0xc9d5cf, ghostly: true });
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 }
@@ -479,15 +534,20 @@ function buildCorridor() {
 function buildDormRoom() {
   const roomZ = -35;
   box("dorm floor", [13, 0.16, 12], [0, -0.08, roomZ], materials.floor);
-  box("dorm back wall", [13, 4, 0.3], [0, 1.9, roomZ - 6], materials.wall);
-  box("bed left base", [2.2, 0.42, 4.8], [-3.1, 0.28, roomZ - 1.6], materials.darkWood);
+  box("dorm back wall", [13, 4, 0.3], [0, 1.9, roomZ - 6], materials.wall, false, true, true);
+  box("dorm left wall", [0.3, 4, 12.3], [-6.5, 1.9, roomZ], materials.wall, false, true, true);
+  box("dorm right wall", [0.3, 4, 12.3], [6.5, 1.9, roomZ], materials.wall, false, true, true);
+  box("dorm front wall left", [2.5, 4, 0.3], [-5.25, 1.9, roomZ + 6], materials.wall, false, true, true);
+  box("dorm front wall right", [2.5, 4, 0.3], [5.25, 1.9, roomZ + 6], materials.wall, false, true, true);
+
+  box("bed left base", [2.2, 0.42, 4.8], [-3.1, 0.28, roomZ - 1.6], materials.darkWood, true, true, true);
   box("bed left mattress", [2.04, 0.28, 4.56], [-3.1, 0.68, roomZ - 1.6], materials.fabric);
-  box("bed right base", [2.2, 0.42, 4.8], [3.1, 0.28, roomZ - 1.4], materials.darkWood);
+  box("bed right base", [2.2, 0.42, 4.8], [3.1, 0.28, roomZ - 1.4], materials.darkWood, true, true, true);
   box("bed right mattress", [2.04, 0.28, 4.56], [3.1, 0.68, roomZ - 1.4], materials.fabric);
-  box("desk", [2.4, 0.22, 1.2], [0, 1, roomZ - 4.4], materials.darkWood);
+  box("desk", [2.4, 0.22, 1.2], [0, 1, roomZ - 4.4], materials.darkWood, true, true, true);
   box("desk left leg", [0.16, 1, 0.16], [-1, 0.45, roomZ - 3.96], materials.darkWood);
   box("desk right leg", [0.16, 1, 0.16], [1, 0.45, roomZ - 3.96], materials.darkWood);
-  box("fallen chair", [0.9, 0.14, 0.9], [-1.7, 0.28, roomZ + 1.8], materials.darkWood).rotation.z = 0.6;
+  box("fallen chair", [0.9, 0.14, 0.9], [-1.7, 0.28, roomZ + 1.8], materials.darkWood, true, true, true).rotation.z = 0.6;
   box("blood mark", [0.9, 0.025, 1.9], [1.7, 0.04, roomZ + 2.8], materials.hazard, false);
   createBookStack([-0.46, 1.17, roomZ - 4.42], 0.1);
   createBookshelf([-5.1, 0, roomZ - 2.6], Math.PI / 2);
@@ -632,9 +692,44 @@ function updateMovement(delta) {
 }
 
 function canOccupy(position) {
-  const inCorridor = Math.abs(position.x) <= 3.55 - playerRadius && position.z <= 8.5 && position.z >= -41;
-  const inDorm = Math.abs(position.x) <= 6.15 - playerRadius && position.z <= -29 && position.z >= -41;
-  return inCorridor || inDorm;
+  const x = position.x;
+  const z = position.z;
+
+  // Global corridor & dorm room Z limits
+  if (z > 8.5 || z < -47.5) return false;
+
+  // Max X limits based on whether we are in the dorm Z-span or not
+  const inDormZ = z <= -29 && z >= -41;
+  const maxX = inDormZ ? 6.15 : 3.55;
+  if (Math.abs(x) > maxX) return false;
+
+  // Check static colliders registered in the list
+  for (let i = 0; i < colliders.length; i++) {
+    const col = colliders[i];
+    if (x >= col.xMin - playerRadius && x <= col.xMax + playerRadius &&
+        z >= col.zMin - playerRadius && z <= col.zMax + playerRadius) {
+      return false;
+    }
+  }
+
+  // Check doors (closed doors block movement through their frame segment)
+  for (let i = 0; i < doors.length; i++) {
+    const door = doors[i];
+    if (!door.userData.open) {
+      const xDoor = door.position.x;
+      const zDoor = door.position.z;
+      const xMin = xDoor - 0.25;
+      const xMax = xDoor + 0.25;
+      const zMin = zDoor - 0.65;
+      const zMax = zDoor + 0.65;
+      if (x >= xMin - playerRadius && x <= xMax + playerRadius &&
+          z >= zMin - playerRadius && z <= zMax + playerRadius) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 function updateState(delta) {

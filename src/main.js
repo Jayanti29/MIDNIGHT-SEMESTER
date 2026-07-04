@@ -86,6 +86,52 @@ const GameState = Object.freeze({
   GAMEOVER: "gameover"
 });
 let gameState = GameState.MENU;
+
+class GameStateManager {
+  constructor() {
+    this.state = GameState.MENU;
+  }
+
+  transitionTo(nextState) {
+    const prevState = this.state;
+    this.state = nextState;
+    gameState = nextState;
+    document.body.dataset.state = nextState;
+    document.body.classList.toggle("started", nextState === GameState.PLAYING || nextState === GameState.PAUSED);
+    
+    if (startScreen) {
+      if (nextState === GameState.MENU) {
+        startScreen.classList.remove("hidden");
+      } else {
+        startScreen.classList.add("hidden");
+      }
+    }
+    if (pauseMenu) pauseMenu.hidden = nextState !== GameState.PAUSED;
+    
+    const settingsPanel = document.querySelector("#settings-panel");
+    if (settingsPanel) settingsPanel.hidden = true;
+    
+    const gameoverScreen = document.querySelector("#gameover-screen");
+    if (gameoverScreen) gameoverScreen.hidden = nextState !== GameState.GAMEOVER;
+
+    this.onStateChange(nextState, prevState);
+  }
+
+  onStateChange(nextState, prevState) {
+    if (nextState === GameState.PLAYING) {
+      if (!clock.running) clock.start();
+    } else if (nextState === GameState.PAUSED || nextState === GameState.MENU || nextState === GameState.GAMEOVER) {
+      clock.stop();
+    }
+  }
+}
+
+const stateManager = new GameStateManager();
+
+function setGameState(nextState) {
+  stateManager.transitionTo(nextState);
+}
+
 const loadingManager = new THREE.LoadingManager();
 
 loadingManager.onError = (url) => {
@@ -101,12 +147,6 @@ window.addEventListener("unhandledrejection", (event) => {
   console.error("Unhandled promise rejection:", event.reason);
 });
 
-function setGameState(nextState) {
-  gameState = nextState;
-  document.body.dataset.state = nextState;
-  document.body.classList.toggle("started", nextState === GameState.PLAYING || nextState === GameState.PAUSED);
-  pauseMenu.hidden = nextState !== GameState.PAUSED;
-}
 
 function completeObjective(step) {
   document.querySelector(`[data-step="${step}"]`)?.classList.add("done");

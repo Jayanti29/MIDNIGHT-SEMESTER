@@ -30,6 +30,11 @@ const interactionPrompt = document.querySelector("#interaction-prompt");
 const actionInteract = document.querySelector("#action-interact");
 const actionFlashlight = document.querySelector("#action-flashlight");
 const fatalError = document.querySelector("#fatal-error");
+const settingsPanel = document.querySelector("#settings-panel");
+const closeSettings = document.querySelector("#close-settings");
+const settingMasterVolume = document.querySelector("#setting-master-volume");
+const settingMouseSensitivity = document.querySelector("#setting-mouse-sensitivity");
+const settingFov = document.querySelector("#setting-fov");
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020303);
@@ -62,6 +67,8 @@ const flickerLights = [];
 const playerRadius = 0.32;
 let yaw = 0;
 let pitch = 0;
+let mouseSensitivity = parseFloat(localStorage.getItem("setting-mouse-sensitivity") || "1.0");
+let masterVolume = parseFloat(localStorage.getItem("setting-master-volume") || "0.8");
 let battery = 100;
 let fear = 0;
 let flashlightOn = true;
@@ -1075,7 +1082,8 @@ renderer.setAnimationLoop(animate);
 
 startButton.addEventListener("click", () => startGame());
 menuSettings.addEventListener("click", () => {
-  caption.textContent = "Settings panel arrives in Task 13.";
+  startScreen.classList.add("hidden");
+  settingsPanel.classList.add("open");
 });
 menuQuit.addEventListener("click", () => {
   caption.textContent = "Quit is disabled in browser preview. Close the tab to exit.";
@@ -1114,8 +1122,8 @@ document.addEventListener("pointerlockerror", () => {
 
 document.addEventListener("mousemove", (event) => {
   if (!pointerLocked || gameState !== GameState.PLAYING) return;
-  yaw -= event.movementX * 0.0022;
-  pitch -= event.movementY * 0.002;
+  yaw -= event.movementX * 0.0022 * mouseSensitivity;
+  pitch -= event.movementY * 0.002 * mouseSensitivity;
   pitch = THREE.MathUtils.clamp(pitch, -1.1, 1.1);
   camera.rotation.set(pitch, yaw, 0, "YXZ");
 });
@@ -1144,13 +1152,54 @@ actionFlashlight.addEventListener("click", () => {
 });
 resumeButton.addEventListener("click", togglePause);
 pauseSettings.addEventListener("click", () => {
-  caption.textContent = "Settings panel arrives in Task 13.";
+  pauseMenu.classList.remove("open");
+  settingsPanel.classList.add("open");
 });
+closeSettings.addEventListener("click", () => {
+  settingsPanel.classList.remove("open");
+  if (gameState === GameState.MENU) {
+    startScreen.classList.remove("hidden");
+  } else if (gameState === GameState.PAUSED) {
+    pauseMenu.classList.add("open");
+  }
+});
+
+// Settings Input Event Listeners
+settingMasterVolume.addEventListener("input", (event) => {
+  masterVolume = parseFloat(event.target.value);
+  localStorage.setItem("setting-master-volume", masterVolume);
+  caption.textContent = `Master Volume: ${Math.round(masterVolume * 100)}%`;
+});
+
+settingMouseSensitivity.addEventListener("input", (event) => {
+  mouseSensitivity = parseFloat(event.target.value);
+  localStorage.setItem("setting-mouse-sensitivity", mouseSensitivity);
+  caption.textContent = `Mouse Sensitivity: ${mouseSensitivity.toFixed(1)}x`;
+});
+
+settingFov.addEventListener("input", (event) => {
+  const fovVal = parseInt(event.target.value);
+  camera.fov = fovVal;
+  camera.updateProjectionMatrix();
+  localStorage.setItem("setting-fov", fovVal);
+  caption.textContent = `Field of View: ${fovVal}°`;
+});
+
 quitToMenu.addEventListener("click", () => {
   setGameState(GameState.MENU);
-  startScreen.classList.remove("hidden");
-  pauseMenu.hidden = true;
 });
+
+// Apply Initial Settings on Startup
+settingMasterVolume.value = masterVolume;
+settingMouseSensitivity.value = mouseSensitivity;
+const savedFov = localStorage.getItem("setting-fov");
+if (savedFov) {
+  camera.fov = parseInt(savedFov);
+  camera.updateProjectionMatrix();
+  settingFov.value = savedFov;
+} else {
+  settingFov.value = 72;
+}
 
 window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;

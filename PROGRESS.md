@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 36/500**
+Commit counter: **Commit 37/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -39,3 +39,4 @@ Commit counter: **Commit 36/500**
 - **Commit 34/500**: Completed Phase 3 Task 34. Added procedural jumpscare stinger audio buffer with high-frequency screams and sub-bass boom, triggered along with a fear spike upon Meera's visual activation.
 - **Commit 35/500**: Completed Phase 3 Task 35. Instantiated a 50Hz mains hum electric buzz buffer and attached it as looping spatial positional sources to corridor lights and the basement gate.
 - **Commit 36/500**: Completed Phase 3 Task 36. Implemented dynamic sector blackout event sequence triggered when Aarav advances down the corridor, playing a heavy grid spin-down sweep with emergency backup light restore.
+- **Commit 37/500**: Completed Phase 3 Task 37. Added SFX and Ambient Volume range sliders in the Settings panel, wiring them to dynamically recalculate category levels across all active AudioManager sounds.

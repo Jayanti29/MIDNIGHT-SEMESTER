@@ -37,6 +37,8 @@ const loadingProgress = document.querySelector("#loading-progress");
 const loadingStatus = document.querySelector("#loading-status");
 const closeSettings = document.querySelector("#close-settings");
 const settingMasterVolume = document.querySelector("#setting-master-volume");
+const settingSfxVolume = document.querySelector("#setting-sfx-volume");
+const settingAmbientVolume = document.querySelector("#setting-ambient-volume");
 const settingMouseSensitivity = document.querySelector("#setting-mouse-sensitivity");
 const settingFov = document.querySelector("#setting-fov");
 const inventoryPanel = document.querySelector("#inventory-panel");
@@ -139,6 +141,7 @@ class AudioManager {
     const volume = options.volume !== undefined ? options.volume : 1.0;
     const positional = options.positional || false;
     const targetMesh = options.targetMesh || null;
+    const category = options.category || "sfx";
     
     let sound;
     if (positional && targetMesh) {
@@ -153,7 +156,10 @@ class AudioManager {
     }
 
     sound.setLoop(loop);
-    sound.setVolume(volume);
+    sound.userData = { category, baseVolume: volume };
+    
+    const catVol = category === "ambient" ? ambientVolume : sfxVolume;
+    sound.setVolume(volume * catVol);
     sound.play();
 
     this.activeSounds.set(name, sound);
@@ -170,6 +176,17 @@ class AudioManager {
     }
 
     return sound;
+  }
+
+  updateCategoryVolumes() {
+    this.activeSounds.forEach((sound) => {
+      if (sound.userData) {
+        const cat = sound.userData.category;
+        const base = sound.userData.baseVolume !== undefined ? sound.userData.baseVolume : 1.0;
+        const factor = cat === "ambient" ? ambientVolume : sfxVolume;
+        sound.setVolume(base * factor);
+      }
+    });
   }
 
   stopSound(name) {
@@ -221,6 +238,8 @@ let yaw = 0;
 let pitch = 0;
 let mouseSensitivity = parseFloat(localStorage.getItem("setting-mouse-sensitivity") || "1.0");
 let masterVolume = parseFloat(localStorage.getItem("setting-master-volume") || "0.8");
+let sfxVolume = parseFloat(localStorage.getItem("setting-sfx-volume") || "0.8");
+let ambientVolume = parseFloat(localStorage.getItem("setting-ambient-volume") || "0.8");
 let battery = 100;
 let fear = 0;
 let flashlightOn = true;
@@ -1920,6 +1939,24 @@ settingMasterVolume.addEventListener("input", (event) => {
   }
 });
 
+settingSfxVolume.addEventListener("input", (event) => {
+  sfxVolume = parseFloat(event.target.value);
+  localStorage.setItem("setting-sfx-volume", sfxVolume);
+  caption.textContent = `SFX Volume: ${Math.round(sfxVolume * 100)}%`;
+  if (audioManager) {
+    audioManager.updateCategoryVolumes();
+  }
+});
+
+settingAmbientVolume.addEventListener("input", (event) => {
+  ambientVolume = parseFloat(event.target.value);
+  localStorage.setItem("setting-ambient-volume", ambientVolume);
+  caption.textContent = `Ambient Volume: ${Math.round(ambientVolume * 100)}%`;
+  if (audioManager) {
+    audioManager.updateCategoryVolumes();
+  }
+});
+
 settingMouseSensitivity.addEventListener("input", (event) => {
   mouseSensitivity = parseFloat(event.target.value);
   localStorage.setItem("setting-mouse-sensitivity", mouseSensitivity);
@@ -1946,6 +1983,8 @@ quitToMenu.addEventListener("click", () => {
 
 // Apply Initial Settings on Startup
 settingMasterVolume.value = masterVolume;
+settingSfxVolume.value = sfxVolume;
+settingAmbientVolume.value = ambientVolume;
 settingMouseSensitivity.value = mouseSensitivity;
 const savedFov = localStorage.getItem("setting-fov");
 if (savedFov) {

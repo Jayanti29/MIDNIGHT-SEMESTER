@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 8/500**
+Commit counter: **Commit 9/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -11,3 +11,4 @@ Commit counter: **Commit 8/500**
 - **Commit 6/500**: Completed Phase 1 Task 6. Fixed E interaction raycasting to correctly intersect the closest object in the scene graph without bypassing walls.
 - **Commit 7/500**: Completed Phase 1 Task 7. Added interactable object tagging system and built a visual basement gate that unlocks when all evidence is collected.
 - **Commit 8/500**: Completed Phase 1 Task 8. Added basic state manager class (GameStateManager) supporting transition hooks and overlay toggling.
+- **Commit 9/500**: Completed Phase 1 Task 9. Wired keyboard and mouse look/button inputs through the state manager and cleared active key sets on pause/menu.

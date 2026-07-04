@@ -122,6 +122,7 @@ class GameStateManager {
       if (!clock.running) clock.start();
     } else if (nextState === GameState.PAUSED || nextState === GameState.MENU || nextState === GameState.GAMEOVER) {
       clock.stop();
+      keys.clear();
     }
   }
 }
@@ -1098,8 +1099,8 @@ document.addEventListener("keydown", (event) => {
     togglePause();
     return;
   }
-  keys.add(event.code);
   if (gameState !== GameState.PLAYING) return;
+  keys.add(event.code);
   if (event.code === "KeyF") {
     flashlightOn = !flashlightOn && battery > 0;
     caption.textContent = flashlightOn ? "Flashlight on." : "Flashlight off.";
@@ -1111,6 +1112,7 @@ document.addEventListener("keyup", (event) => keys.delete(event.code));
 nextLineButton.addEventListener("click", showNextStoryLine);
 actionInteract.addEventListener("click", inspectNearest);
 actionFlashlight.addEventListener("click", () => {
+  if (gameState !== GameState.PLAYING) return;
   flashlightOn = !flashlightOn && battery > 0;
   caption.textContent = flashlightOn ? "Flashlight on." : "Flashlight off.";
 });

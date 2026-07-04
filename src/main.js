@@ -538,6 +538,9 @@ function initAudio() {
   audioManager.buffers.set("door_creak", doorCreakBuffer);
   audioManager.buffers.set("door_latch", doorLatchBuffer);
 
+  const whisperBuffer = createWhisperBuffer(audioCtx);
+  audioManager.buffers.set("evidence_whisper", whisperBuffer);
+
   heartbeatTimer = window.setInterval(() => {
     if (!document.body.classList.contains("started")) return;
     playTone(64, 0.11, 0.04 + fear / 900, "sine");
@@ -572,10 +575,36 @@ function playDoorCreak(targetMesh, isOpen) {
   }
 }
 
+function createWhisperBuffer(ctx) {
+  const duration = 1.8;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(2, numSamples, sampleRate);
+  const left = buffer.getChannelData(0);
+  const right = buffer.getChannelData(1);
+  
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-2.2 * t);
+    const chimeFreq = 880 * Math.exp(-1.8 * t);
+    const chime = Math.sin(2 * Math.PI * chimeFreq * t) * 0.4;
+    const sub = Math.sin(2 * Math.PI * 65 * Math.exp(-4 * t) * t) * 0.45;
+    const mod = Math.sin(2 * Math.PI * 4.5 * t) * 0.4 + 0.6;
+    const whisper = (Math.random() * 2 - 1) * 0.18 * mod;
+    left[i] = (chime + sub + whisper) * envelope * 0.16;
+    
+    const tRight = Math.max(0, t - 0.025);
+    const chimeR = Math.sin(2 * Math.PI * (880 * Math.exp(-1.8 * tRight)) * tRight) * 0.4;
+    const whisperR = (Math.random() * 2 - 1) * 0.18 * mod;
+    right[i] = (chimeR + sub + whisperR) * envelope * 0.16;
+  }
+  return buffer;
+}
+
 function playWhisper() {
-  playTone(520, 0.18, 0.035, "triangle");
-  window.setTimeout(() => playTone(410, 0.22, 0.025, "triangle"), 160);
-  window.setTimeout(() => playTone(615, 0.14, 0.025, "sine"), 340);
+  if (audioManager) {
+    audioManager.playSound("evidence_whisper", { volume: 0.95 });
+  }
 }
 
 function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#776b5a", scale = 1 }) {

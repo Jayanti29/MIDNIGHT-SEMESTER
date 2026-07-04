@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 11/500**
+Commit counter: **Commit 12/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -14,3 +14,4 @@ Commit counter: **Commit 11/500**
 - **Commit 9/500**: Completed Phase 1 Task 9. Wired keyboard and mouse look/button inputs through the state manager and cleared active key sets on pause/menu.
 - **Commit 10/500**: Completed Phase 1 Task 10. Added global error boundary handling, WebGL context loss listener, and asset loading error interception.
 - **Commit 11/500**: Completed Phase 2 Task 11. Refined Main Menu screen DOM overlay styling with modern typography, layout, transitions, and hover animations.
+- **Commit 12/500**: Completed Phase 2 Task 12. Implemented dynamic pause menu scale transitions and animated glassmorphism styling toggled via Esc.

@@ -106,13 +106,25 @@ class GameStateManager {
         startScreen.classList.add("hidden");
       }
     }
-    if (pauseMenu) pauseMenu.hidden = nextState !== GameState.PAUSED;
+    if (pauseMenu) {
+      if (nextState === GameState.PAUSED) {
+        pauseMenu.classList.add("open");
+      } else {
+        pauseMenu.classList.remove("open");
+      }
+    }
     
     const settingsPanel = document.querySelector("#settings-panel");
-    if (settingsPanel) settingsPanel.hidden = true;
+    if (settingsPanel) settingsPanel.classList.remove("open");
     
     const gameoverScreen = document.querySelector("#gameover-screen");
-    if (gameoverScreen) gameoverScreen.hidden = nextState !== GameState.GAMEOVER;
+    if (gameoverScreen) {
+      if (nextState === GameState.GAMEOVER) {
+        gameoverScreen.classList.add("open");
+      } else {
+        gameoverScreen.classList.remove("open");
+      }
+    }
 
     this.onStateChange(nextState, prevState);
   }

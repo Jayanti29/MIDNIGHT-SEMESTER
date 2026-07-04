@@ -260,13 +260,26 @@ body.started .task-log {
   display: grid;
   gap: 12px;
   width: min(420px, calc(100vw - 48px));
-  transform: translate(-50%, -50%);
-  border: 1px solid rgba(222, 211, 191, 0.2);
-  border-radius: 6px;
-  padding: 24px;
-  background: rgba(8, 7, 6, 0.9);
-  box-shadow: 0 24px 90px rgba(0, 0, 0, 0.64);
+  transform: translate(-50%, -50%) scale(0.92);
+  border: 1px solid rgba(201, 165, 109, 0.18);
+  border-radius: 8px;
+  padding: 28px;
+  background: rgba(14, 12, 11, 0.76);
+  box-shadow: 0 30px 100px rgba(0, 0, 0, 0.8), inset 0 1px 0 rgba(255, 255, 255, 0.05);
   z-index: 15;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  opacity: 0;
+  pointer-events: none;
+  visibility: hidden;
+  transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.modal-menu.open {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1);
 }
 
 .modal-menu h2 {

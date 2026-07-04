@@ -462,6 +462,17 @@ body.started .quick-actions {
   transform: translate(-50%, -50%);
   opacity: 0.68;
   z-index: 3;
+  transition: all 0.15s cubic-bezier(0.25, 0.8, 0.25, 1);
+  pointer-events: none;
+}
+
+#reticle.active {
+  width: 14px;
+  height: 14px;
+  border-color: #c9a56d;
+  background: rgba(201, 165, 109, 0.35);
+  box-shadow: 0 0 10px rgba(201, 165, 109, 0.8);
+  opacity: 1;
 }
 
 #vignette {

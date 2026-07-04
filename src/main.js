@@ -30,6 +30,7 @@ const interactionPrompt = document.querySelector("#interaction-prompt");
 const actionInteract = document.querySelector("#action-interact");
 const actionFlashlight = document.querySelector("#action-flashlight");
 const fatalError = document.querySelector("#fatal-error");
+const reticle = document.querySelector("#reticle");
 const settingsPanel = document.querySelector("#settings-panel");
 const closeSettings = document.querySelector("#close-settings");
 const settingMasterVolume = document.querySelector("#setting-master-volume");
@@ -938,9 +939,11 @@ function updateInteractionPrompt() {
   const hit = getFocusedInteractable();
   if (!hit || !document.body.classList.contains("started")) {
     interactionPrompt.hidden = true;
+    if (reticle) reticle.classList.remove("active");
     return;
   }
 
+  if (reticle) reticle.classList.add("active");
   const type = hit.object.userData.interactionType;
   interactionPrompt.hidden = false;
   

@@ -286,6 +286,7 @@ let heartbeatTimer = 0;
 let footstepTimer = 0.35;
 let meeraWarned = false;
 let meeraFirstWhisperPlayed = false;
+let kulkarniCallPlayed = false;
 let basementGateGroup = null;
 let blackoutTriggered = false;
 let isBlackoutActive = false;
@@ -798,6 +799,9 @@ function initAudio() {
   const whisperBuffer = createWhisperBuffer(audioCtx);
   audioManager.buffers.set("evidence_whisper", whisperBuffer);
 
+  const phoneRingBuffer = createPhoneRingBuffer(audioCtx);
+  audioManager.buffers.set("phone_ring", phoneRingBuffer);
+
   const jumpscareBuffer = createJumpscareStingerBuffer(audioCtx);
   audioManager.buffers.set("jumpscare_stinger", jumpscareBuffer);
 
@@ -903,6 +907,27 @@ function playWhisper() {
   if (audioManager) {
     audioManager.playSound("evidence_whisper", { volume: 0.58 });
   }
+}
+
+function createPhoneRingBuffer(ctx) {
+  const sampleRate = ctx.sampleRate;
+  const duration = 2.4;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    let ring = 0;
+    if ((t >= 0 && t < 0.4) || (t >= 0.6 && t < 1.0)) {
+      ring = Math.sin(2 * Math.PI * 400 * t) + Math.sin(2 * Math.PI * 450 * t);
+      ring *= 0.5 * (1 + Math.sin(2 * Math.PI * 25 * t));
+      let localT = (t >= 0 && t < 0.4) ? t : t - 0.6;
+      let fade = Math.sin(Math.PI * localT / 0.4);
+      ring *= fade;
+    }
+    data[i] = ring * 0.24;
+  }
+  return buffer;
 }
 
 function createJumpscareStingerBuffer(ctx) {
@@ -2003,6 +2028,25 @@ function inspectNearest() {
     window.setTimeout(() => {
       caseFile.classList.remove("open");
     }, 7200);
+
+    if (inspected === 1 && !kulkarniCallPlayed) {
+      kulkarniCallPlayed = true;
+      window.setTimeout(() => {
+        if (audioManager) {
+          audioManager.playSound("phone_ring", { volume: 0.8 });
+        }
+        caption.textContent = "A static buzzing ring echoes from Aarav's pocket.";
+        window.setTimeout(() => {
+          queueStory([
+            ["Aarav", "My phone... wait, the network is dead. How is it ringing?"],
+            ["Aarav", "(answers call) Professor? Professor Kulkarni?"],
+            ["Professor Kulkarni", "Aarav! Did you... did you find Verma's memo? You need to leave. She knows you're looking."],
+            ["Aarav", "Professor! What happened in 2005? Who is Meera?"],
+            ["Professor Kulkarni", "We tried to cure... the counting... (static) ...run, Aarav! (line dead beep)"]
+          ]);
+        }, 2500);
+      }, 7600);
+    }
     return;
   }
 
@@ -2347,6 +2391,7 @@ function resetGame() {
     introPlayed = false;
     meeraWarned = false;
     meeraFirstWhisperPlayed = false;
+    kulkarniCallPlayed = false;
   }
   
   updateObjectivesSystem();

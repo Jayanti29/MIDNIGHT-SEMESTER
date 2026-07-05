@@ -2107,8 +2107,9 @@ function inspectNearest() {
         triggerWin();
       }, 9800);
     } else {
-      caption.textContent = "The gate is chained shut. Find all three missing documents first.";
-      sayLine("Aarav", "It's locked. I need to find everything Meera left behind.");
+      caption.textContent = "Chained shut. A rusted plaque reads: 'Applied Cognition Lab - Authorized Entry Only'.";
+      sayLine("Aarav", "This leads to the old sub-level. A flight of concrete stairs goes down into pitch black... Kulkarni was hiding something down there.");
+      addTaskLog("Inspected the basement gate; locked, leads to the sub-level lab.");
     }
     return;
   }

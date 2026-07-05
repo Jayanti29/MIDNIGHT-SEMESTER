@@ -287,6 +287,8 @@ let footstepTimer = 0.35;
 let meeraWarned = false;
 let meeraFirstWhisperPlayed = false;
 let kulkarniCallPlayed = false;
+let meeraSecondEventPlayed = false;
+let activeCountdownFlicker = false;
 let basementGateGroup = null;
 let blackoutTriggered = false;
 let isBlackoutActive = false;
@@ -1818,9 +1820,35 @@ function updateState(delta) {
     addTaskLog("Heard something near Room 29.");
   }
 
+  // Task 64: Meera's second ghost event — countdown sound + shadow flicker near Room 29
+  if (!meeraSecondEventPlayed && inspected >= 1 && camera.position.z < -16 && gameState === GameState.PLAYING) {
+    meeraSecondEventPlayed = true;
+    activeCountdownFlicker = true;
+    playWhisper();
+    if (audioManager) {
+      audioManager.playSound("blackout_cue", { volume: 0.5 });
+    }
+    window.setTimeout(() => {
+      queueStory([
+        ["Meera", "Three..."],
+        ["Meera", "Two..."],
+        ["Meera", "One..."],
+        ["Meera", "Ready or not."]
+      ]);
+    }, 600);
+    window.setTimeout(() => {
+      activeCountdownFlicker = false;
+    }, 11000);
+    caption.textContent = "The overhead light buzzes violently. A shadow stretches from Room 29...";
+    addTaskLog("Experienced an electrical anomaly near Room 29.");
+  }
+
   flickerLights.forEach(({ light, base, phase }) => {
     if (isBlackoutActive) {
       light.intensity = THREE.MathUtils.lerp(light.intensity, 0, delta * 12);
+    } else if (activeCountdownFlicker && Math.abs(light.position.z - (-26)) < 1.0) {
+      // Override: violent flickering for lamp at z = -26
+      light.intensity = Math.random() > 0.45 ? base * 1.85 : 0.05;
     } else {
       const pulse = Math.sin(clock.elapsedTime * 7.5 + phase) > 0.92 ? 0.26 : 1;
       light.intensity = THREE.MathUtils.lerp(light.intensity, base * pulse, delta * 8);
@@ -2392,6 +2420,8 @@ function resetGame() {
     meeraWarned = false;
     meeraFirstWhisperPlayed = false;
     kulkarniCallPlayed = false;
+    meeraSecondEventPlayed = false;
+    activeCountdownFlicker = false;
   }
   
   updateObjectivesSystem();

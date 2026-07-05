@@ -100,8 +100,9 @@ npm run preview
 | 2 | Environment Build | ✅ Done |
 | 3 | UI/UX & Audio | ✅ Done |
 | 4 | Gameplay Functionality | ✅ Done |
-| 5 | Polish & Performance | 🔄 In Progress (commits 51–60) |
-| 6–10 | Narrative, AI, Multiple Levels, Final Ship | ⏳ Planned |
+| 5 | Polish & Performance | ✅ Done (commits 51–58) |
+| 6 | Narrative & Environmental Polish | ✅ Done (commits 59–74) |
+| 7–10 | AI, Multiple Levels, Final Ship | ⏳ Planned |
 
 See [PROGRESS.md](PROGRESS.md) for the full 500-commit log and [NOTES.md](NOTES.md) for known issues and deferred work.
 

@@ -5,7 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] — Commits 61–72
+## [Unreleased] — Commits 61–73
 
 ### Phase 6 — Narrative & Environmental Polish
 
@@ -23,6 +23,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 #### Changed
 - Cleaned up unused meeraWarned variable and references in main.js
+- Implemented per-cylinder battery pickup state tracking and saved battery states to terminal checkpoints
 
 #### Planned
 - Second level (Basement / Generator Room)

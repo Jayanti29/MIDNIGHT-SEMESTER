@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 69/500**
+Commit counter: **Commit 70/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -72,3 +72,4 @@ Commit counter: **Commit 69/500**
 - **Commit 67/500**: Completed Phase 6 Task 70. Added 2005 Dean's Memo as a findable lore note collectible at z=-18.2.
 - **Commit 68/500**: Completed Phase 6 Task 71. Implemented Meera's final ghost event: a non-hostile full apparition drift across the hallway at z=-31.5 triggered when evidence=3.
 - **Commit 69/500**: Completed Phase 6 Task 72. Performed code cleanup by removing the unused meeraWarned variable and its references.
+- **Commit 70/500**: Completed Phase 6 Task 73. Implemented per-cylinder battery pickup state tracking and persisted collected battery states across terminal checkpoint load/reset cycles.

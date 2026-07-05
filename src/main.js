@@ -277,6 +277,7 @@ let inspected = 0;
 let stamina = 100;
 let sprintExhausted = false;
 const collectedEvidence = new Set();
+const collectedBatteries = new Set();
 let xrSession = null;
 let activeLineTimer = 0;
 let introPlayed = false;
@@ -2218,6 +2219,8 @@ function inspectNearest() {
         interactables.splice(idx, 1);
       }
       
+      collectedBatteries.add(parent.name);
+      
       caption.textContent = "Flashlight battery recharged (+45%).";
       sayLine("Aarav", "This battery still has charge. Good.");
       if (audioManager) {
@@ -2236,6 +2239,7 @@ function inspectNearest() {
         battery: battery,
         collectedEvidence: Array.from(collectedEvidence),
         collectedDocuments: Array.from(collectedDocuments.entries()),
+        collectedBatteries: Array.from(collectedBatteries),
         inspected: inspected,
         blackoutTriggered: blackoutTriggered
       };
@@ -2478,6 +2482,11 @@ function resetGame() {
     collectedDocuments.clear();
     activeCheckpoint.collectedDocuments.forEach(([k, v]) => collectedDocuments.set(k, v));
     
+    collectedBatteries.clear();
+    if (activeCheckpoint.collectedBatteries) {
+      activeCheckpoint.collectedBatteries.forEach(b => collectedBatteries.add(b));
+    }
+    
     camera.position.set(...activeCheckpoint.position);
     camera.rotation.set(0, 0, 0);
     yaw = 0;
@@ -2493,6 +2502,7 @@ function resetGame() {
     inspected = 0;
     collectedEvidence.clear();
     collectedDocuments.clear();
+    collectedBatteries.clear();
     
     camera.position.set(0, 1.7, 8);
     camera.rotation.set(0, 0, 0);
@@ -2544,12 +2554,20 @@ function resetGame() {
   });
 
   batteryItems.forEach((group) => {
-    // If checkpoint states exist, just restore them all for simplicity
-    group.visible = true;
+    const isCollected = collectedBatteries.has(group.name);
+    group.visible = !isCollected;
     const body = group.children[0];
-    body.visible = true;
-    if (!interactables.includes(body)) {
-      interactables.push(body);
+    body.visible = !isCollected;
+    
+    if (isCollected) {
+      const idx = interactables.indexOf(body);
+      if (idx !== -1) {
+        interactables.splice(idx, 1);
+      }
+    } else {
+      if (!interactables.includes(body)) {
+        interactables.push(body);
+      }
     }
   });
 

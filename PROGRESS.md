@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 50/500**
+Commit counter: **Commit 60/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -53,3 +53,11 @@ Commit counter: **Commit 50/500**
 - **Commit 48/500**: Completed Phase 4 Tasks 49+50. Implemented win condition — basement gate triggers 3-line escape cinematic, WIN game state, and a styled completion screen with run stats. Ghost catch now properly triggers GAMEOVER state with a custom reason message.
 - **Commit 49/500**: Completed Phase 4 Task 51. Placed 4 wall-pinned lore notes (maintenance notice, torn lab page, Meera's scrawl, burned dean's notice) as readable environmental storytelling triggers throughout the corridor.
 - **Commit 50/500**: Completed Phase 4 Task 52. Full-loop code review playtest: verified evidence, doors, AI, checkpoints, win/lose conditions. Fixed ghost-catch double-trigger guard and introPlayed/meeraWarned reset. Logged 5 deferred issues to NOTES.md.
+- **Commit 51/500**: Completed Phase 5 Task 53. Added EffectComposer post-processing pipeline with custom FilmGrainShader (grain, chromatic aberration, scanlines, vignette) all driven by fear level.
+- **Commit 52/500**: Completed Phase 5 Task 54. Halved procedural texture canvas from 1024 to 512px, reduced stroke counts, shrunk label canvas, fixed fillText position.
+- **Commit 53/500**: Completed Phase 5 Task 55. Grouped dorm room into LOD distance-gate THREE.Group hidden when player z > -22. Three.js frustum culling verified active.
+- **Commit 54/500**: Completed Phase 5 Task 56. Removed debug console.log, clamped texture anisotropy to renderer max, removed dead dummy function.
+- **Commit 55/500**: Completed Phase 5 Task 57. Added touch look-drag (right 40% of screen), gamepad polling (left stick move, right stick look, A interact, X flashlight, L3 sprint).
+- **Commit 56/500**: Completed Phase 5 Task 58. Full README rewrite with accurate feature list, controls table, tech stack, and phase status.
+- **Commit 57/500**: Completed Phase 5 Task 59. Created CHANGELOG.md documenting all changes across Phases 1-5 in Keep a Changelog format.
+- **Commit 58/500**: Completed Phase 5 Task 60. Final playtest pass, build verified, v0.1-playable tag created. Phase 5 complete.

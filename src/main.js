@@ -841,6 +841,21 @@ function initAudio() {
     });
   }
 
+  const metronomeTickBuffer = createTickingBuffer(audioCtx);
+  audioManager.buffers.set("metronome_tick", metronomeTickBuffer);
+
+  if (scene.userData.metronomeMesh) {
+    audioManager.playSound("metronome_tick", {
+      positional: true,
+      targetMesh: scene.userData.metronomeMesh,
+      loop: true,
+      refDistance: 1.2,
+      maxDistance: 12,
+      volume: 0.28,
+      category: "ambient"
+    });
+  }
+
   audioManager.buffers.set("ui_hover", createUiHoverBuffer(audioCtx));
   audioManager.buffers.set("ui_select", createUiSelectBuffer(audioCtx));
   audioManager.buffers.set("ui_pause_open", createUiPauseOpenBuffer(audioCtx));
@@ -929,6 +944,24 @@ function createPhoneRingBuffer(ctx) {
       ring *= fade;
     }
     data[i] = ring * 0.24;
+  }
+  return buffer;
+}
+
+function createTickingBuffer(ctx) {
+  const sampleRate = ctx.sampleRate;
+  const duration = 1.0; // 1 tick per second
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    let click = 0;
+    if (t < 0.05) {
+      // Woodblock/tick decay click
+      click = Math.sin(2 * Math.PI * 1200 * t) * Math.exp(-120 * t);
+    }
+    data[i] = click * 0.18;
   }
   return buffer;
 }
@@ -1395,7 +1428,38 @@ function buildDormRoom() {
   dormGroup.attach(reportPage);
   interactables.push(reportPage);
 
+  // Task 68: Add metronome prop on desk
+  buildMetronome([-0.6, 1.11, roomZ - 4.4], dormGroup);
+
   scene.add(dormGroup);
+}
+
+function buildMetronome(position, dormGroup) {
+  const group = new THREE.Group();
+  group.name = "metronome_group";
+  group.position.set(...position);
+
+  // Pyramidal base (cylinder with 4 segments and different radii)
+  const baseGeo = new THREE.CylinderGeometry(0.04, 0.12, 0.32, 4);
+  const baseMesh = new THREE.Mesh(baseGeo, materials.darkWood);
+  baseMesh.castShadow = true;
+  baseMesh.receiveShadow = true;
+  baseMesh.rotation.y = Math.PI / 4; // look like a pyramid
+  group.add(baseMesh);
+
+  // Brass rod
+  const rodGeo = new THREE.BoxGeometry(0.01, 0.22, 0.01);
+  const rodMesh = new THREE.Mesh(rodGeo, materials.brass);
+  rodMesh.position.set(0, 0.10, 0.04);
+  rodMesh.castShadow = true;
+  group.add(rodMesh);
+
+  tagInteractable(baseMesh, "metronome", "Sealed Metronome");
+  baseMesh.userData.parentMetronome = group;
+  scene.userData.metronomeMesh = baseMesh;
+
+  dormGroup.attach(group);
+  interactables.push(baseMesh);
 }
 
 function buildDocuments() {
@@ -2154,6 +2218,13 @@ function inspectNearest() {
         ]);
       }, 5500);
     }
+    return;
+  }
+
+  if (type === "metronome") {
+    caption.textContent = "A sealed mechanical metronome. It ticks steadily without any winding.";
+    sayLine("Aarav", "Wait, the scrawl on the door frame: 'the metronome doesn't need power.' It's completely sealed...");
+    addTaskLog("Inspected the sealed metronome.");
     return;
   }
 }

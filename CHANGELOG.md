@@ -7,6 +7,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] — Commits 61–78
 
+### Phase 10 — Developer Debug Console & Cheats
+
+#### Added
+- In-Game Developer Command Line Console (`#debug-console`) absolute-positioned at screen bottom
+- Backquote/Tilde (`` ` ``) key listener to open/close the console dynamically
+- Key input routing blocks (WASD movements and mouse camera rotation disabled when console is open)
+- Core console command parser (`/help`, `/god`, `/ib`, `/battery`, `/tp`, `/skip`, `/ghostspeed`, `/loadlevel`)
+- Integrated invincibility toggles, infinite battery locks, ghost speed variables, and level skipping overrides
+
 ### Phase 9 — WebXR Controller & VR Navigation
 
 #### Added

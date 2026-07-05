@@ -17,6 +17,9 @@ const fearText = document.querySelector("#fear");
 const fearMeter = document.querySelector("#fear-meter");
 const fearText2 = document.querySelector("#fear2");
 const fearMeter2 = document.querySelector("#fear2-meter");
+const debugConsole = document.querySelector("#debug-console");
+const debugInput = document.querySelector("#debug-input");
+const debugOutput = document.querySelector("#debug-output");
 const objective = document.querySelector("#objective");
 const objectiveSteps = document.querySelectorAll("[data-step]");
 const caseFile = document.querySelector("#case-file");
@@ -343,6 +346,10 @@ let camera2 = null;
 let player2Character = null;
 let player2Yaw = 0;
 let player2Pitch = 0;
+let godModeActive = false;
+let infiniteBatteryActive = false;
+let debugConsoleOpen = false;
+let meeraSpeedMultiplier = 1.0;
 let vrController1 = null;
 let vrController2 = null;
 let vrControllerGrip1 = null;
@@ -2084,7 +2091,7 @@ function buildFlashlightProp() {
 }
 
 function updateMovement(delta) {
-  if (gameState !== GameState.PLAYING) return;
+  if (gameState !== GameState.PLAYING || debugConsoleOpen) return;
 
   if (renderer.xr.enabled && renderer.xr.isPresenting) {
     const session = renderer.xr.getSession();
@@ -2296,13 +2303,59 @@ function updateState(delta) {
     triggerBlackoutSequence();
   }
 
-  if (flashlightOn) battery = Math.max(0, battery - delta * 1.15);
+  if (flashlightOn && !infiniteBatteryActive) battery = Math.max(0, battery - delta * 1.15);
   if (battery <= 0 && flashlightOn) setFlashlight(false);
-  const depthFear = THREE.MathUtils.clamp((-camera.position.z - 6) * 1.7, 0, 58);
-  const darknessFear = flashlightOn ? 0 : 24;
-  fear = THREE.MathUtils.lerp(fear, depthFear + darknessFear + inspected * 5, delta * 0.9);
-  if (fear >= 100 && gameState === GameState.PLAYING) {
-    triggerGameOver("Aarav's heart could not take the terror. The dark claimed him.");
+  
+  if (godModeActive) {
+    fear = 0;
+  } else {
+    const depthFear = THREE.MathUtils.clamp((-camera.position.z - 6) * 1.7, 0, 58);
+    const darknessFear = flashlightOn ? 0 : 24;
+    fear = THREE.MathUtils.lerp(fear, depthFear + darknessFear + inspected * 5, delta * 0.9);
+    if (fear >= 100 && gameState === GameState.PLAYING) {
+      triggerGameOver("Aarav's heart could not take the terror. The dark claimed him.");
+    }
+  }
+
+  // Player 2 Flashlight, Battery, and Fear updates
+  if (coopMode && camera2 && player2Flashlight) {
+    if (flashlightOn2 && !infiniteBatteryActive) battery2 = Math.max(0, battery2 - delta * 1.15);
+    if (battery2 <= 0 && flashlightOn2) setFlashlight2(false);
+
+    if (godModeActive) {
+      fear2 = 0;
+    } else {
+      const depthFear2 = THREE.MathUtils.clamp((-camera2.position.z - 6) * 1.7, 0, 58);
+      const darknessFear2 = flashlightOn2 ? 0 : 24;
+      fear2 = THREE.MathUtils.lerp(fear2, depthFear2 + darknessFear2 + inspected * 5, delta * 0.9);
+      if (fear2 >= 100 && gameState === GameState.PLAYING) {
+        triggerGameOver("Rohan's heart could not take the terror. The dark claimed him.");
+      }
+    }
+
+    if (flashlightOn2 && player2Flashlight.parent !== camera2) {
+      camera2.add(player2Flashlight);
+      camera2.add(player2Flashlight.target);
+    }
+    if (!flashlightOn2 && player2Flashlight.parent === camera2) {
+      camera2.remove(player2Flashlight);
+      camera2.remove(player2Flashlight.target);
+    }
+    let targetIntensity2 = 3.4 * (battery2 / 100 + 0.1);
+    if (flashlightOn2) {
+      if (battery2 < 35 && battery2 > 0) {
+        const lowFlicker2 = Math.sin(clock.elapsedTime * 22) > 0.3 ? 1.0 : (Math.random() > 0.45 ? 0.18 : 0.02);
+        targetIntensity2 *= lowFlicker2;
+      }
+      player2Flashlight.intensity = targetIntensity2;
+    } else {
+      player2Flashlight.intensity = 0;
+    }
+
+    if (batteryText2) batteryText2.textContent = `${Math.round(battery2)}%`;
+    if (batteryMeter2) batteryMeter2.value = battery2;
+    if (fearText2) fearText2.textContent = `${Math.round(fear2)}%`;
+    if (fearMeter2) fearMeter2.value = fear2;
   }
 
   if (flashlightOn && flashlightLight.parent !== camera) {
@@ -2331,13 +2384,15 @@ function updateState(delta) {
   if (batteryMeter) batteryMeter.value = battery;
   if (fearText) fearText.textContent = `${Math.round(fear)}%`;
   if (fearMeter) fearMeter.value = fear;
-  vignette.style.opacity = String(0.35 + fear / 145);
+  
+  const activeFear = coopMode ? Math.max(fear, fear2) : fear;
+  vignette.style.opacity = String(0.35 + activeFear / 145);
 
   // Drive post-processing shader uniforms from fear level
   if (filmPass) {
-    filmPass.uniforms.vignetteAmount.value = 0.55 + fear * 0.004;
-    filmPass.uniforms.aberrationAmount.value = 0.0018 + fear * 0.000055;
-    filmPass.uniforms.grainAmount.value = 0.09 + fear * 0.0008;
+    filmPass.uniforms.vignetteAmount.value = 0.55 + activeFear * 0.004;
+    filmPass.uniforms.aberrationAmount.value = 0.0018 + activeFear * 0.000055;
+    filmPass.uniforms.grainAmount.value = 0.09 + activeFear * 0.0008;
   }
 
   const ghost = scene.userData.ghost;
@@ -2398,7 +2453,7 @@ function updateState(delta) {
       }
       
       if (meeraState === AiState.PATROL) {
-        meeraSpeed = 1.2;
+        meeraSpeed = 1.2 * meeraSpeedMultiplier;
         meera.position.z += meeraPatrolDir * meeraSpeed * delta;
         const zMin = currentLevel === 1 ? -45 : -35;
         const zMax = currentLevel === 1 ? -16 : 8;
@@ -2409,16 +2464,16 @@ function updateState(delta) {
         }
         meera.position.x = THREE.MathUtils.lerp(meera.position.x, 0, delta * 3);
       } else if (meeraState === AiState.CHASE) {
-        meeraSpeed = (currentLevel === 2 ? 1.48 : 1.6) + (targetFear / 160);
+        meeraSpeed = ((currentLevel === 2 ? 1.48 : 1.6) + (targetFear / 160)) * meeraSpeedMultiplier;
         const toPlayer = new THREE.Vector3().subVectors(targetCamera.position, meera.position);
         toPlayer.y = 0;
         toPlayer.normalize();
         meera.position.addScaledVector(toPlayer, meeraSpeed * delta);
         
         if (targetIsP2) {
-          fear2 = Math.min(100, fear2 + delta * 3.6);
+          if (!godModeActive) fear2 = Math.min(100, fear2 + delta * 3.6);
         } else {
-          fear = Math.min(100, fear + delta * 3.6);
+          if (!godModeActive) fear = Math.min(100, fear + delta * 3.6);
         }
         
         if (targetDist > 18 && currentLevel === 1) {
@@ -2444,15 +2499,15 @@ function updateState(delta) {
       
       if (targetDist < 4.5 && meeraState === AiState.CHASE) {
         if (targetIsP2) {
-          fear2 = Math.min(100, fear2 + delta * 24);
+          if (!godModeActive) fear2 = Math.min(100, fear2 + delta * 24);
         } else {
-          fear = Math.min(100, fear + delta * 24);
+          if (!godModeActive) fear = Math.min(100, fear + delta * 24);
         }
         shakeOffset.x = (Math.random() - 0.5) * 0.045;
         shakeOffset.y = (Math.random() - 0.5) * 0.045;
       }
       
-      if (targetDist < 1.15 && gameState === GameState.PLAYING) {
+      if (targetDist < 1.15 && gameState === GameState.PLAYING && !godModeActive) {
         triggerGameOver(targetIsP2 ? "Rohan was caught by Meera's presence." : "Aarav was caught by Meera's presence.");
       }
     }
@@ -3037,6 +3092,149 @@ function inspectObject(hit, isPlayer2 = false) {
       addTaskLog("Accessed exit operations terminal.");
     }
     return;
+  }
+}
+
+function addConsoleLog(msg) {
+  if (!debugOutput) return;
+  const div = document.createElement("div");
+  div.textContent = msg;
+  debugOutput.appendChild(div);
+  debugOutput.scrollTop = debugOutput.scrollHeight;
+}
+
+function executeCommand(cmdStr) {
+  const trimmed = cmdStr.trim();
+  addConsoleLog(`> ${trimmed}`);
+  
+  if (!trimmed.startsWith("/")) {
+    addConsoleLog("Error: Commands must start with a slash (/). Type /help for assistance.");
+    return;
+  }
+  
+  const tokens = trimmed.slice(1).split(/\s+/);
+  const command = tokens[0].toLowerCase();
+  const args = tokens.slice(1);
+  
+  switch (command) {
+    case "help":
+      addConsoleLog("Available commands:");
+      addConsoleLog("  /help - Display this help list");
+      addConsoleLog("  /god - Toggle godmode (invincible to fear/catches)");
+      addConsoleLog("  /ib - Toggle infinite battery");
+      addConsoleLog("  /battery - Recharge battery to 100%");
+      addConsoleLog("  /tp <z> - Teleport player to Z coordinates");
+      addConsoleLog("  /skip - Teleport straight to exit operations console");
+      addConsoleLog("  /ghostspeed <mult> - Multiply ghost movement speed (e.g. /ghostspeed 0.5)");
+      addConsoleLog("  /loadlevel <1|2> - Jump to level 1 or level 2");
+      break;
+      
+    case "god":
+      godModeActive = !godModeActive;
+      addConsoleLog(`Godmode toggled: ${godModeActive ? "ON" : "OFF"}`);
+      addTaskLog(`Developer toggled invincibility: ${godModeActive ? "ACTIVE" : "INACTIVE"}.`);
+      break;
+      
+    case "ib":
+    case "infinite_battery":
+      infiniteBatteryActive = !infiniteBatteryActive;
+      battery = 100;
+      battery2 = 100;
+      addConsoleLog(`Infinite battery toggled: ${infiniteBatteryActive ? "ON" : "OFF"}`);
+      break;
+      
+    case "battery":
+      battery = 100;
+      battery2 = 100;
+      setFlashlight(true);
+      if (coopMode) setFlashlight2(true);
+      addConsoleLog("Recharged flashlight batteries (+100%).");
+      break;
+      
+    case "tp":
+    case "teleport": {
+      if (args.length === 0) {
+        addConsoleLog("Error: Missing Z coordinate parameter. Example: /tp -30");
+        break;
+      }
+      const zVal = parseFloat(args[0]);
+      if (isNaN(zVal)) {
+        addConsoleLog(`Error: Invalid coordinate '${args[0]}'`);
+        break;
+      }
+      camera.position.z = zVal;
+      if (camera2) camera2.position.z = zVal;
+      addConsoleLog(`Teleported player to z = ${zVal}`);
+      break;
+    }
+      
+    case "skip":
+      if (currentLevel === 1) {
+        inspected = 3;
+        completeObjective("start");
+        completeObjective("evidence");
+        completeObjective("basement");
+        loadLevel2();
+        addConsoleLog("Skipping Level 1... Loading Level 2.");
+      }
+      window.setTimeout(() => {
+        camera.position.set(0, 1.7, -37);
+        if (camera2) camera2.position.set(0, 1.7, -37);
+        generatorActive = true;
+        blackoutTriggered = true;
+        isBlackoutActive = true;
+        if (scene.userData.meeraCharacter) {
+          scene.userData.meeraCharacter.position.set(0, 0, -32);
+          scene.userData.meeraCharacter.visible = true;
+        }
+        meeraState = AiState.CHASE;
+        addConsoleLog("Teleported to Exit Terminal. Generator Active.");
+      }, 500);
+      break;
+      
+    case "ghostspeed":
+    case "gs": {
+      if (args.length === 0) {
+        addConsoleLog("Error: Missing multiplier value. Example: /ghostspeed 0.5");
+        break;
+      }
+      const mult = parseFloat(args[0]);
+      if (isNaN(mult)) {
+        addConsoleLog(`Error: Invalid multiplier '${args[0]}'`);
+        break;
+      }
+      meeraSpeedMultiplier = mult;
+      addConsoleLog(`Ghost speed multiplier set to ${mult}`);
+      break;
+    }
+      
+    case "loadlevel":
+    case "lvl": {
+      if (args.length === 0) {
+        addConsoleLog("Error: Specify level 1 or 2. Example: /loadlevel 2");
+        break;
+      }
+      const lvlNum = parseInt(args[0]);
+      if (lvlNum === 1) {
+        currentLevel = 1;
+        level2Group.visible = false;
+        level1Group.visible = true;
+        activeLevelGroup = level1Group;
+        camera.position.set(0, 1.7, 8);
+        if (camera2) camera2.position.set(0.8, 1.7, 8);
+        addConsoleLog("Loaded Level 1.");
+      } else if (lvlNum === 2) {
+        loadLevel2();
+        addConsoleLog("Loaded Level 2.");
+      } else {
+        addConsoleLog("Error: Invalid level number.");
+      }
+      break;
+    }
+      
+    default:
+      addConsoleLog(`Error: Unknown command '/${command}'. Type /help for commands.`);
+      break;
   }
 }
 
@@ -3644,7 +3842,7 @@ document.addEventListener("pointerlockerror", () => {
 });
 
 document.addEventListener("mousemove", (event) => {
-  if (!pointerLocked || gameState !== GameState.PLAYING) return;
+  if (!pointerLocked || gameState !== GameState.PLAYING || debugConsoleOpen) return;
   yaw -= event.movementX * 0.0022 * mouseSensitivity;
   pitch -= event.movementY * 0.002 * mouseSensitivity;
   pitch = THREE.MathUtils.clamp(pitch, -1.1, 1.1);
@@ -3652,6 +3850,30 @@ document.addEventListener("mousemove", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  if (event.code === "Backquote") {
+    event.preventDefault();
+    if (debugConsoleOpen) {
+      debugConsole.style.display = "none";
+      debugConsoleOpen = false;
+      requestPointerLock();
+    } else {
+      debugConsole.style.display = "flex";
+      debugConsoleOpen = true;
+      document.exitPointerLock?.();
+      window.setTimeout(() => debugInput.focus(), 80);
+    }
+    return;
+  }
+
+  if (debugConsoleOpen) {
+    if (event.code === "Enter") {
+      event.preventDefault();
+      executeCommand(debugInput.value);
+      debugInput.value = "";
+    }
+    return;
+  }
+
   // Graceful Escape/Inventory closure first
   if (event.code === "Escape" || event.code === "KeyI" || event.code === "Tab") {
     if (inventoryPanel && inventoryPanel.classList.contains("open")) {

@@ -7,6 +7,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] — Commits 61–78
 
+### Phase 9 — WebXR Controller & VR Navigation
+
+#### Added
+- WebXR controller connection hooks to spawn and track VR controller groups
+- Custom 3D laser-line pointers (`THREE.Line`) attached to controllers representing laser beams
+- World-matrix-based raycast intersection mapping (`inspectNearestVR`) to detect targeted meshes in VR space
+- Controller button triggers to fire flashlight toggling (`squeezestart`) and object inspections (`selectstart`)
+- Multi-gamepad thumbstick polling inside the frame movement loop to support smooth joystick locomotion and rotation yaw navigation
+
 ### Phase 8 — Local Split-Screen Co-op
 
 #### Added

@@ -343,6 +343,10 @@ let camera2 = null;
 let player2Character = null;
 let player2Yaw = 0;
 let player2Pitch = 0;
+let vrController1 = null;
+let vrController2 = null;
+let vrControllerGrip1 = null;
+let vrControllerGrip2 = null;
 let player2Flashlight = null;
 const player2Keys = new Set();
 let blackoutTriggered = false;
@@ -528,15 +532,76 @@ async function setupVrEntry() {
         optionalFeatures: ["local-floor", "bounded-floor", "hand-tracking"]
       });
       renderer.xr.setSession(xrSession);
+      renderer.xr.enabled = true;
       vrToggle.textContent = "Exit VR";
+
+      vrController1 = renderer.xr.getController(0);
+      vrController2 = renderer.xr.getController(1);
+
+      const laserGeom = new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(0, 0, -4)
+      ]);
+      const laserMat = new THREE.LineBasicMaterial({
+        color: 0x73d08a,
+        transparent: true,
+        opacity: 0.65
+      });
+
+      const l1 = new THREE.Line(laserGeom, laserMat);
+      l1.name = "laser";
+      vrController1.add(l1);
+
+      const l2 = new THREE.Line(laserGeom, laserMat);
+      l2.name = "laser";
+      vrController2.add(l2);
+
+      scene.add(vrController1);
+      scene.add(vrController2);
+
+      vrController1.addEventListener("selectstart", () => inspectNearestVR(vrController1));
+      vrController2.addEventListener("selectstart", () => inspectNearestVR(vrController2));
+
+      vrController1.addEventListener("squeezestart", () => toggleFlashlight());
+      vrController2.addEventListener("squeezestart", () => toggleFlashlight());
+
       xrSession.addEventListener("end", () => {
         xrSession = null;
+        renderer.xr.enabled = false;
         vrToggle.textContent = "Enter VR";
+        scene.remove(vrController1);
+        scene.remove(vrController2);
       });
       startGame({ lockPointer: false });
     });
   } catch (error) {
     console.warn("VR entry unavailable in this browser.", error);
+  }
+}
+
+function inspectNearestVR(controller) {
+  if (gameState !== GameState.PLAYING) return;
+  const raycaster = new THREE.Raycaster();
+
+  const tempMatrix = new THREE.Matrix4();
+  tempMatrix.identity().extractRotation(controller.matrixWorld);
+
+  const origin = new THREE.Vector3().setFromMatrixPosition(controller.matrixWorld);
+  const direction = new THREE.Vector3(0, 0, -1).applyMatrix4(tempMatrix).normalize();
+
+  raycaster.set(origin, direction);
+  const hits = raycaster.intersectObjects(scene.children, true);
+
+  const hit = hits.find(h => h.distance <= 4.0);
+  if (!hit) return;
+
+  let current = hit.object;
+  while (current) {
+    if (current.userData && current.userData.interactable) {
+      inspectObject({ object: current, distance: hit.distance }, false);
+      break;
+    }
+    current = current.parent;
   }
 }
 
@@ -2020,6 +2085,46 @@ function buildFlashlightProp() {
 
 function updateMovement(delta) {
   if (gameState !== GameState.PLAYING) return;
+
+  if (renderer.xr.enabled && renderer.xr.isPresenting) {
+    const session = renderer.xr.getSession();
+    if (session) {
+      const sources = session.inputSources;
+      let vrForward = 0;
+      let vrStrafe = 0;
+      let vrLookYaw = 0;
+      
+      for (const source of sources) {
+        if (source.gamepad) {
+          const axes = source.gamepad.axes;
+          const handedness = source.handedness;
+          const deadzone = 0.18;
+          
+          if (handedness === "left") {
+            const x = axes[2] ?? axes[0] ?? 0;
+            const y = axes[3] ?? axes[1] ?? 0;
+            if (Math.abs(x) > deadzone) vrStrafe = x;
+            if (Math.abs(y) > deadzone) vrForward = -y;
+          } else if (handedness === "right") {
+            const x = axes[2] ?? axes[0] ?? 0;
+            if (Math.abs(x) > deadzone) vrLookYaw = x;
+          }
+        }
+      }
+      
+      yaw -= vrLookYaw * delta * 1.5;
+      camera.rotation.set(0, yaw, 0, "YXZ");
+      
+      const vrDir = new THREE.Vector3(vrStrafe, 0, -vrForward).normalize().multiplyScalar(3.0 * delta);
+      vrDir.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+      const vrCandidate = camera.position.clone().add(vrDir);
+      if (canOccupy(vrCandidate)) {
+        camera.position.copy(vrCandidate);
+      }
+      camera.position.y = 1.7;
+    }
+    return;
+  }
   const forward = Number(keys.has("KeyW")) - Number(keys.has("KeyS"));
   const strafe = Number(keys.has("KeyD")) - Number(keys.has("KeyA"));
   const wantsSprint = keys.has("ShiftLeft");

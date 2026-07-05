@@ -285,6 +285,7 @@ let droneGain = null;
 let heartbeatTimer = 0;
 let footstepTimer = 0.35;
 let meeraWarned = false;
+let meeraFirstWhisperPlayed = false;
 let basementGateGroup = null;
 let blackoutTriggered = false;
 let isBlackoutActive = false;
@@ -1781,6 +1782,17 @@ function updateState(delta) {
     scene.userData.dormGroup.visible = camera.position.z < -22;
   }
 
+  // Task 62: Meera's first ghost whisper — one-time, triggers on first approach to dorm wing
+  if (!meeraFirstWhisperPlayed && inspected === 0 && camera.position.z < -24.5 && gameState === GameState.PLAYING) {
+    meeraFirstWhisperPlayed = true;
+    playWhisper();
+    window.setTimeout(() => {
+      sayLine("Meera", "You look just like the ones who used to watch.", 7000);
+    }, 800);
+    caption.textContent = "Something cold passes through the air near Room 29.";
+    addTaskLog("Heard something near Room 29.");
+  }
+
   flickerLights.forEach(({ light, base, phase }) => {
     if (isBlackoutActive) {
       light.intensity = THREE.MathUtils.lerp(light.intensity, 0, delta * 12);
@@ -2334,6 +2346,7 @@ function resetGame() {
   if (!activeCheckpoint) {
     introPlayed = false;
     meeraWarned = false;
+    meeraFirstWhisperPlayed = false;
   }
   
   updateObjectivesSystem();

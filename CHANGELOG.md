@@ -7,6 +7,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] — Commits 61–78
 
+### Phase 8 — Local Split-Screen Co-op
+
+#### Added
+- Local Split-Screen Co-op multiplayer gameplay toggle in the Main Menu (Play Solo vs Play Co-op)
+- Dual rendering viewports (`renderer.setViewport` & `renderer.setScissor`) in the animation loop
+- Keyboard layout splitting: Player 1 (WASD + Mouse) and Player 2 (Arrows + Period/Slash for flashlight/interactions)
+- Gamepad controller support mapping for Player 2 movement and looking direction
+- Duplicate HUD player metrics panels (P1 left and P2 right absolute layout) and independent reticles
+- Aarav and Rohan 3D character models visible in opposite player viewports with head clipping layers protection
+- Proximity-based target switching for Meera's chase AI behavior and independent fear level calculation loops
+
 ### Phase 7 — Basement Lab & Branching Endings
 
 #### Added

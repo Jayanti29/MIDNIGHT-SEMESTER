@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 76/500**
+Commit counter: **Commit 77/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -79,3 +79,4 @@ Commit counter: **Commit 76/500**
 - **Commit 74/500**: Completed Phase 6 Task 77. Updated NOTES.md to mark all deferred known issues from Phase 5/6 as fully resolved.
 - **Commit 75/500**: Completed Phase 6 Task 78. Updated README.md project status table to reflect the completion of Phase 5 and Phase 6.
 - **Commit 76/500**: Completed Phase 7 Tasks 79-87. Implemented Level 2 (Basement Lab), fuel valves/generator puzzle, Sam AI co-op partner companion, branching ending selection overlay, and custom procedural Web Audio effects.
+- **Commit 77/500**: Completed Phase 8 Tasks 89-95. Implemented Local Split-Screen Co-op multiplayer mode with dual viewport rendering, independent fear/battery HUD meters, shared keyboard/gamepad input partitioning, and target-switching ghost AI.

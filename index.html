@@ -35,22 +35,37 @@
           </p>
         </div>
         <nav class="main-menu" aria-label="Main menu">
-          <button id="start-button" type="button">Play</button>
+          <button id="start-button" type="button">Play Solo</button>
+          <button id="coop-button" type="button">Play Co-op (Split-Screen)</button>
           <button id="menu-settings" type="button">Settings</button>
           <button id="menu-quit" type="button">Quit</button>
         </nav>
       </section>
       <section id="hud" aria-live="polite">
-        <!-- Diegetic battery feedback used instead of HUD meter -->
-        <div class="hud-panel compact" style="display: none;" aria-hidden="true">
-          <span class="label">Flashlight</span>
-          <span id="battery">100%</span>
-          <meter id="battery-meter" min="0" max="100" value="100"></meter>
+        <div id="hud-p1" style="position: absolute; left: 24px; top: 24px; z-index: 10; display: flex; flex-direction: column; gap: 8px;">
+          <div class="hud-panel compact" style="display: none;" aria-hidden="true">
+            <span class="label">Flashlight</span>
+            <span id="battery">100%</span>
+            <meter id="battery-meter" min="0" max="100" value="100"></meter>
+          </div>
+          <div class="hud-panel compact">
+            <span class="label">P1 Fear</span>
+            <span id="fear">0%</span>
+            <meter id="fear-meter" min="0" max="100" value="0"></meter>
+          </div>
         </div>
-        <div class="hud-panel compact">
-          <span class="label">Fear</span>
-          <span id="fear">0%</span>
-          <meter id="fear-meter" min="0" max="100" value="0"></meter>
+        
+        <div id="hud-p2" style="position: absolute; right: 24px; top: 24px; z-index: 10; display: none; flex-direction: column; gap: 8px;">
+          <div class="hud-panel compact" style="display: none;" aria-hidden="true">
+            <span class="label">Flashlight</span>
+            <span id="battery2">100%</span>
+            <meter id="battery2-meter" min="0" max="100" value="100"></meter>
+          </div>
+          <div class="hud-panel compact">
+            <span class="label">P2 Fear</span>
+            <span id="fear2">0%</span>
+            <meter id="fear2-meter" min="0" max="100" value="0"></meter>
+          </div>
         </div>
         <!-- In-World Journal / Notebook Prop for Objectives -->
         <div id="journal-notebook" class="notebook-prop">
@@ -137,12 +152,14 @@
         <h2>Renderer failed to start</h2>
         <p>Refresh the page or open the game in a modern browser with WebGL enabled.</p>
       </section>
-      <div id="interaction-prompt" class="interaction-prompt" aria-live="polite" hidden>Press E</div>
+      <div id="interaction-prompt" class="interaction-prompt" style="position: absolute; left: 50%; top: 55%; transform: translate(-50%, -50%); z-index: 100;" hidden>Press E</div>
+      <div id="interaction-prompt-p2" style="position: absolute; left: 75%; top: 55%; transform: translate(-50%, -50%); z-index: 100; font-family: inherit; font-size: 0.9rem; color: #e5d4bc; background: rgba(22, 17, 14, 0.85); border: 1px solid #584435; padding: 6px 12px; border-radius: 4px; pointer-events: none; text-transform: uppercase; letter-spacing: 0.05em;" hidden>Press ShiftRight</div>
       <div id="quick-actions" class="quick-actions">
         <button id="action-interact" type="button">Interact</button>
         <button id="action-flashlight" type="button">Flashlight</button>
       </div>
-      <div id="reticle"></div>
+      <div id="reticle-p1" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 100; width: 6px; height: 6px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; pointer-events: none; border: 1px solid rgba(0,0,0,0.5);"></div>
+      <div id="reticle-p2" style="position: absolute; left: 75%; top: 50%; transform: translate(-50%, -50%); z-index: 100; width: 6px; height: 6px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; pointer-events: none; border: 1px solid rgba(0,0,0,0.5); display: none;"></div>
       <div id="vignette"></div>
       <div id="caption">Click to lock pointer. WASD move, mouse look, Shift sprint, F flashlight, E inspect.</div>
     </main>

@@ -6,12 +6,17 @@ import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 const canvas = document.querySelector("#game");
 const startScreen = document.querySelector("#start-screen");
 const startButton = document.querySelector("#start-button");
+const coopButton = document.querySelector("#coop-button");
 const menuSettings = document.querySelector("#menu-settings");
 const menuQuit = document.querySelector("#menu-quit");
 const batteryText = document.querySelector("#battery");
 const batteryMeter = document.querySelector("#battery-meter");
+const batteryText2 = document.querySelector("#battery2");
+const batteryMeter2 = document.querySelector("#battery2-meter");
 const fearText = document.querySelector("#fear");
 const fearMeter = document.querySelector("#fear-meter");
+const fearText2 = document.querySelector("#fear2");
+const fearMeter2 = document.querySelector("#fear2-meter");
 const objective = document.querySelector("#objective");
 const objectiveSteps = document.querySelectorAll("[data-step]");
 const caseFile = document.querySelector("#case-file");
@@ -30,10 +35,12 @@ const speaker = document.querySelector("#speaker");
 const line = document.querySelector("#line");
 const nextLineButton = document.querySelector("#next-line");
 const interactionPrompt = document.querySelector("#interaction-prompt");
+const interactionPromptP2 = document.querySelector("#interaction-prompt-p2");
 const actionInteract = document.querySelector("#action-interact");
 const actionFlashlight = document.querySelector("#action-flashlight");
 const fatalError = document.querySelector("#fatal-error");
-const reticle = document.querySelector("#reticle");
+const reticleP1 = document.querySelector("#reticle-p1");
+const reticleP2 = document.querySelector("#reticle-p2");
 const settingsPanel = document.querySelector("#settings-panel");
 const loadingScreen = document.querySelector("#loading-screen");
 const loadingProgress = document.querySelector("#loading-progress");
@@ -326,6 +333,18 @@ let generatorPressure = 0;
 let generatorActive = false;
 let samCharacter = null;
 let samFlashlight = null;
+let coopMode = false;
+let battery2 = 100;
+let fear2 = 0;
+let stamina2 = 100;
+let sprintExhausted2 = false;
+let flashlightOn2 = true;
+let camera2 = null;
+let player2Character = null;
+let player2Yaw = 0;
+let player2Pitch = 0;
+let player2Flashlight = null;
+const player2Keys = new Set();
 let blackoutTriggered = false;
 let isBlackoutActive = false;
 const AiState = {
@@ -851,6 +870,20 @@ function setFlashlight(state) {
 
 function toggleFlashlight() {
   setFlashlight(!flashlightOn);
+}
+
+function setFlashlight2(state) {
+  const previous = flashlightOn2;
+  flashlightOn2 = state && battery2 > 0;
+  if (previous !== flashlightOn2) {
+    const clickSound = flashlightOn2 ? "flashlight_on" : "flashlight_off";
+    if (audioManager) audioManager.playSound(clickSound, { volume: 0.42 });
+    caption.textContent = flashlightOn2 ? "Player 2 Flashlight on." : "Player 2 Flashlight off.";
+  }
+}
+
+function toggleFlashlight2() {
+  setFlashlight2(!flashlightOn2);
 }
 
 function initAudio() {
@@ -1989,7 +2022,7 @@ function updateMovement(delta) {
   if (gameState !== GameState.PLAYING) return;
   const forward = Number(keys.has("KeyW")) - Number(keys.has("KeyS"));
   const strafe = Number(keys.has("KeyD")) - Number(keys.has("KeyA"));
-  const wantsSprint = keys.has("ShiftLeft") || keys.has("ShiftRight");
+  const wantsSprint = keys.has("ShiftLeft");
   const moving = forward !== 0 || strafe !== 0;
   const sprint = wantsSprint && moving && stamina > 0 && !sprintExhausted;
   stamina = THREE.MathUtils.clamp(stamina + (sprint ? -34 : 22) * delta, 0, 100);
@@ -1999,8 +2032,14 @@ function updateMovement(delta) {
   }
   if (!wantsSprint && stamina > 35) sprintExhausted = false;
   const speed = sprint ? 5.4 : 3.0;
-  const lookX = Number(keys.has("ArrowRight")) - Number(keys.has("ArrowLeft"));
-  const lookY = Number(keys.has("ArrowDown")) - Number(keys.has("ArrowUp"));
+  
+  // Player 1 Mouse / Keyboard Look (if not using split-screen keyboard keys, P1 can look with mouse, but if shared keyboard let's allow arrow keys only if NOT co-op mode)
+  let lookX = 0;
+  let lookY = 0;
+  if (!coopMode) {
+    lookX = Number(keys.has("ArrowRight")) - Number(keys.has("ArrowLeft"));
+    lookY = Number(keys.has("ArrowDown")) - Number(keys.has("ArrowUp"));
+  }
   yaw -= lookX * delta * 1.7;
   pitch = THREE.MathUtils.clamp(pitch - lookY * delta * 1.25, -1.1, 1.1);
   camera.rotation.set(pitch, yaw, 0, "YXZ");
@@ -2018,6 +2057,73 @@ function updateMovement(delta) {
   }
   camera.position.y = 1.7;
 
+  // Sync Player 1 model
+  if (coopMode && scene.userData.player1Character) {
+    scene.userData.player1Character.position.copy(camera.position);
+    scene.userData.player1Character.position.y = 0;
+    scene.userData.player1Character.rotation.set(0, yaw, 0);
+  }
+
+  // Player 2 controls
+  if (coopMode && camera2 && player2Character) {
+    const forward2 = Number(player2Keys.has("ArrowUp")) - Number(player2Keys.has("ArrowDown"));
+    const strafe2 = Number(player2Keys.has("ArrowRight")) - Number(player2Keys.has("ArrowLeft"));
+    const wantsSprint2 = player2Keys.has("ShiftRight");
+    const moving2 = forward2 !== 0 || strafe2 !== 0;
+    const sprint2 = wantsSprint2 && moving2 && stamina2 > 0 && !sprintExhausted2;
+    stamina2 = THREE.MathUtils.clamp(stamina2 + (sprint2 ? -34 : 22) * delta, 0, 100);
+    if (stamina2 <= 0 && !sprintExhausted2) {
+      sprintExhausted2 = true;
+    }
+    if (!wantsSprint2 && stamina2 > 35) sprintExhausted2 = false;
+    const speed2 = sprint2 ? 5.4 : 3.0;
+
+    let gpForward = forward2;
+    let gpStrafe = strafe2;
+    let gpLookX = 0;
+    let gpLookY = 0;
+    let gpSprint = sprint2;
+    
+    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+    if (pads[0]) {
+      const pad = pads[0];
+      const lx = pad.axes[0] ?? 0;
+      const ly = pad.axes[1] ?? 0;
+      const rx = pad.axes[2] ?? 0;
+      const ry = pad.axes[3] ?? 0;
+      const dead = 0.18;
+      
+      if (Math.abs(lx) > dead) gpStrafe = lx;
+      if (Math.abs(ly) > dead) gpForward = -ly;
+      if (Math.abs(rx) > dead) gpLookX = rx;
+      if (Math.abs(ry) > dead) gpLookY = ry;
+      if (pad.buttons[10]?.pressed) gpSprint = true;
+    }
+
+    // P2 keyboard rotate look using Period / Slash if no controller is attached
+    const lookX2 = Number(player2Keys.has("Period")) - Number(player2Keys.has("Slash"));
+    player2Yaw -= (lookX2 * 1.7 + gpLookX * 1.5) * delta;
+    player2Pitch = THREE.MathUtils.clamp(player2Pitch - gpLookY * delta * 1.25, -1.1, 1.1);
+    camera2.rotation.set(player2Pitch, player2Yaw, 0, "YXZ");
+
+    const direction2 = new THREE.Vector3(gpStrafe, 0, gpForward).normalize().multiplyScalar(speed2 * delta);
+    direction2.applyAxisAngle(new THREE.Vector3(0, 1, 0), player2Yaw);
+    const candidate2 = camera2.position.clone().add(direction2);
+    if (canOccupy(candidate2)) {
+      camera2.position.copy(candidate2);
+    } else {
+      const xOnly2 = camera2.position.clone().add(new THREE.Vector3(direction2.x, 0, 0));
+      const zOnly2 = camera2.position.clone().add(new THREE.Vector3(0, 0, direction2.z));
+      if (canOccupy(xOnly2)) camera2.position.copy(xOnly2);
+      if (canOccupy(zOnly2)) camera2.position.copy(zOnly2);
+    }
+    camera2.position.y = 1.7;
+
+    player2Character.position.copy(camera2.position);
+    player2Character.position.y = 0;
+    player2Character.rotation.set(0, player2Yaw, 0);
+  }
+
   // Footstep audio triggering logic
   if (moving) {
     const stepInterval = sprint ? 0.34 : 0.56;
@@ -2029,7 +2135,7 @@ function updateMovement(delta) {
       audioManager.playSound(stepSound, { volume: sprint ? 0.32 : 0.18 });
     }
   } else {
-    footstepTimer = 0.35; // prime for immediate feedback on next move
+    footstepTimer = 0.35;
   }
 }
 
@@ -2135,11 +2241,26 @@ function updateState(delta) {
   scene.userData.kulkarni?.lookAt(camera.position.x, 1.2, camera.position.z);
   if (scene.userData.meeraCharacter) {
     const meera = scene.userData.meeraCharacter;
-    const distToPlayer = meera.position.distanceTo(camera.position);
+    
+    // Choose nearest player target
+    let targetCamera = camera;
+    let targetDist = meera.position.distanceTo(camera.position);
+    let targetFear = fear;
+    let targetIsP2 = false;
+
+    if (coopMode && camera2) {
+      const distToP2 = meera.position.distanceTo(camera2.position);
+      if (distToP2 < targetDist) {
+        targetCamera = camera2;
+        targetDist = distToP2;
+        targetFear = fear2;
+        targetIsP2 = true;
+      }
+    }
     
     if (meeraState === AiState.INACTIVE) {
       if (currentLevel === 1) {
-        if (camera.position.z < -16 || fear > 28) {
+        if (camera.position.z < -16 || fear > 28 || (coopMode && (camera2.position.z < -16 || fear2 > 28))) {
           meeraState = AiState.PATROL;
           meera.position.set(0, 0, -35);
           meera.visible = true;
@@ -2158,9 +2279,12 @@ function updateState(delta) {
     }
     
     if (meeraState !== AiState.INACTIVE) {
-      meera.lookAt(camera.position.x, meera.position.y, camera.position.z);
+      meera.lookAt(targetCamera.position.x, meera.position.y, targetCamera.position.z);
       
-      const playerDetected = (flashlightOn && distToPlayer < 15) || (distToPlayer < 7) || (sprintExhausted === false && keys.has("ShiftLeft") && distToPlayer < 11);
+      const targetFlashlightOn = targetIsP2 ? flashlightOn2 : flashlightOn;
+      const targetWantsSprint = targetIsP2 ? player2Keys.has("ShiftRight") : keys.has("ShiftLeft");
+      const targetSprintExhausted = targetIsP2 ? sprintExhausted2 : sprintExhausted;
+      const playerDetected = (targetFlashlightOn && targetDist < 15) || (targetDist < 7) || (targetSprintExhausted === false && targetWantsSprint && targetDist < 11);
       
       if (playerDetected && meeraState === AiState.PATROL) {
         meeraState = AiState.CHASE;
@@ -2180,21 +2304,24 @@ function updateState(delta) {
         }
         meera.position.x = THREE.MathUtils.lerp(meera.position.x, 0, delta * 3);
       } else if (meeraState === AiState.CHASE) {
-        meeraSpeed = (currentLevel === 2 ? 1.48 : 1.6) + (fear / 160);
-        const toPlayer = new THREE.Vector3().subVectors(camera.position, meera.position);
+        meeraSpeed = (currentLevel === 2 ? 1.48 : 1.6) + (targetFear / 160);
+        const toPlayer = new THREE.Vector3().subVectors(targetCamera.position, meera.position);
         toPlayer.y = 0;
         toPlayer.normalize();
         meera.position.addScaledVector(toPlayer, meeraSpeed * delta);
         
-        fear = Math.min(100, fear + delta * 3.6);
+        if (targetIsP2) {
+          fear2 = Math.min(100, fear2 + delta * 3.6);
+        } else {
+          fear = Math.min(100, fear + delta * 3.6);
+        }
         
-        if (distToPlayer > 18 && currentLevel === 1) {
+        if (targetDist > 18 && currentLevel === 1) {
           meeraState = AiState.PATROL;
           addTaskLog("Lost the ghost threat.");
         }
       }
       
-      // Open doors that Meera is close to, so she doesn't clip through closed doors
       doors.forEach((door) => {
         if (!door.userData.open) {
           const dx = meera.position.x - door.position.x;
@@ -2202,7 +2329,7 @@ function updateState(delta) {
           const dist2D = Math.sqrt(dx * dx + dz * dz);
           if (dist2D < 1.6) {
             door.userData.open = true;
-            door.userData.locked = false; // Bypass lock
+            door.userData.locked = false;
             playDoorCreak(door, true);
             caption.textContent = "A door creaks open behind the ghost's cold wind...";
             addTaskLog(`Ghost opened closed door: ${door.userData.label}.`);
@@ -2210,14 +2337,18 @@ function updateState(delta) {
         }
       });
       
-      if (distToPlayer < 4.5 && meeraState === AiState.CHASE) {
-        fear = Math.min(100, fear + delta * 24);
+      if (targetDist < 4.5 && meeraState === AiState.CHASE) {
+        if (targetIsP2) {
+          fear2 = Math.min(100, fear2 + delta * 24);
+        } else {
+          fear = Math.min(100, fear + delta * 24);
+        }
         shakeOffset.x = (Math.random() - 0.5) * 0.045;
         shakeOffset.y = (Math.random() - 0.5) * 0.045;
       }
       
-      if (distToPlayer < 1.15 && gameState === GameState.PLAYING) {
-        triggerGameOver("Aarav was caught by Meera's presence inside the old wing.");
+      if (targetDist < 1.15 && gameState === GameState.PLAYING) {
+        triggerGameOver(targetIsP2 ? "Rohan was caught by Meera's presence." : "Aarav was caught by Meera's presence.");
       }
     }
   }
@@ -2360,33 +2491,66 @@ function getFocusedInteractable(maxDistance = 4) {
 }
 
 function updateInteractionPrompt() {
+  if (!document.body.classList.contains("started")) return;
+
+  // Player 1 Prompt
   const hit = getFocusedInteractable();
-  if (!hit || !document.body.classList.contains("started")) {
+  if (!hit) {
     interactionPrompt.hidden = true;
-    if (reticle) reticle.classList.remove("active");
-    return;
+    if (reticleP1) reticleP1.classList.remove("active");
+  } else {
+    if (reticleP1) reticleP1.classList.add("active");
+    interactionPrompt.hidden = false;
+    const type = hit.object.userData.interactionType;
+    if (type === "door") {
+      const door = hit.object.userData.parentDoor;
+      const label = door ? door.userData.label : "door";
+      const isOpen = door ? door.userData.open : false;
+      interactionPrompt.textContent = `[E] ${isOpen ? "Close" : "Open"} ${label}`;
+    } else if (type === "basement_gate") {
+      if (inspected >= 3) {
+        interactionPrompt.textContent = "[E] Open Basement Gate";
+      } else {
+        interactionPrompt.textContent = "Basement Gate (Locked - 3 Evidence required)";
+      }
+    } else if (type === "evidence") {
+      const label = hit.object.userData.interactionLabel || "Evidence";
+      interactionPrompt.textContent = `[E] Inspect ${label}`;
+    } else {
+      interactionPrompt.textContent = `[E] ${hit.object.userData.interactionLabel || "Interact"}`;
+    }
   }
 
-  if (reticle) reticle.classList.add("active");
-  const type = hit.object.userData.interactionType;
-  interactionPrompt.hidden = false;
-  
-  if (type === "door") {
-    const door = hit.object.userData.parentDoor;
-    const label = door ? door.userData.label : "door";
-    const isOpen = door ? door.userData.open : false;
-    interactionPrompt.textContent = `[E] ${isOpen ? "Close" : "Open"} ${label}`;
-  } else if (type === "basement_gate") {
-    if (inspected >= 3) {
-      interactionPrompt.textContent = "[E] Open Basement Gate";
+  // Player 2 Prompt
+  if (coopMode && camera2) {
+    const hit2 = getFocusedInteractable2();
+    if (!hit2) {
+      if (interactionPromptP2) interactionPromptP2.hidden = true;
+      if (reticleP2) reticleP2.classList.remove("active");
     } else {
-      interactionPrompt.textContent = "Basement Gate (Locked - 3 Evidence required)";
+      if (reticleP2) reticleP2.classList.add("active");
+      if (interactionPromptP2) {
+        interactionPromptP2.hidden = false;
+        const type = hit2.object.userData.interactionType;
+        if (type === "door") {
+          const door = hit2.object.userData.parentDoor;
+          const label = door ? door.userData.label : "door";
+          const isOpen = door ? door.userData.open : false;
+          interactionPromptP2.textContent = `[ShiftRight] ${isOpen ? "Close" : "Open"} ${label}`;
+        } else if (type === "basement_gate") {
+          if (inspected >= 3) {
+            interactionPromptP2.textContent = "[ShiftRight] Open Basement Gate";
+          } else {
+            interactionPromptP2.textContent = "Basement Gate (Locked - 3 Evidence required)";
+          }
+        } else if (type === "evidence") {
+          const label = hit2.object.userData.interactionLabel || "Evidence";
+          interactionPromptP2.textContent = `[ShiftRight] Inspect ${label}`;
+        } else {
+          interactionPromptP2.textContent = `[ShiftRight] ${hit2.object.userData.interactionLabel || "Interact"}`;
+        }
+      }
     }
-  } else if (type === "evidence") {
-    const label = hit.object.userData.interactionLabel || "Evidence";
-    interactionPrompt.textContent = `[E] Inspect ${label}`;
-  } else {
-    interactionPrompt.textContent = `[E] ${hit.object.userData.interactionLabel || "Interact"}`;
   }
 }
 
@@ -2439,6 +2603,28 @@ function playIntroDialogue() {
   ]);
 }
 
+function getFocusedInteractable2(maxDistance = 4) {
+  if (!camera2) return null;
+  const raycaster = new THREE.Raycaster();
+  raycaster.setFromCamera(new THREE.Vector2(0, 0), camera2);
+  const hits = raycaster.intersectObjects(scene.children, true);
+  
+  const hit = hits.find(h => h.distance <= maxDistance);
+  if (!hit) return null;
+  
+  let current = hit.object;
+  while (current) {
+    if (current.userData && current.userData.interactable) {
+      return {
+        object: current,
+        distance: hit.distance
+      };
+    }
+    current = current.parent;
+  }
+  return null;
+}
+
 function inspectNearest() {
   if (gameState !== GameState.PLAYING) return;
   const hit = getFocusedInteractable();
@@ -2446,8 +2632,23 @@ function inspectNearest() {
     caption.textContent = "Nothing close enough to inspect.";
     return;
   }
+  inspectObject(hit, false);
+}
 
+function inspectNearest2() {
+  if (gameState !== GameState.PLAYING) return;
+  const hit = getFocusedInteractable2();
+  if (!hit) {
+    caption.textContent = "Nothing close enough to inspect.";
+    return;
+  }
+  inspectObject(hit, true);
+}
+
+function inspectObject(hit, isPlayer2 = false) {
   const type = hit.object.userData.interactionType;
+  const playerName = isPlayer2 ? "Rohan" : "Aarav";
+
   if (type === "door") {
     const door = hit.object.userData.parentDoor;
     if (door) {
@@ -2456,28 +2657,32 @@ function inspectNearest() {
           door.userData.locked = false;
           caption.textContent = "You unlock Room 32 using the credentials from Dr. Verma's memo.";
           addTaskLog("Unlocked Room 32 Left Door.");
-          sayLine("Aarav", "Okay, it's open. Let's see what's in here.");
+          sayLine(playerName, "Okay, it's open. Let's see what's in here.");
           if (audioManager) audioManager.playSound("door_latch", { volume: 0.35 });
         } else if (door.userData.label.includes("Room 29 right") && inspected >= 2) {
           door.userData.locked = false;
           caption.textContent = "You unlock Room 29 using the access card from the Watchman's Logbook.";
           addTaskLog("Unlocked Room 29 Right Door.");
-          sayLine("Aarav", "The right wing dorm is unlocked. I should check the study tables.");
+          sayLine(playerName, "The right wing dorm is unlocked. I should check the study tables.");
           if (audioManager) audioManager.playSound("door_latch", { volume: 0.35 });
         } else {
           caption.textContent = "The door is locked from the inside. Find more documents first.";
-          sayLine("Aarav", "Locked tight. I must have missed something down the hall.");
+          sayLine(playerName, "Locked tight. I must have missed something down the hall.");
           if (audioManager) audioManager.playSound("door_latch", { volume: 0.35 });
         }
         return;
       }
 
       door.userData.open = !door.userData.open;
-      fear = Math.min(100, fear + 4);
+      if (isPlayer2) {
+        fear2 = Math.min(100, fear2 + 4);
+      } else {
+        fear = Math.min(100, fear + 4);
+      }
       playDoorCreak(door, door.userData.open);
       caption.textContent = door.userData.open ? "The door groans open." : "The latch clicks shut.";
       addTaskLog(`${door.userData.open ? "Opened" : "Closed"} ${door.userData.label}.`);
-      if (door.userData.open && camera.position.z < -12) {
+      if (door.userData.open && (camera.position.z < -12 || (camera2 && camera2.position.z < -12))) {
         sayLine("Professor Kulkarni", "Some rooms were sealed after 2005. If a door opens by itself, step back.");
       }
       objective.textContent = "Search rooms for lab records, books, and anything Meera left behind.";
@@ -2491,16 +2696,16 @@ function inspectNearest() {
       addTaskLog("Basement gate unlocked. Descending to basement.");
       completeObjective("basement");
       queueStory([
-        ["Aarav", "The chain falls. Three years of evidence — and the lab was right here."],
-        ["Aarav", "I have to file this with the department. Meera deserves that much."],
-        ["Aarav", "Let's get out before she comes back."]
+        [playerName, "The chain falls. Three years of evidence — and the lab was right here."],
+        [playerName, "I have to file this with the department. Meera deserves that much."],
+        [playerName, "Let's get out before she comes back."]
       ]);
       window.setTimeout(() => {
         loadLevel2();
       }, 9800);
     } else {
       caption.textContent = "Chained shut. A rusted plaque reads: 'Applied Cognition Lab - Authorized Entry Only'.";
-      sayLine("Aarav", "This leads to the old sub-level. A flight of concrete stairs goes down into pitch black... Kulkarni was hiding something down there.");
+      sayLine(playerName, "This leads to the old sub-level. A flight of concrete stairs goes down into pitch black... Kulkarni was hiding something down there.");
       addTaskLog("Inspected the basement gate; locked, leads to the sub-level lab.");
     }
     return;
@@ -2526,7 +2731,7 @@ function inspectNearest() {
     playWhisper();
     updateObjectivesSystem();
     caption.textContent = "Document added to case file.";
-    sayLine("Aarav", `This belongs in the case file: ${doc.title}.`);
+    sayLine(playerName, `This belongs in the case file: ${doc.title}.`);
     addTaskLog(`Recovered evidence: ${doc.title}.`);
     window.setTimeout(() => {
       caseFile.classList.remove("open");
@@ -2541,10 +2746,10 @@ function inspectNearest() {
         caption.textContent = "A static buzzing ring echoes from Aarav's pocket.";
         window.setTimeout(() => {
           queueStory([
-            ["Aarav", "My phone... wait, the network is dead. How is it ringing?"],
-            ["Aarav", "(answers call) Professor? Professor Kulkarni?"],
+            [playerName, "My phone... wait, the network is dead. How is it ringing?"],
+            [playerName, "(answers call) Professor? Professor Kulkarni?"],
             ["Professor Kulkarni", "Aarav! Did you... did you find Verma's memo? You need to leave. She knows you're looking."],
-            ["Aarav", "Professor! What happened in 2005? Who is Meera?"],
+            [playerName, "Professor! What happened in 2005? Who is Meera?"],
             ["Professor Kulkarni", "We tried to cure... the counting... (static) ...run, Aarav! (line dead beep)"]
           ]);
         }, 2500);
@@ -2556,7 +2761,11 @@ function inspectNearest() {
   if (type === "battery") {
     const parent = hit.object.userData.parentBattery;
     if (parent) {
-      battery = Math.min(100, battery + 45);
+      if (isPlayer2) {
+        battery2 = Math.min(100, battery2 + 45);
+      } else {
+        battery = Math.min(100, battery + 45);
+      }
       parent.visible = false;
       
       const idx = interactables.indexOf(hit.object);
@@ -2567,7 +2776,7 @@ function inspectNearest() {
       collectedBatteries.add(parent.name);
       
       caption.textContent = "Flashlight battery recharged (+45%).";
-      sayLine("Aarav", "This battery still has charge. Good.");
+      sayLine(playerName, "This battery still has charge. Good.");
       if (audioManager) {
         audioManager.playSound("ui_select", { volume: 0.25 });
       }
@@ -2580,8 +2789,8 @@ function inspectNearest() {
     const parent = hit.object.userData.parentConsole;
     if (parent) {
       activeCheckpoint = {
-        position: [parent.position.x - 1.0, 1.7, parent.position.z],
-        battery: battery,
+        position: isPlayer2 ? [parent.position.x + 1.0, 1.7, parent.position.z] : [parent.position.x - 1.0, 1.7, parent.position.z],
+        battery: isPlayer2 ? battery2 : battery,
         collectedEvidence: Array.from(collectedEvidence),
         collectedDocuments: Array.from(collectedDocuments.entries()),
         collectedBatteries: Array.from(collectedBatteries),
@@ -2591,7 +2800,7 @@ function inspectNearest() {
         level: currentLevel
       };
       caption.textContent = "Progress checkpoint saved.";
-      sayLine("Aarav", "A backup power console. The terminal says security log saved.");
+      sayLine(playerName, "A backup power console. The terminal says security log saved.");
       if (audioManager) {
         audioManager.playSound("ui_select", { volume: 0.25 });
       }
@@ -2606,15 +2815,15 @@ function inspectNearest() {
     if (!text) return;
     readLoreNotes.add(lbl);
     caption.textContent = `\u201c${text}\u201d`;
-    sayLine("Aarav", `Found something pinned here: ${lbl}.`);
+    sayLine(playerName, `Found something pinned here: ${lbl}.`);
     addTaskLog(`Read environmental log: ${lbl}.`);
 
     if (lbl === "Meera's Diary Page" && !meeraDiaryReacted) {
       meeraDiaryReacted = true;
       window.setTimeout(() => {
         queueStory([
-          ["Aarav", "October 2004... that was right before the department shut down the Cognitive studies."],
-          ["Aarav", "Professor Kulkarni was the lead supervisor back then. What did they do to her?"]
+          [playerName, "October 2004... that was right before the department shut down the Cognitive studies."],
+          [playerName, "Professor Kulkarni was the lead supervisor back then. What did they do to her?"]
         ]);
       }, 5500);
     }
@@ -2623,7 +2832,7 @@ function inspectNearest() {
 
   if (type === "metronome") {
     caption.textContent = "A sealed mechanical metronome. It ticks steadily without any winding.";
-    sayLine("Aarav", "Wait, the scrawl on the door frame: 'the metronome doesn't need power.' It's completely sealed...");
+    sayLine(playerName, "Wait, the scrawl on the door frame: 'the metronome doesn't need power.' It's completely sealed...");
     addTaskLog("Inspected the sealed metronome.");
     return;
   }
@@ -2632,12 +2841,12 @@ function inspectNearest() {
     const valveId = hit.object.userData.valveId;
     if (valvesActivated.has(valveId)) {
       caption.textContent = "This fuel line is already primed.";
-      sayLine("Aarav", "The valve is turned all the way.");
+      sayLine(playerName, "The valve is turned all the way.");
     } else {
       valvesActivated.add(valveId);
       generatorPressure += 33.3;
       caption.textContent = `${hit.object.userData.interactionLabel} turned. Pressure line priming... (${valvesActivated.size}/3)`;
-      sayLine("Aarav", "Okay, that's one line open. I hear fuel rushing through the pipes.");
+      sayLine(playerName, "Okay, that's one line open. I hear fuel rushing through the pipes.");
       if (audioManager) {
         audioManager.playSound("door_creak", { volume: 0.5 });
       }
@@ -2650,12 +2859,12 @@ function inspectNearest() {
   if (type === "generator_lever") {
     if (generatorActive) {
       caption.textContent = "The generator is humming loudly. Backup power is online.";
-      sayLine("Aarav", "It's running. No need to pull the starter again.");
+      sayLine(playerName, "It's running. No need to pull the starter again.");
       return;
     }
     if (valvesActivated.size < 3) {
       caption.textContent = "The lever is locked. The pressure lines are cold. Prime all 3 fuel valves first.";
-      sayLine("Aarav", "Nothing happens. The fuel lines aren't primed yet.");
+      sayLine(playerName, "Nothing happens. The fuel lines aren't primed yet.");
       if (audioManager) {
         audioManager.playSound("door_latch", { volume: 0.5 });
       }
@@ -2664,7 +2873,7 @@ function inspectNearest() {
       generatorPressure = 100;
       hit.object.rotation.x = 0.52;
       caption.textContent = "The generator starter roars to life! Power grid online.";
-      sayLine("Aarav", "Yes! The lights... wait, they are turning red.");
+      sayLine(playerName, "Yes! The lights... wait, they are turning red.");
       if (audioManager) {
         audioManager.playSound("generator_start", { volume: 0.9 });
       }
@@ -2688,7 +2897,7 @@ function inspectNearest() {
       
       queueStory([
         ["Professor Kulkarni", "Aarav! The main sensor logs are peaking! Powering the backup grid woke the neural array. You must run!"],
-        ["Aarav", "What is that sound? Something's coming up from the sensory chamber!"]
+        [playerName, "What is that sound? Something's coming up from the sensory chamber!"]
       ]);
     }
     return;
@@ -2697,7 +2906,7 @@ function inspectNearest() {
   if (type === "exit_terminal") {
     if (!generatorActive) {
       caption.textContent = "Terminal display is blank. Power grid offline.";
-      sayLine("Aarav", "No power. I need to get the generator running first.");
+      sayLine(playerName, "No power. I need to get the generator running first.");
     } else {
       document.exitPointerLock?.();
       setGameState(GameState.CHOICE);
@@ -2730,10 +2939,32 @@ function animate() {
   const delta = Math.min(clock.getDelta(), 0.05);
   updateMovement(delta);
   updateState(delta);
-  if (filmPass) {
-    filmPass.uniforms.time.value = clock.elapsedTime * 60.0;
+  
+  if (coopMode) {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    
+    renderer.setScissorTest(true);
+    
+    // Player 1 Left Viewport
+    renderer.setViewport(0, 0, width / 2, height);
+    renderer.setScissor(0, 0, width / 2, height);
+    renderer.render(scene, camera);
+    
+    // Player 2 Right Viewport
+    renderer.setViewport(width / 2, 0, width / 2, height);
+    renderer.setScissor(width / 2, 0, width / 2, height);
+    if (camera2) {
+      renderer.render(scene, camera2);
+    }
+  } else {
+    renderer.setScissorTest(false);
+    renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
+    if (filmPass) {
+      filmPass.uniforms.time.value = clock.elapsedTime * 60.0;
+    }
+    composer.render();
   }
-  composer.render();
 }
 
 // ─── Post-processing composer ─────────────────────────────────────────────────
@@ -2804,8 +3035,66 @@ composer.addPass(new RenderPass(scene, camera));
 const filmPass = new ShaderPass(filmGrainShader);
 composer.addPass(filmPass);
 
+function setupPlayer2() {
+  if (!coopMode) return;
+  
+  camera2 = new THREE.PerspectiveCamera(camera.fov, (window.innerWidth / 2) / window.innerHeight, 0.1, 100);
+  camera2.position.set(0.8, 1.7, 8);
+  camera2.rotation.set(0, 0, 0);
+  scene.add(camera2);
+
+  camera.layers.enable(0);
+  camera.layers.enable(1);
+  
+  camera2.layers.enable(0);
+  camera2.layers.enable(2);
+
+  player2Character = createCharacter({ name: "Rohan", position: [0.8, 0, 8], color: 0x3f5b7a });
+  player2Character.layers.set(1);
+  player2Character.traverse(child => {
+    if (child.isMesh) child.layers.set(1);
+  });
+
+  scene.userData.player1Character = createCharacter({ name: "Aarav", position: [0, 0, 8], color: 0x8c5d3f });
+  scene.userData.player1Character.layers.set(2);
+  scene.userData.player1Character.traverse(child => {
+    if (child.isMesh) child.layers.set(2);
+  });
+
+  player2Flashlight = new THREE.SpotLight(0xffecc2, 3.4, 18, Math.PI / 6, 0.45, 1.0);
+  player2Flashlight.castShadow = true;
+  camera2.add(player2Flashlight);
+  camera2.add(player2Flashlight.target);
+  
+  const hudP2 = document.querySelector("#hud-p2");
+  if (hudP2) hudP2.style.display = "flex";
+
+  if (reticleP1) {
+    reticleP1.style.left = "25%";
+  }
+  if (interactionPrompt) {
+    interactionPrompt.style.left = "25%";
+  }
+  if (reticleP2) {
+    reticleP2.style.display = "block";
+    reticleP2.style.left = "75%";
+  }
+  if (interactionPromptP2) {
+    interactionPromptP2.style.left = "75%";
+  }
+  
+  battery2 = 100;
+  fear2 = 0;
+  stamina2 = 100;
+  sprintExhausted2 = false;
+  flashlightOn2 = true;
+  player2Yaw = 0;
+  player2Pitch = 0;
+}
+
 function startGame({ lockPointer = true } = {}) {
   initAudio();
+  setupPlayer2();
   setupUiSounds();
   startScreen.classList.add("hidden");
   setGameState(GameState.PLAYING);
@@ -2975,6 +3264,35 @@ function triggerEnding(endingId) {
 }
 
 function resetGame() {
+  if (camera2) {
+    scene.remove(camera2);
+    camera2 = null;
+  }
+  if (player2Character) {
+    scene.remove(player2Character);
+    player2Character = null;
+  }
+  if (scene.userData.player1Character) {
+    scene.remove(scene.userData.player1Character);
+    scene.userData.player1Character = null;
+  }
+  player2Keys.clear();
+  const hudP2 = document.querySelector("#hud-p2");
+  if (hudP2) hudP2.style.display = "none";
+
+  if (reticleP1) {
+    reticleP1.style.left = "50%";
+  }
+  if (interactionPrompt) {
+    interactionPrompt.style.left = "50%";
+  }
+  if (reticleP2) {
+    reticleP2.style.display = "none";
+  }
+  if (interactionPromptP2) {
+    interactionPromptP2.style.display = "none";
+  }
+
   if (activeCheckpoint) {
     fear = 0;
     battery = activeCheckpoint.battery;
@@ -3173,7 +3491,14 @@ if (new URLSearchParams(window.location.search).has("vr")) {
 }
 renderer.setAnimationLoop(animate);
 
-startButton.addEventListener("click", () => startGame());
+startButton.addEventListener("click", () => {
+  coopMode = false;
+  startGame();
+});
+coopButton.addEventListener("click", () => {
+  coopMode = true;
+  startGame();
+});
 menuSettings.addEventListener("click", () => {
   startScreen.classList.add("hidden");
   settingsPanel.classList.add("open");
@@ -3250,14 +3575,31 @@ document.addEventListener("keydown", (event) => {
   }
 
   if (gameState !== GameState.PLAYING) return;
-  keys.add(event.code);
-  if (event.code === "KeyF") {
-    toggleFlashlight();
+  
+  const p2Codes = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Period", "Slash", "ShiftRight"];
+  if (coopMode && p2Codes.includes(event.code)) {
+    player2Keys.add(event.code);
+    if (event.code === "Period") {
+      toggleFlashlight2();
+    }
+    if (event.code === "ShiftRight") {
+      inspectNearest2();
+    }
+  } else {
+    keys.add(event.code);
+    if (event.code === "KeyF") {
+      toggleFlashlight();
+    }
+    if (event.code === "KeyE") {
+      inspectNearest();
+    }
   }
-  if (event.code === "KeyE") inspectNearest();
 });
 
-document.addEventListener("keyup", (event) => keys.delete(event.code));
+document.addEventListener("keyup", (event) => {
+  keys.delete(event.code);
+  player2Keys.delete(event.code);
+});
 nextLineButton.addEventListener("click", showNextStoryLine);
 actionInteract.addEventListener("click", inspectNearest);
 actionFlashlight.addEventListener("click", () => {
@@ -3368,8 +3710,13 @@ if (savedFov) {
 }
 
 window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
+  const aspect = window.innerWidth / window.innerHeight;
+  camera.aspect = coopMode ? (aspect / 2) : aspect;
   camera.updateProjectionMatrix();
+  if (camera2) {
+    camera2.aspect = coopMode ? (aspect / 2) : aspect;
+    camera2.updateProjectionMatrix();
+  }
   renderer.setSize(window.innerWidth, window.innerHeight);
   composer.setSize(window.innerWidth, window.innerHeight);
 });

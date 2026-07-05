@@ -1746,7 +1746,7 @@ function updateState(delta) {
         camera.position.y += (Math.random() - 0.5) * 0.045;
       }
       
-      if (distToPlayer < 1.15) {
+      if (distToPlayer < 1.15 && gameState === GameState.PLAYING) {
         triggerGameOver("Aarav was caught by Meera's presence inside the old wing.");
       }
     }
@@ -2226,6 +2226,12 @@ function resetGame() {
   if (scene.userData.meeraCharacter) {
     scene.userData.meeraCharacter.position.set(2.6, 0, -34.5);
     scene.userData.meeraCharacter.visible = false;
+  }
+
+  // Reset per-session flags
+  if (!activeCheckpoint) {
+    introPlayed = false;
+    meeraWarned = false;
   }
   
   updateObjectivesSystem();

@@ -82,3 +82,28 @@ Current source files:
 ## Non-Applicable Requested Areas For This Prototype
 
 This repository is currently a local Three.js horror prototype. It does not contain authentication, database connectivity, real-time sync, voice chat, video calls, messaging backend, notes backend, or group creation systems. Those areas cannot be repaired until such systems are added to the project scope.
+
+---
+
+## Task 52 Audit: Full Loop Playtest — Phase 4 Complete (Commit 50/500)
+
+### Verified Working
+- **Start → Game**: Menu → Start Game transitions correctly; AudioContext resumes on first click; intro dialogue fires once.
+- **Evidence pickup (3 of 3)**: Dr. Verma Memo, Watchman's Logbook, Meera ID all visible and collectable. On pickup, mesh hides, removed from interactables, case file opens, objective updates.
+- **Door locks**: Room 32 Left requires Evidence >= 1 (Memo). Room 29 Right requires Evidence >= 2 (Logbook). Both auto-unlock on interact when condition is met.
+- **Basement gate**: Locked until Evidence = 3. On open: 3-line escape cinematic queues -> WIN screen fires after ~9.8 s with correct stats (evidence count, elapsed time, fear%).
+- **Ghost AI**: Meera enters PATROL when player reaches z < -16 or fear > 28. Transitions to CHASE on flashlight/sprint detection. Camera shake at < 4.5 m. GAMEOVER if distance < 1.15 m (guarded with gameState === PLAYING check).
+- **Fear -> GAMEOVER**: fear >= 100 correctly guarded with PLAYING state; triggerGameOver() fires once.
+- **Battery drain + pickups**: 3 cylinders spawn; interact recharges 45%; reset handled on restart.
+- **Checkpoint**: Emergency Terminal at z = -18.5 saves position, battery, evidence state. On restart: doors auto-unlock per evidence count, collected items stay hidden.
+- **Lore notes**: 4 wall notes at z = -5.8, -14.2, -26.8, -38.4; E reads full text into caption and fires Aarav voice line.
+- **Win screen**: Evidence count, escape time, fear% shown. Play Again clears checkpoint and fully restarts.
+- **Full restart**: introPlayed and meeraWarned reset correctly for clean new-game experience.
+
+### Known Issues / Deferred to Phase 5
+- meeraWarned declared and reset but never actively read (old code removed in Task 45). Remove in Phase 5 cleanup.
+- Battery cylinders always restore on checkpoint-reset regardless of mid-run pickup state (simplification; per-item tracking is Phase 5).
+- Ghost may clip through closed doors in rare corner cases — Meera's vector is not blocked by AABB. Path-finding improvement deferred to Phase 5.
+- Camera Y shake during ghost proximity can briefly push player above floor (magnitude 0.045 acceptable; clamp in Phase 5).
+- No ambient duck on WIN state transition. Background audio fades missing. Deferred to Phase 5 audio polish.
+

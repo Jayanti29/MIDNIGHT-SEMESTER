@@ -1881,6 +1881,22 @@ function updateState(delta) {
         }
       }
       
+      // Open doors that Meera is close to, so she doesn't clip through closed doors
+      doors.forEach((door) => {
+        if (!door.userData.open) {
+          const dx = meera.position.x - door.position.x;
+          const dz = meera.position.z - door.position.z;
+          const dist2D = Math.sqrt(dx * dx + dz * dz);
+          if (dist2D < 1.6) {
+            door.userData.open = true;
+            door.userData.locked = false; // Bypass lock
+            playDoorCreak(door, true);
+            caption.textContent = "A door creaks open behind the ghost's cold wind...";
+            addTaskLog(`Ghost opened closed door: ${door.userData.label}.`);
+          }
+        }
+      });
+      
       if (distToPlayer < 4.5 && meeraState === AiState.CHASE) {
         fear = Math.min(100, fear + delta * 24);
         camera.position.x += (Math.random() - 0.5) * 0.045;

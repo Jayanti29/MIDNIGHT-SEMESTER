@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 70/500**
+Commit counter: **Commit 71/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -73,3 +73,4 @@ Commit counter: **Commit 70/500**
 - **Commit 68/500**: Completed Phase 6 Task 71. Implemented Meera's final ghost event: a non-hostile full apparition drift across the hallway at z=-31.5 triggered when evidence=3.
 - **Commit 69/500**: Completed Phase 6 Task 72. Performed code cleanup by removing the unused meeraWarned variable and its references.
 - **Commit 70/500**: Completed Phase 6 Task 73. Implemented per-cylinder battery pickup state tracking and persisted collected battery states across terminal checkpoint load/reset cycles.
+- **Commit 71/500**: Completed Phase 6 Task 74. Implemented dynamic door-opening behavior for Meera's ghost AI, preventing her from clipping through closed doors by forcing them open with creak SFX on proximity.

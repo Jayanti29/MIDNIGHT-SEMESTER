@@ -1319,25 +1319,39 @@ function buildCorridor() {
 }
 
 function buildDormRoom() {
-  const roomZ = -35;
-  box("dorm floor", [13, 0.16, 12], [0, -0.08, roomZ], materials.floor);
-  box("dorm back wall", [13, 4, 0.3], [0, 1.9, roomZ - 6], materials.wall, false, true, true);
-  box("dorm left wall", [0.3, 4, 12.3], [-6.5, 1.9, roomZ], materials.wall, false, true, true);
-  box("dorm right wall", [0.3, 4, 12.3], [6.5, 1.9, roomZ], materials.wall, false, true, true);
-  box("dorm front wall left", [2.5, 4, 0.3], [-5.25, 1.9, roomZ + 6], materials.wall, false, true, true);
-  box("dorm front wall right", [2.5, 4, 0.3], [5.25, 1.9, roomZ + 6], materials.wall, false, true, true);
+  const dormGroup = new THREE.Group();
+  dormGroup.name = "dorm_room_group";
+  scene.userData.dormGroup = dormGroup;
 
-  box("bed left base", [2.2, 0.42, 4.8], [-3.1, 0.28, roomZ - 1.6], materials.darkWood, true, true, true);
-  box("bed left mattress", [2.04, 0.28, 4.56], [-3.1, 0.68, roomZ - 1.6], materials.fabric);
-  box("bed right base", [2.2, 0.42, 4.8], [3.1, 0.28, roomZ - 1.4], materials.darkWood, true, true, true);
-  box("bed right mattress", [2.04, 0.28, 4.56], [3.1, 0.68, roomZ - 1.4], materials.fabric);
-  box("desk", [2.4, 0.22, 1.2], [0, 1, roomZ - 4.4], materials.darkWood, true, true, true);
-  box("desk left leg", [0.16, 1, 0.16], [-1, 0.45, roomZ - 3.96], materials.darkWood);
-  box("desk right leg", [0.16, 1, 0.16], [1, 0.45, roomZ - 3.96], materials.darkWood);
-  box("fallen chair", [0.9, 0.14, 0.9], [-1.7, 0.28, roomZ + 1.8], materials.darkWood, true, true, true).rotation.z = 0.6;
-  box("blood mark", [0.9, 0.025, 1.9], [1.7, 0.04, roomZ + 2.8], materials.hazard, false);
+  const roomZ = -35;
+
+  function dormBox(name, size, position, mat, cast = true, receive = true, isCol = false) {
+    const m = box(name, size, position, mat, cast, receive, isCol);
+    dormGroup.attach(m);
+    return m;
+  }
+
+  dormBox("dorm floor", [13, 0.16, 12], [0, -0.08, roomZ], materials.floor);
+  dormBox("dorm back wall", [13, 4, 0.3], [0, 1.9, roomZ - 6], materials.wall, false, true, true);
+  dormBox("dorm left wall", [0.3, 4, 12.3], [-6.5, 1.9, roomZ], materials.wall, false, true, true);
+  dormBox("dorm right wall", [0.3, 4, 12.3], [6.5, 1.9, roomZ], materials.wall, false, true, true);
+  dormBox("dorm front wall left", [2.5, 4, 0.3], [-5.25, 1.9, roomZ + 6], materials.wall, false, true, true);
+  dormBox("dorm front wall right", [2.5, 4, 0.3], [5.25, 1.9, roomZ + 6], materials.wall, false, true, true);
+
+  dormBox("bed left base", [2.2, 0.42, 4.8], [-3.1, 0.28, roomZ - 1.6], materials.darkWood, true, true, true);
+  dormBox("bed left mattress", [2.04, 0.28, 4.56], [-3.1, 0.68, roomZ - 1.6], materials.fabric);
+  dormBox("bed right base", [2.2, 0.42, 4.8], [3.1, 0.28, roomZ - 1.4], materials.darkWood, true, true, true);
+  dormBox("bed right mattress", [2.04, 0.28, 4.56], [3.1, 0.68, roomZ - 1.4], materials.fabric);
+  dormBox("desk", [2.4, 0.22, 1.2], [0, 1, roomZ - 4.4], materials.darkWood, true, true, true);
+  dormBox("desk left leg", [0.16, 1, 0.16], [-1, 0.45, roomZ - 3.96], materials.darkWood);
+  dormBox("desk right leg", [0.16, 1, 0.16], [1, 0.45, roomZ - 3.96], materials.darkWood);
+  dormBox("fallen chair", [0.9, 0.14, 0.9], [-1.7, 0.28, roomZ + 1.8], materials.darkWood, true, true, true).rotation.z = 0.6;
+  dormBox("blood mark", [0.9, 0.025, 1.9], [1.7, 0.04, roomZ + 2.8], materials.hazard, false);
+
   createBookStack([-0.46, 1.17, roomZ - 4.42], 0.1);
   createBookshelf([-5.1, 0, roomZ - 2.6], Math.PI / 2);
+
+  scene.add(dormGroup);
 }
 
 function buildDocuments() {
@@ -1762,6 +1776,11 @@ function updateState(delta) {
     }
   }
   scene.userData.dust.rotation.y += delta * 0.018;
+
+  // Distance-gate LOD: hide dorm room geometry when player is far away
+  if (scene.userData.dormGroup) {
+    scene.userData.dormGroup.visible = camera.position.z < -22;
+  }
 
   flickerLights.forEach(({ light, base, phase }) => {
     if (isBlackoutActive) {

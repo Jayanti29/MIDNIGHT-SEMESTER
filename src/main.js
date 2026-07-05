@@ -1,4 +1,7 @@
 import * as THREE from "three";
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 
 const canvas = document.querySelector("#game");
 const startScreen = document.querySelector("#start-screen");
@@ -1687,6 +1690,13 @@ function updateState(delta) {
   if (fearMeter) fearMeter.value = fear;
   vignette.style.opacity = String(0.35 + fear / 145);
 
+  // Drive post-processing shader uniforms from fear level
+  if (filmPass) {
+    filmPass.uniforms.vignetteAmount.value = 0.55 + fear * 0.004;
+    filmPass.uniforms.aberrationAmount.value = 0.0018 + fear * 0.000055;
+    filmPass.uniforms.grainAmount.value = 0.09 + fear * 0.0008;
+  }
+
   const ghost = scene.userData.ghost;
   ghost.lookAt(camera.position);
   ghost.material.opacity = Math.max(0, Math.sin(clock.elapsedTime * 1.7) * 0.16 + (fear - 42) / 210);
@@ -2020,8 +2030,81 @@ function animate() {
   const delta = Math.min(clock.getDelta(), 0.05);
   updateMovement(delta);
   updateState(delta);
-  renderer.render(scene, camera);
+  if (filmPass) {
+    filmPass.uniforms.time.value = clock.elapsedTime * 60.0;
+  }
+  composer.render();
 }
+
+// ─── Post-processing composer ─────────────────────────────────────────────────
+const filmGrainShader = {
+  name: "FilmGrainShader",
+  uniforms: {
+    tDiffuse: { value: null },
+    time: { value: 0.0 },
+    grainAmount: { value: 0.09 },
+    vignetteAmount: { value: 0.55 },
+    aberrationAmount: { value: 0.0018 },
+    scanlineAmount: { value: 0.04 }
+  },
+  vertexShader: /* glsl */`
+    varying vec2 vUv;
+    void main() {
+      vUv = uv;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }
+  `,
+  fragmentShader: /* glsl */`
+    uniform sampler2D tDiffuse;
+    uniform float time;
+    uniform float grainAmount;
+    uniform float vignetteAmount;
+    uniform float aberrationAmount;
+    uniform float scanlineAmount;
+    varying vec2 vUv;
+
+    float rand(vec2 co) {
+      return fract(sin(dot(co, vec2(12.9898, 78.233))) * 43758.5453 + time * 0.001);
+    }
+
+    void main() {
+      vec2 uv = vUv;
+
+      // Chromatic aberration
+      float r = texture2D(tDiffuse, uv + vec2( aberrationAmount, 0.0)).r;
+      float g = texture2D(tDiffuse, uv).g;
+      float b = texture2D(tDiffuse, uv - vec2( aberrationAmount, 0.0)).b;
+      vec4 color = vec4(r, g, b, 1.0);
+
+      // Film grain
+      float grain = rand(uv + vec2(time * 0.003, 0.0)) * 2.0 - 1.0;
+      color.rgb += grain * grainAmount;
+
+      // Scanlines
+      float scanline = sin(uv.y * 800.0 + time * 2.0) * 0.5 + 0.5;
+      color.rgb -= scanline * scanlineAmount * 0.5;
+
+      // Vignette
+      vec2 center = uv - 0.5;
+      float dist = dot(center, center);
+      float vignette = 1.0 - smoothstep(0.12, 0.72, dist * 2.0 * vignetteAmount);
+      color.rgb *= vignette;
+
+      // Slight desaturation for horror tone
+      float luma = dot(color.rgb, vec3(0.299, 0.587, 0.114));
+      color.rgb = mix(color.rgb, vec3(luma), 0.18);
+
+      gl_FragColor = color;
+    }
+  `
+};
+
+const composer = new EffectComposer(renderer);
+composer.addPass(new RenderPass(scene, camera));
+const filmPass = new ShaderPass(filmGrainShader);
+composer.addPass(filmPass);
+
+function dummy_prevent_tree_shake() {}
 
 function startGame({ lockPointer = true } = {}) {
   initAudio();
@@ -2426,4 +2509,5 @@ window.addEventListener("resize", () => {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize(window.innerWidth, window.innerHeight);
+  composer.setSize(window.innerWidth, window.innerHeight);
 });

@@ -284,7 +284,6 @@ let audioCtx = null;
 let droneGain = null;
 let heartbeatTimer = 0;
 let footstepTimer = 0.35;
-let meeraWarned = false;
 let meeraFirstWhisperPlayed = false;
 let kulkarniCallPlayed = false;
 let meeraSecondEventPlayed = false;
@@ -2570,7 +2569,6 @@ function resetGame() {
   // Reset per-session flags
   if (!activeCheckpoint) {
     introPlayed = false;
-    meeraWarned = false;
     meeraFirstWhisperPlayed = false;
     kulkarniCallPlayed = false;
     meeraSecondEventPlayed = false;

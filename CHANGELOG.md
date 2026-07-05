@@ -5,7 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] — Commits 61–71
+## [Unreleased] — Commits 61–72
 
 ### Phase 6 — Narrative & Environmental Polish
 
@@ -20,6 +20,9 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Basement stairwell preview monologue and restricted plaque caption on locked gate inspection
 - 2005 Dean's Memo as a findable lore note collectible at z=-18.2
 - Meera's final ghost event (non-hostile apparition drift across hallway at z=-31.5 when evidence=3)
+
+#### Changed
+- Cleaned up unused meeraWarned variable and references in main.js
 
 #### Planned
 - Second level (Basement / Generator Room)

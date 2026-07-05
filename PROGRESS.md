@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 60/500**
+Commit counter: **Commit 68/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -60,4 +60,14 @@ Commit counter: **Commit 60/500**
 - **Commit 55/500**: Completed Phase 5 Task 57. Added touch look-drag (right 40% of screen), gamepad polling (left stick move, right stick look, A interact, X flashlight, L3 sprint).
 - **Commit 56/500**: Completed Phase 5 Task 58. Full README rewrite with accurate feature list, controls table, tech stack, and phase status.
 - **Commit 57/500**: Completed Phase 5 Task 59. Created CHANGELOG.md documenting all changes across Phases 1-5 in Keep a Changelog format.
-- **Commit 58/500**: Completed Phase 5 Task 60. Final playtest pass, build verified, v0.1-playable tag created. Phase 5 complete.
+- **Commit 58/500**: Completed Phase 5. Final playtest pass, build verified, v0.1-playable tag created. Phase 5 complete.
+- **Commit 59/500**: Completed Phase 6 Task 61. Expanded Act 1 prologue to 6-line opening monologue with Aarav's inner voice, Kulkarni's warning, and Meera's echo.
+- **Commit 60/500**: Completed Phase 6 Task 62. Added Meera's first ghost whisper stinger as a one-time event triggered on approaching the dorm wing at z<-24.5 with 0 evidence.
+- **Commit 61/500**: Completed Phase 6 Task 63. Programmed Professor Kulkarni's intercom phone call sequence triggered upon picking up the first evidence document.
+- **Commit 62/500**: Completed Phase 6 Task 64. Added Meera's second ghost event, triggering a countdown dialogue and violent corridor lamp flickering near Room 29 at z<-26 with evidence >= 1.
+- **Commit 63/500**: Completed Phase 6 Task 65+66. Spawned readable Meera's Diary Page (2004) and Aarav's Capstone Report (2026) paper meshes inside the dorm room.
+- **Commit 64/500**: Completed Phase 6 Task 67. Added Aarav's internal monologue reaction upon reading Meera's Diary page inside Room 32.
+- **Commit 65/500**: Completed Phase 6 Task 68. Created a metronome 3D prop inside the dorm room with constant spatial ticking audio loop and inspection monologue.
+- **Commit 66/500**: Completed Phase 6 Task 69. Added basement stairwell preview monologue and restricted plaque caption on locked gate inspection.
+- **Commit 67/500**: Completed Phase 6 Task 70. Added 2005 Dean's Memo as a findable lore note collectible at z=-18.2.
+- **Commit 68/500**: Completed Phase 6 Task 71. Implemented Meera's final ghost event: a non-hostile full apparition drift across the hallway at z=-31.5 triggered when evidence=3.

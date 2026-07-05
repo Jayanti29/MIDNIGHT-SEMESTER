@@ -290,6 +290,10 @@ let kulkarniCallPlayed = false;
 let meeraSecondEventPlayed = false;
 let activeCountdownFlicker = false;
 let meeraDiaryReacted = false;
+let meeraFinalEventPlayed = false;
+let activeApparitionWalk = false;
+let apparitionGhost = null;
+let apparitionFadeTimer = 0;
 let basementGateGroup = null;
 let blackoutTriggered = false;
 let isBlackoutActive = false;
@@ -1929,6 +1933,45 @@ function updateState(delta) {
     addTaskLog("Experienced an electrical anomaly near Room 29.");
   }
 
+  // Task 71: Meera's final ghost event — full apparition walk across corridor at z=-30 when evidence=3
+  if (!meeraFinalEventPlayed && inspected === 3 && camera.position.z < -24.0 && gameState === GameState.PLAYING) {
+    meeraFinalEventPlayed = true;
+    activeApparitionWalk = true;
+    apparitionGhost = createCharacter({ name: "MeeraApparition", position: [-3.2, 0, -31.5], color: 0x9ed2c2, ghostly: true });
+    scene.add(apparitionGhost);
+    apparitionGhost.rotation.y = Math.PI / 2; // looking right
+    playWhisper();
+    if (audioManager) {
+      audioManager.playSound("blackout_cue", { volume: 0.4 });
+    }
+    queueStory([
+      ["Aarav", "Meera... I can see you. You're trying to show me the way down..."]
+    ]);
+    caption.textContent = "A cold, pale figure drifts slowly across the hallway ahead...";
+    addTaskLog("Witnessed a non-hostile apparition near the basement gate.");
+  }
+
+  if (activeApparitionWalk && apparitionGhost) {
+    apparitionGhost.position.x += delta * 0.72;
+    apparitionGhost.position.y = Math.sin(clock.elapsedTime * 3) * 0.04;
+    if (apparitionGhost.position.x > 3.2) {
+      activeApparitionWalk = false;
+      apparitionFadeTimer = 0;
+    }
+  } else if (apparitionGhost) {
+    apparitionFadeTimer += delta;
+    apparitionGhost.children.forEach(c => {
+      if (c.material) {
+        c.material.transparent = true;
+        c.material.opacity = Math.max(0, 0.42 * (1.0 - apparitionFadeTimer / 2.0));
+      }
+    });
+    if (apparitionFadeTimer >= 2.0) {
+      scene.remove(apparitionGhost);
+      apparitionGhost = null;
+    }
+  }
+
   flickerLights.forEach(({ light, base, phase }) => {
     if (isBlackoutActive) {
       light.intensity = THREE.MathUtils.lerp(light.intensity, 0, delta * 12);
@@ -2518,6 +2561,12 @@ function resetGame() {
     scene.userData.meeraCharacter.visible = false;
   }
 
+  if (apparitionGhost) {
+    scene.remove(apparitionGhost);
+    apparitionGhost = null;
+  }
+  activeApparitionWalk = false;
+
   // Reset per-session flags
   if (!activeCheckpoint) {
     introPlayed = false;
@@ -2527,6 +2576,7 @@ function resetGame() {
     meeraSecondEventPlayed = false;
     activeCountdownFlicker = false;
     meeraDiaryReacted = false;
+    meeraFinalEventPlayed = false;
   }
   
   updateObjectivesSystem();

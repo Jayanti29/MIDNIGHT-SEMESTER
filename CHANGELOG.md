@@ -5,9 +5,23 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] — Phase 6–10 (Planned)
+## [Unreleased] — Commits 61–71
 
-### Planned
+### Phase 6 — Narrative & Environmental Polish
+
+#### Added
+- Act 1 prologue expanded to 6-line opening monologue (Aarav's inner voice, Kulkarni's warning, Meera's echo)
+- Meera's first ghost whisper stinger (one-time sound event at z<-24.5 with 0 evidence)
+- Professor Kulkarni intercom phone call sequence triggered upon picking up the 1st evidence document
+- Meera's second ghost event (countdown dialogue + shadow/lamp flickering near Room 29 at z<-26)
+- Readable Meera's Diary Page (2004) and Aarav's Capstone Report (2026) paper meshes in the dorm room
+- Aarav's internal monologue reaction inside Room 32 after reading Meera's Diary page
+- Metronome 3D prop in the dorm room with constant spatial ticking audio loop and inspection monologue
+- Basement stairwell preview monologue and restricted plaque caption on locked gate inspection
+- 2005 Dean's Memo as a findable lore note collectible at z=-18.2
+- Meera's final ghost event (non-hostile apparition drift across hallway at z=-31.5 when evidence=3)
+
+#### Planned
 - Second level (Basement / Generator Room)
 - Full Act 2 and Act 3 narrative with branching endings
 - Multiplayer ghost-hunting mode (experimental)

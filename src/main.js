@@ -1378,6 +1378,22 @@ function buildDormRoom() {
   createBookStack([-0.46, 1.17, roomZ - 4.42], 0.1);
   createBookshelf([-5.1, 0, roomZ - 2.6], Math.PI / 2);
 
+  // Task 65: Meera's Diary Page on left bed
+  const diaryPage = box("Meera's Diary Page", [0.34, 0.02, 0.24], [-3.1, 0.83, roomZ - 1.6], materials.paper);
+  tagInteractable(diaryPage, "lore_note", "Meera's Diary Page");
+  diaryPage.userData.loreText = "October 12, 2004. The noise in the walls isn't random. It's a sequence. 42, 18, 5, 0... If I stop counting, the doors stay locked. If I sleep, they change the sequence.";
+  diaryPage.userData.loreLabel = "Meera's Diary Page";
+  dormGroup.attach(diaryPage);
+  interactables.push(diaryPage);
+
+  // Task 66: Aarav's Capstone Project Report on desk
+  const reportPage = box("Capstone Project Report", [0.34, 0.02, 0.24], [0.8, 1.13, roomZ - 4.4], materials.paper);
+  tagInteractable(reportPage, "lore_note", "Capstone Project Report");
+  reportPage.userData.loreText = "Ravenswood Capstone 2026 - Aarav Mehta. Topic: Neural Synchronization via Low-Frequency Audio Stimuli. Notes: The backup grid in Block A still hums at 12Hz, exactly matching the target frequency from the 2004 experiments.";
+  reportPage.userData.loreLabel = "Capstone Project Report";
+  dormGroup.attach(reportPage);
+  interactables.push(reportPage);
+
   scene.add(dormGroup);
 }
 

@@ -126,7 +126,6 @@ class AudioManager {
         url,
         (buffer) => {
           this.buffers.set(name, buffer);
-          console.log(`Audio buffer loaded: ${name} (${url})`);
           resolve(buffer);
         },
         undefined,
@@ -992,7 +991,7 @@ function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#
   texture.wrapS = THREE.RepeatWrapping;
   texture.wrapT = THREE.RepeatWrapping;
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
+  texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
   return texture;
 }
 
@@ -2122,8 +2121,6 @@ const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
 const filmPass = new ShaderPass(filmGrainShader);
 composer.addPass(filmPass);
-
-function dummy_prevent_tree_shake() {}
 
 function startGame({ lockPointer = true } = {}) {
   initAudio();

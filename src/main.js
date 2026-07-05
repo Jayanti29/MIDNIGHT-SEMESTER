@@ -1600,6 +1600,11 @@ function initLoreNotes() {
     "Safety notice, partially burned: \"All Applied Cognition experiments suspended pending ethics review. Files to be sealed until 2025. Access revoked. \u2014 Dean\'s Office, 2005.\"",
     "Burned Safety Notice"
   );
+  buildLoreNote(
+    [-3.42, 1.50, -18.2], Math.PI / 2,
+    "Dean\'s Memo, June 2005: \"Kulkarni, the Ministry is questioning the volunteer registry. We cannot account for Meera Iyer\'s academic status. Erase all records from the Block A local server immediately.\"",
+    "Dean\'s Secret Memo"
+  );
 }
 
 function addAtmosphere() {

@@ -5,7 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] — Commits 61–75
+## [Unreleased] — Commits 61–76
 
 ### Phase 6 — Narrative & Environmental Polish
 
@@ -25,6 +25,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Cleaned up unused meeraWarned variable and references in main.js
 - Implemented per-cylinder battery pickup state tracking and saved battery states to terminal checkpoints
 - Implemented dynamic door-opening behavior for Meera's ghost AI to prevent clipping through closed doors
+- Implemented smooth background ambient audio loop fade-out on Game Over and Win transitions
 
 #### Fixed
 - Fixed permanent player position drift and collision bypass during ghost chase camera shakes

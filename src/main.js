@@ -218,6 +218,21 @@ class AudioManager {
     });
   }
 
+  fadeAmbientOut(durationSecs = 2.0) {
+    window.clearTimeout(this.duckTimer);
+    this.activeSounds.forEach((sound) => {
+      if (sound.userData && sound.userData.category === "ambient") {
+        if (sound.gain && sound.gain.gain) {
+          const ctx = this.listener.context;
+          sound.gain.gain.setValueAtTime(sound.gain.gain.value, ctx.currentTime);
+          sound.gain.gain.linearRampToValueAtTime(0, ctx.currentTime + durationSecs);
+        } else {
+          sound.setVolume(0);
+        }
+      }
+    });
+  }
+
   stopSound(name) {
     const sound = this.activeSounds.get(name);
     if (sound) {
@@ -2461,6 +2476,9 @@ function triggerGameOver(reason) {
   document.exitPointerLock?.();
   if (gameoverReason) gameoverReason.textContent = reason;
   playTone(55, 2.0, 0.4, "sawtooth");
+  if (audioManager) {
+    audioManager.fadeAmbientOut(2.2);
+  }
   addTaskLog("Fatal: Aarav collapsed due to extreme heart strain.");
 }
 
@@ -2483,6 +2501,9 @@ function triggerWin() {
   playTone(220, 1.8, 0.28, "sine");
   window.setTimeout(() => playTone(277, 1.8, 0.18, "sine"), 420);
   window.setTimeout(() => playTone(330, 2.2, 0.22, "sine"), 840);
+  if (audioManager) {
+    audioManager.fadeAmbientOut(2.5);
+  }
   addTaskLog("Aarav escaped through the basement. Evidence filed.");
 }
 
@@ -2617,6 +2638,9 @@ function resetGame() {
   }
   
   updateObjectivesSystem();
+  if (audioManager) {
+    audioManager.updateCategoryVolumes();
+  }
   addTaskLog(activeCheckpoint ? "System status restored to last terminal checkpoint." : "System status restored. Re-entering Block A.");
 }
 

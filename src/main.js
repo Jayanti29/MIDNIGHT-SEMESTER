@@ -951,40 +951,40 @@ function playJumpscareStinger() {
 
 function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#776b5a", scale = 1 }) {
   const textureCanvas = document.createElement("canvas");
-  textureCanvas.width = 1024;
-  textureCanvas.height = 1024;
+  textureCanvas.width = 512;
+  textureCanvas.height = 512;
   const ctx = textureCanvas.getContext("2d");
   ctx.fillStyle = base;
-  ctx.fillRect(0, 0, 1024, 1024);
+  ctx.fillRect(0, 0, 512, 512);
 
-  for (let i = 0; i < 900; i += 1) {
+  for (let i = 0; i < 420; i += 1) {
     const alpha = Math.random() * 0.16;
     ctx.strokeStyle = i % 4 === 0 ? `rgba(255,245,220,${alpha})` : `rgba(0,0,0,${alpha})`;
     ctx.beginPath();
-    const x = Math.random() * 1024;
-    const y = Math.random() * 1024;
+    const x = Math.random() * 512;
+    const y = Math.random() * 512;
     ctx.moveTo(x, y);
-    ctx.lineTo(x + (Math.random() - 0.5) * 160 * scale, y + Math.random() * 26 * scale);
+    ctx.lineTo(x + (Math.random() - 0.5) * 80 * scale, y + Math.random() * 13 * scale);
     ctx.stroke();
   }
 
   ctx.strokeStyle = grain;
-  ctx.lineWidth = 3;
-  for (let y = 0; y < 1024; y += 92) {
+  ctx.lineWidth = 2;
+  for (let y = 0; y < 512; y += 48) {
     ctx.beginPath();
-    ctx.moveTo(0, y + Math.random() * 18);
-    ctx.lineTo(1024, y + Math.random() * 22);
+    ctx.moveTo(0, y + Math.random() * 9);
+    ctx.lineTo(512, y + Math.random() * 11);
     ctx.stroke();
   }
 
   ctx.strokeStyle = scratches;
   ctx.lineWidth = 1;
-  for (let i = 0; i < 120; i += 1) {
+  for (let i = 0; i < 55; i += 1) {
     ctx.beginPath();
-    const x = Math.random() * 1024;
-    const y = Math.random() * 1024;
+    const x = Math.random() * 512;
+    const y = Math.random() * 512;
     ctx.moveTo(x, y);
-    ctx.lineTo(x + Math.random() * 220 - 80, y + Math.random() * 90 - 45);
+    ctx.lineTo(x + Math.random() * 110 - 40, y + Math.random() * 45 - 22);
     ctx.stroke();
   }
 
@@ -1054,14 +1054,14 @@ function tagInteractable(object, type, label) {
 
 function addLabel(text, position, size = 0.34) {
   const canvasLabel = document.createElement("canvas");
-  canvasLabel.width = 1024;
-  canvasLabel.height = 256;
+  canvasLabel.width = 512;
+  canvasLabel.height = 128;
   const ctx = canvasLabel.getContext("2d");
   ctx.fillStyle = "#d8c39f";
   ctx.fillRect(0, 0, canvasLabel.width, canvasLabel.height);
   ctx.fillStyle = "#2d2118";
-  ctx.font = "700 58px Georgia";
-  ctx.fillText(text, 46, 145);
+  ctx.font = "700 29px Georgia";
+  ctx.fillText(text, 23, 72);
   const texture = new THREE.CanvasTexture(canvasLabel);
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(size * 4, size),

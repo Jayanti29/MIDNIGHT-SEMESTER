@@ -1892,9 +1892,12 @@ function playIntroDialogue() {
   if (introPlayed) return;
   introPlayed = true;
   queueStory([
-    ["Aarav", "Gate control is offline. Why is Block A drawing backup power?"],
-    ["Professor Kulkarni", "Aarav, listen carefully. Do not enter the basement. Restore the generator and leave."],
-    ["Meera", "Forty-two hours. Still awake. Still here."]
+    ["Aarav", "Three days. That's all I need. Finish the capstone, submit by Friday, go home."],
+    ["Aarav", "Block A is the only building still on backup power. I shouldn't be here after midnight."],
+    ["Aarav", "Gate control is offline. Why is Block A drawing backup power at 1 a.m.?"],
+    ["Professor Kulkarni", "Aarav, listen carefully. Do not enter the basement under any circumstance. Restore the generator and leave immediately."],
+    ["Aarav", "That was three calls ago. He stopped picking up."],
+    ["Meera", "Forty-two hours. Still awake. Still here. Still counting."]
   ]);
 }
 

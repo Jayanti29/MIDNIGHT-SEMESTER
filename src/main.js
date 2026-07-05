@@ -2527,3 +2527,75 @@ window.addEventListener("resize", () => {
   renderer.setSize(window.innerWidth, window.innerHeight);
   composer.setSize(window.innerWidth, window.innerHeight);
 });
+
+// ─── Touch & Gamepad Fallback Controls (Task 57) ─────────────────────────────
+
+// Touch look: drag right 40% of screen to rotate camera
+let touchLookId = null;
+let touchLookLastX = 0;
+let touchLookLastY = 0;
+
+canvas.addEventListener("touchstart", (e) => {
+  e.preventDefault();
+  for (const t of e.changedTouches) {
+    if (t.clientX > window.innerWidth * 0.6 && touchLookId === null) {
+      touchLookId = t.identifier;
+      touchLookLastX = t.clientX;
+      touchLookLastY = t.clientY;
+    }
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchmove", (e) => {
+  e.preventDefault();
+  for (const t of e.changedTouches) {
+    if (t.identifier === touchLookId) {
+      const dx = t.clientX - touchLookLastX;
+      const dy = t.clientY - touchLookLastY;
+      yaw -= dx * mouseSensitivity * 0.003;
+      pitch = THREE.MathUtils.clamp(pitch - dy * mouseSensitivity * 0.003, -1.1, 1.1);
+      touchLookLastX = t.clientX;
+      touchLookLastY = t.clientY;
+    }
+  }
+}, { passive: false });
+
+canvas.addEventListener("touchend", (e) => {
+  for (const t of e.changedTouches) {
+    if (t.identifier === touchLookId) touchLookId = null;
+  }
+});
+
+// Gamepad polling — inject left stick into keys Set and right stick into yaw/pitch
+function pollGamepad() {
+  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+  for (const pad of pads) {
+    if (!pad) continue;
+    const lx = pad.axes[0] ?? 0;
+    const ly = pad.axes[1] ?? 0;
+    const rx = pad.axes[2] ?? 0;
+    const ry = pad.axes[3] ?? 0;
+    const dead = 0.18;
+
+    if (ly < -dead) keys.add("KeyW"); else keys.delete("KeyW");
+    if (ly >  dead) keys.add("KeyS"); else keys.delete("KeyS");
+    if (lx < -dead) keys.add("KeyA"); else keys.delete("KeyA");
+    if (lx >  dead) keys.add("KeyD"); else keys.delete("KeyD");
+
+    if (Math.abs(rx) > dead) yaw -= rx * 0.035;
+    if (Math.abs(ry) > dead) pitch = THREE.MathUtils.clamp(pitch - ry * 0.028, -1.1, 1.1);
+
+    if (pad.buttons[0]?.pressed) inspectNearest();
+    if (pad.buttons[2]?.pressed) toggleFlashlight();
+    if (pad.buttons[10]?.pressed) keys.add("ShiftLeft");
+    else keys.delete("ShiftLeft");
+  }
+}
+
+// Wrap animate to also poll gamepad each frame
+const _rawAnimate = animate;
+renderer.setAnimationLoop(() => {
+  if (gameState === GameState.PLAYING) pollGamepad();
+  _rawAnimate();
+});
+

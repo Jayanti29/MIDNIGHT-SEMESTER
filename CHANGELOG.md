@@ -7,6 +7,22 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] — Commits 61–78
 
+### Phase 7 — Basement Lab & Branching Endings
+
+#### Added
+- Level 2 (Basement Lab) layout, concrete geometry, and emergency red/green lights
+- Fuel valves (3 valve meshes) and generator starter lever interaction puzzle
+- Dr. Verma's Confession Tape collectible lore note in the basement lab
+- Branching Ending choice terminal UI and fullscreen selection modal
+- Four branching ending cinematics and sequences (Ending A: Whistleblower, Ending B: Compliance, Ending C: Trapped, Ending D: Escape)
+- Sam AI co-op companion who follows the player with a secondary flashlight
+- Procedural `generator_start` Web Audio sound buffer and start-up revving sequence
+
+#### Changed
+- Re-architected level building using distinct groups (`level1Group`, `level2Group`) to enable switching levels cleanly
+- Modified basement gate interaction to transition player to Level 2 instead of immediate escape
+- Updated checkpoint terminal saving to store player's active level and read lore notes count
+
 ### Phase 6 — Narrative & Environmental Polish
 
 #### Added

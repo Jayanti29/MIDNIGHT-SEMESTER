@@ -59,6 +59,12 @@ const winDetail = document.querySelector("#win-detail");
 const winStats = document.querySelector("#win-stats");
 const playAgainButton = document.querySelector("#play-again-button");
 
+const choiceScreen = document.querySelector("#choice-screen");
+const choiceEndingA = document.querySelector("#choice-ending-a");
+const choiceEndingB = document.querySelector("#choice-ending-b");
+const choiceEndingC = document.querySelector("#choice-ending-c");
+const choiceEndingD = document.querySelector("#choice-ending-d");
+
 const loadingManager = new THREE.LoadingManager();
 
 loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
@@ -293,6 +299,7 @@ let stamina = 100;
 let sprintExhausted = false;
 const collectedEvidence = new Set();
 const collectedBatteries = new Set();
+const readLoreNotes = new Set();
 let xrSession = null;
 let activeLineTimer = 0;
 let introPlayed = false;
@@ -310,6 +317,15 @@ let activeApparitionWalk = false;
 let apparitionGhost = null;
 let apparitionFadeTimer = 0;
 let basementGateGroup = null;
+let level1Group = null;
+let level2Group = null;
+let currentLevel = 1;
+let activeLevelGroup = null;
+const valvesActivated = new Set();
+let generatorPressure = 0;
+let generatorActive = false;
+let samCharacter = null;
+let samFlashlight = null;
 let blackoutTriggered = false;
 let isBlackoutActive = false;
 const AiState = {
@@ -330,7 +346,8 @@ const GameState = Object.freeze({
   PLAYING: "playing",
   PAUSED: "paused",
   GAMEOVER: "gameover",
-  WIN: "win"
+  WIN: "win",
+  CHOICE: "choice"
 });
 let gameState = GameState.MENU;
 
@@ -344,7 +361,7 @@ class GameStateManager {
     this.state = nextState;
     gameState = nextState;
     document.body.dataset.state = nextState;
-    document.body.classList.toggle("started", nextState === GameState.PLAYING || nextState === GameState.PAUSED);
+    document.body.classList.toggle("started", nextState === GameState.PLAYING || nextState === GameState.PAUSED || nextState === GameState.CHOICE);
     
     if (startScreen) {
       if (nextState === GameState.MENU) {
@@ -387,13 +404,21 @@ class GameStateManager {
       }
     }
 
+    if (choiceScreen) {
+      if (nextState === GameState.CHOICE) {
+        choiceScreen.classList.add("open");
+      } else {
+        choiceScreen.classList.remove("open");
+      }
+    }
+
     this.onStateChange(nextState, prevState);
   }
 
   onStateChange(nextState, prevState) {
     if (nextState === GameState.PLAYING) {
       if (!clock.running) clock.start();
-    } else if (nextState === GameState.PAUSED || nextState === GameState.MENU || nextState === GameState.GAMEOVER || nextState === GameState.WIN) {
+    } else if (nextState === GameState.PAUSED || nextState === GameState.MENU || nextState === GameState.GAMEOVER || nextState === GameState.WIN || nextState === GameState.CHOICE) {
       clock.stop();
       keys.clear();
     }
@@ -434,16 +459,29 @@ function completeObjective(step) {
 }
 
 function updateObjectivesSystem() {
-  if (inspected === 0) {
-    objective.textContent = "Search the corridor for Dr. Verma's Memo.";
-  } else if (inspected === 1) {
-    completeObjective("start");
-    objective.textContent = "Use Memo details to unlock Room 32 Left door and find the Watchman's Logbook.";
-  } else if (inspected === 2) {
-    objective.textContent = "Use the Logbook card to unlock Room 29 Right door and locate Meera's ID.";
-  } else if (inspected >= 3) {
-    completeObjective("evidence");
-    objective.textContent = "Basement access chains unlocked! Find the gate at the end of the corridor.";
+  if (currentLevel === 1) {
+    if (inspected === 0) {
+      objective.textContent = "Search the corridor for Dr. Verma's Memo.";
+    } else if (inspected === 1) {
+      completeObjective("start");
+      objective.textContent = "Use Memo details to unlock Room 32 Left door and find the Watchman's Logbook.";
+    } else if (inspected === 2) {
+      objective.textContent = "Use the Logbook card to unlock Room 29 Right door and locate Meera's ID.";
+    } else if (inspected >= 3) {
+      completeObjective("evidence");
+      objective.textContent = "Basement access chains unlocked! Find the gate at the end of the corridor.";
+    }
+  } else {
+    if (!generatorActive) {
+      const activeValvesCount = valvesActivated.size;
+      if (activeValvesCount < 3) {
+        objective.textContent = `Basement sealed. Find and turn fuel valves to prime the backup generator (${activeValvesCount}/3).`;
+      } else {
+        objective.textContent = "Valves primed. Pull the Generator Starter Lever in the side engine room.";
+      }
+    } else {
+      objective.textContent = "Generator active! Reach the Operations Terminal at the end of the hall.";
+    }
   }
 }
 
@@ -669,6 +707,37 @@ function createBlackoutCueBuffer(ctx) {
   return buffer;
 }
 
+function createGeneratorStartBuffer(ctx) {
+  const duration = 5.0;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(2, numSamples, sampleRate);
+  const left = buffer.getChannelData(0);
+  const right = buffer.getChannelData(1);
+  
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    let engineSound = 0;
+    if (t < 1.5) {
+      const click = Math.sin(2 * Math.PI * 8 * t) > 0.7 ? 0.35 : 0;
+      const noise = (Math.random() * 2 - 1) * 0.12 * Math.sin(2 * Math.PI * 40 * t);
+      engineSound = click + noise;
+    } else {
+      const ramp = Math.min(1.0, (t - 1.5) / 2.0);
+      const mainFreq = 30 + ramp * 25;
+      engineSound = Math.sin(2 * Math.PI * mainFreq * t) * 0.6 + 
+                    Math.sin(2 * Math.PI * (mainFreq * 2) * t) * 0.28 +
+                    (Math.random() * 2 - 1) * 0.06;
+    }
+    const envelope = t > 4.2 ? Math.max(0, 1.0 - (t - 4.2) / 0.8) : 1.0;
+    const finalVal = engineSound * envelope * 0.8;
+    
+    left[i] = finalVal;
+    right[i] = finalVal;
+  }
+  return buffer;
+}
+
 function triggerBlackoutSequence() {
   isBlackoutActive = true;
   if (audioManager) {
@@ -833,6 +902,9 @@ function initAudio() {
 
   const buzzBuffer = createBuzzBuffer(audioCtx);
   audioManager.buffers.set("electric_buzz", buzzBuffer);
+
+  const generatorStartBuffer = createGeneratorStartBuffer(audioCtx);
+  audioManager.buffers.set("generator_start", generatorStartBuffer);
 
   // Play spatial buzzing hum on a couple of the corridor lights
   flickerLights.forEach((lightObj, index) => {
@@ -1113,13 +1185,21 @@ function registerCollider(object) {
   });
 }
 
+function addToActiveLevel(object) {
+  if (activeLevelGroup) {
+    activeLevelGroup.add(object);
+  } else {
+    scene.add(object);
+  }
+}
+
 function box(name, size, position, material, cast = true, receive = true, isCollider = false) {
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
   mesh.name = name;
   mesh.position.set(...position);
   mesh.castShadow = cast;
   mesh.receiveShadow = receive;
-  scene.add(mesh);
+  addToActiveLevel(mesh);
   if (isCollider) {
     registerCollider(mesh);
   }
@@ -1151,7 +1231,7 @@ function addLabel(text, position, size = 0.34) {
   mesh.position.set(...position);
   mesh.rotation.y = Math.PI;
   mesh.castShadow = true;
-  scene.add(mesh);
+  addToActiveLevel(mesh);
   return mesh;
 }
 
@@ -1181,7 +1261,7 @@ function createDoor({ side, z, label }) {
   const sign = addLabel(label.replace(" door", "").toUpperCase(), [direction * 3.48, 1.92, z], 0.16);
   sign.rotation.y = direction < 0 ? Math.PI / 2 : -Math.PI / 2;
 
-  scene.add(group);
+  addToActiveLevel(group);
   doors.push(group);
   interactables.push(panel, knob);
   return group;
@@ -1214,7 +1294,7 @@ function createStudyTable(position, rotation = 0) {
     group.add(leg);
   });
 
-  scene.add(group);
+  addToActiveLevel(group);
   createBookStack([position[0] - 0.34, position[1] + 1.0, position[2] + 0.08], rotation);
   registerCollider(group);
   return group;
@@ -1241,7 +1321,7 @@ function createBookshelf(position, rotation = 0) {
       group.add(book);
     }
   }
-  scene.add(group);
+  addToActiveLevel(group);
   registerCollider(group);
   return group;
 }
@@ -1291,7 +1371,7 @@ function createCharacter({ name, position, color, ghostly = false }) {
     group.add(leg);
   });
 
-  scene.add(group);
+  addToActiveLevel(group);
   return group;
 }
 
@@ -1347,7 +1427,7 @@ function buildCorridor() {
     const lamp = new THREE.PointLight(0xffc987, 1.1, 8, 2.1);
     lamp.position.set(0, 3.35, z);
     lamp.castShadow = true;
-    scene.add(lamp);
+    addToActiveLevel(lamp);
     flickerLights.push({ light: lamp, base: lamp.intensity, phase: Math.random() * Math.PI * 2 });
     box("lamp shade", [1.1, 0.12, 0.55], [0, 3.28, z], materials.brass);
     box("lamp glow", [0.72, 0.035, 0.26], [0, 3.2, z], materials.emission, false, false);
@@ -1391,12 +1471,214 @@ function buildCorridor() {
   tagInteractable(gateRight, "basement_gate", "Basement Gate Right");
   basementGateGroup.add(gateRight);
 
-  scene.add(basementGateGroup);
+  addToActiveLevel(basementGateGroup);
   registerCollider(gateFrame);
   interactables.push(gateLeft, gateRight);
   initBatteries();
   initLoreNotes();
   buildCheckpointConsole([2.8, 0, -18.5], "Emergency Terminal");
+}
+
+function clearGroup(group) {
+  if (!group) return;
+  while (group.children.length > 0) {
+    const child = group.children[0];
+    group.remove(child);
+  }
+}
+
+function loadLevel2() {
+  currentLevel = 2;
+  level1Group.visible = false;
+  level2Group.visible = true;
+  activeLevelGroup = level2Group;
+
+  valvesActivated.clear();
+  generatorPressure = 0;
+  generatorActive = false;
+
+  colliders.length = 0;
+  interactables.length = 0;
+  doors.length = 0;
+  evidenceItems.length = 0;
+  batteryItems.length = 0;
+  flickerLights.length = 0;
+
+  clearGroup(level2Group);
+  buildLevel2();
+
+  camera.position.set(0, 1.7, 8);
+  camera.rotation.set(0, 0, 0);
+  yaw = 0;
+  pitch = 0;
+
+  caption.textContent = "A cold, damp basement smell. Backup batteries hum in the dark.";
+  sayLine("Aarav", "I'm in... it's completely sealed. The generator room should be down the hall.");
+  
+  if (audioManager) {
+    audioManager.playSound("blackout_cue", { volume: 0.5 });
+  }
+
+  updateObjectivesSystem();
+  addTaskLog("Entered Block A Basement Lab.");
+}
+
+function buildValveMesh(position, id, name) {
+  const group = new THREE.Group();
+  group.name = id;
+  group.position.set(...position);
+  
+  const pipe = new THREE.Mesh(new THREE.CylinderGeometry(0.04, 0.04, 0.52, 8), materials.brass);
+  pipe.rotation.z = Math.PI / 2;
+  group.add(pipe);
+  
+  const wheel = new THREE.Mesh(new THREE.TorusGeometry(0.18, 0.04, 8, 16), materials.bookRed);
+  wheel.position.set(0.26, 0, 0);
+  wheel.rotation.y = Math.PI / 2;
+  group.add(wheel);
+  
+  tagInteractable(wheel, "valve", name);
+  wheel.userData.valveId = id;
+  wheel.userData.parentValve = group;
+  interactables.push(wheel);
+  
+  addToActiveLevel(group);
+  return group;
+}
+
+function buildConfessionTapeMesh(position) {
+  const group = new THREE.Group();
+  group.name = "confession_tape";
+  group.position.set(...position);
+  
+  const tape = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.05, 0.18), materials.brass);
+  tape.castShadow = true;
+  group.add(tape);
+  
+  tagInteractable(tape, "lore_note", "Dr. Verma's Confession Tape");
+  tape.userData.loreText = "Audio Log - Dr. Verma (2005): 'The trial has exceeded 168 hours. Subject M is unresponsive to external audio cues but continues to vocalize the numerical sequence. The administration wants to seal the block to preserve funding. God forgive us.'";
+  tape.userData.loreLabel = "Dr. Verma's Confession Tape";
+  
+  interactables.push(tape);
+  addToActiveLevel(group);
+  return group;
+}
+
+let exitTerminalGroup = null;
+
+function buildExitTerminalMesh(position) {
+  const group = new THREE.Group();
+  group.name = "exit_terminal";
+  group.position.set(...position);
+  
+  const base = box("exit terminal base", [0.65, 0.95, 0.65], [0, 0.47, 0], materials.darkWood, true, true, true);
+  group.add(base);
+  
+  const screen = new THREE.Mesh(
+    new THREE.BoxGeometry(0.48, 0.35, 0.1),
+    materials.emission
+  );
+  screen.position.set(0, 1.05, 0.05);
+  screen.rotation.x = -0.35;
+  group.add(screen);
+  
+  tagInteractable(screen, "exit_terminal", "Main Operations Terminal");
+  screen.userData.parentTerminal = group;
+  interactables.push(screen);
+  
+  addToActiveLevel(group);
+  exitTerminalGroup = group;
+  return group;
+}
+
+function buildLevel2() {
+  box("basement floor", [6, 0.18, 50], [0, -0.1, -15], materials.floor, false, true);
+  box("basement ceiling", [6, 0.24, 50], [0, 3.0, -15], materials.wall, false, true);
+  
+  box("basement left wall", [0.24, 3.0, 50], [-3.02, 1.41, -15], materials.wall, true, true, true);
+  box("basement right wall", [0.24, 3.0, 50], [3.02, 1.41, -15], materials.wall, true, true, true);
+  
+  box("basement front wall", [6, 3.0, 0.24], [0, 1.41, 10.02], materials.wall, true, true, true);
+  box("basement back wall", [6, 3.0, 0.24], [0, 1.41, -40.02], materials.wall, true, true, true);
+
+  box("gen room floor", [6, 0.18, 8], [6.0, -0.1, -20], materials.floor, false, true);
+  box("gen room ceiling", [6, 0.24, 8], [6.0, 3.0, -20], materials.wall, false, true);
+  box("gen room back wall", [6, 3.0, 0.24], [6.0, 1.41, -24.02], materials.wall, true, true, true);
+  box("gen room front wall", [6, 3.0, 0.24], [6.0, 1.41, -15.98], materials.wall, true, true, true);
+  box("gen room right wall", [0.24, 3.0, 8], [9.02, 1.41, -20], materials.wall, true, true, true);
+  
+  box("gen wall segment left", [0.24, 3.0, 21], [3.02, 1.41, -5.5], materials.wall, true, true, true);
+  box("gen wall segment right", [0.24, 3.0, 21], [3.02, 1.41, -30.5], materials.wall, true, true, true);
+  
+  const genGroup = new THREE.Group();
+  genGroup.name = "generator";
+  genGroup.position.set(6.0, 0, -20.0);
+  
+  const genBase = box("generator base", [2.2, 1.15, 2.2], [0, 0.52, 0], materials.darkWood, true, true, true);
+  genGroup.add(genBase);
+  
+  const genEngine = box("generator engine", [1.6, 0.82, 1.6], [0, 1.3, 0], materials.brass, true, true, true);
+  genGroup.add(genEngine);
+  
+  const genStripe = box("generator stripe", [1.68, 0.16, 1.68], [0, 1.1, 0], materials.emission, false, false);
+  genGroup.add(genStripe);
+  
+  const leverBase = box("lever base", [0.35, 0.35, 0.18], [0, 1.2, 0.82], materials.darkWood, true, true, true);
+  genGroup.add(leverBase);
+  const leverHandle = box("generator starter lever", [0.08, 0.42, 0.08], [0, 1.32, 0.88], materials.brass, true, true, true);
+  leverHandle.rotation.x = -0.52;
+  tagInteractable(leverHandle, "generator_lever", "Generator Starter Lever");
+  leverHandle.userData.parentLever = genGroup;
+  genGroup.add(leverHandle);
+  interactables.push(leverHandle);
+  
+  addToActiveLevel(genGroup);
+  
+  buildValveMesh([0, 0.82, 5.0], "Valve 1", "Fuel Valve A");
+  buildValveMesh([-2.4, 0.82, -35.0], "Valve 2", "Fuel Valve B");
+  buildValveMesh([7.5, 0.82, -22.5], "Valve 3", "Fuel Valve C");
+  
+  buildConfessionTapeMesh([6.8, 1.12, -18.2]);
+
+  const chamberGroup = new THREE.Group();
+  chamberGroup.name = "sensory chamber";
+  chamberGroup.position.set(-2.0, 0, -22.0);
+  const chamberShell = box("chamber shell", [1.8, 2.5, 1.8], [0, 1.25, 0], materials.darkWood, true, true, true);
+  chamberGroup.add(chamberShell);
+  const chamberGlass = box("chamber glass", [1.2, 1.6, 0.08], [0, 1.3, 0.86], materials.glass, false, true, true);
+  chamberGroup.add(chamberGlass);
+  const chamberLabel = addLabel("EXPERIMENTAL SENSORY ISOLATION CHAMBER 01", [0, 2.3, 0.92], 0.22);
+  chamberGroup.add(chamberLabel);
+  addToActiveLevel(chamberGroup);
+  registerCollider(chamberShell);
+  
+  buildCheckpointConsole([-2.0, 0, -10.0], "Applied Cognition Terminal");
+  buildExitTerminalMesh([0, 0, -38.5]);
+
+  for (let z = 5; z > -36; z -= 12) {
+    const lamp = new THREE.PointLight(0x73d08a, 0.88, 7, 2.0);
+    lamp.position.set(0, 2.65, z);
+    lamp.castShadow = true;
+    addToActiveLevel(lamp);
+    flickerLights.push({ light: lamp, base: lamp.intensity, phase: Math.random() * Math.PI * 2 });
+    box("lamp shade", [0.9, 0.1, 0.45], [0, 2.58, z], materials.brass);
+    box("lamp glow", [0.6, 0.03, 0.22], [0, 2.5, z], materials.emission, false, false);
+  }
+  
+  scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [0, 0, -32], color: 0xc9d5cf, ghostly: true });
+  scene.userData.meeraCharacter.visible = false;
+
+  samCharacter = createCharacter({ name: "Sam", position: [1.2, 0, 7.5], color: 0xa87c5c });
+  const samLight = new THREE.SpotLight(0xffecc2, 2.5, 14, Math.PI / 6, 0.45, 1.0);
+  samLight.castShadow = true;
+  addToActiveLevel(samLight);
+  addToActiveLevel(samLight.target);
+  samFlashlight = samLight;
+
+  queueStory([
+    ["Sam", "Aarav, is that you? Thank god. Kulkarni told me you went down here."],
+    ["Sam", "I brought a backup light. Let's find the fuel valves and get this grid online together."]
+  ]);
 }
 
 function buildDormRoom() {
@@ -1451,7 +1733,7 @@ function buildDormRoom() {
   // Task 68: Add metronome prop on desk
   buildMetronome([-0.6, 1.11, roomZ - 4.4], dormGroup);
 
-  scene.add(dormGroup);
+  addToActiveLevel(dormGroup);
 }
 
 function buildMetronome(position, dormGroup) {
@@ -1541,7 +1823,7 @@ function buildBatteryMesh(position, name) {
   tagInteractable(body, "battery", name);
   body.userData.parentBattery = group;
   
-  scene.add(group);
+  addToActiveLevel(group);
   return group;
 }
 
@@ -1573,7 +1855,7 @@ function buildCheckpointConsole(position, name) {
   tagInteractable(screen, "checkpoint", name);
   screen.userData.parentConsole = group;
   
-  scene.add(group);
+  addToActiveLevel(group);
   return group;
 }
 
@@ -1594,7 +1876,7 @@ function buildLoreNote(position, rotation, text, label) {
   paper.userData.loreText = text;
   paper.userData.loreLabel = label;
 
-  scene.add(noteGroup);
+  addToActiveLevel(noteGroup);
   interactables.push(paper);
   return noteGroup;
 }
@@ -1856,12 +2138,22 @@ function updateState(delta) {
     const distToPlayer = meera.position.distanceTo(camera.position);
     
     if (meeraState === AiState.INACTIVE) {
-      if (camera.position.z < -16 || fear > 28) {
-        meeraState = AiState.PATROL;
-        meera.position.set(0, 0, -35);
-        meera.visible = true;
+      if (currentLevel === 1) {
+        if (camera.position.z < -16 || fear > 28) {
+          meeraState = AiState.PATROL;
+          meera.position.set(0, 0, -35);
+          meera.visible = true;
+        } else {
+          meera.visible = false;
+        }
       } else {
-        meera.visible = false;
+        if (generatorActive) {
+          meeraState = AiState.CHASE;
+          meera.position.set(0, 0, -32);
+          meera.visible = true;
+        } else {
+          meera.visible = false;
+        }
       }
     }
     
@@ -1879,14 +2171,16 @@ function updateState(delta) {
       if (meeraState === AiState.PATROL) {
         meeraSpeed = 1.2;
         meera.position.z += meeraPatrolDir * meeraSpeed * delta;
-        if (meera.position.z < -45) {
+        const zMin = currentLevel === 1 ? -45 : -35;
+        const zMax = currentLevel === 1 ? -16 : 8;
+        if (meera.position.z < zMin) {
           meeraPatrolDir = 1;
-        } else if (meera.position.z > -16) {
+        } else if (meera.position.z > zMax) {
           meeraPatrolDir = -1;
         }
         meera.position.x = THREE.MathUtils.lerp(meera.position.x, 0, delta * 3);
       } else if (meeraState === AiState.CHASE) {
-        meeraSpeed = 1.6 + (fear / 160);
+        meeraSpeed = (currentLevel === 2 ? 1.48 : 1.6) + (fear / 160);
         const toPlayer = new THREE.Vector3().subVectors(camera.position, meera.position);
         toPlayer.y = 0;
         toPlayer.normalize();
@@ -1894,7 +2188,7 @@ function updateState(delta) {
         
         fear = Math.min(100, fear + delta * 3.6);
         
-        if (distToPlayer > 18) {
+        if (distToPlayer > 18 && currentLevel === 1) {
           meeraState = AiState.PATROL;
           addTaskLog("Lost the ghost threat.");
         }
@@ -2023,6 +2317,20 @@ function updateState(delta) {
     const target = door.userData.open ? (door.userData.side === "left" ? -1.18 : 1.18) : 0;
     door.rotation.y = THREE.MathUtils.lerp(door.rotation.y, target, delta * 6);
   });
+
+  if (currentLevel === 2 && samCharacter && samFlashlight) {
+    const distToSam = samCharacter.position.distanceTo(camera.position);
+    if (distToSam > 2.8) {
+      const toPlayer = new THREE.Vector3().subVectors(camera.position, samCharacter.position);
+      toPlayer.y = 0;
+      toPlayer.normalize();
+      samCharacter.position.addScaledVector(toPlayer, 1.48 * delta);
+      samCharacter.lookAt(camera.position.x, samCharacter.position.y, camera.position.z);
+    }
+    samFlashlight.position.copy(samCharacter.position).add(new THREE.Vector3(0, 1.3, 0));
+    const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(samCharacter.quaternion);
+    samFlashlight.target.position.copy(samFlashlight.position).add(dir);
+  }
 
   updateInteractionPrompt();
   camera.position.add(shakeOffset);
@@ -2180,7 +2488,7 @@ function inspectNearest() {
   if (type === "basement_gate") {
     if (inspected >= 3) {
       caption.textContent = "The gate yields — a cold draft rises from the basement stairwell.";
-      addTaskLog("Basement gate unlocked. Escape achieved.");
+      addTaskLog("Basement gate unlocked. Descending to basement.");
       completeObjective("basement");
       queueStory([
         ["Aarav", "The chain falls. Three years of evidence — and the lab was right here."],
@@ -2188,7 +2496,7 @@ function inspectNearest() {
         ["Aarav", "Let's get out before she comes back."]
       ]);
       window.setTimeout(() => {
-        triggerWin();
+        loadLevel2();
       }, 9800);
     } else {
       caption.textContent = "Chained shut. A rusted plaque reads: 'Applied Cognition Lab - Authorized Entry Only'.";
@@ -2210,6 +2518,7 @@ function inspectNearest() {
 
     collectedDocuments.set(doc.title, doc.body);
     collectedEvidence.add(doc.title);
+    readLoreNotes.add(doc.title);
     inspected = collectedEvidence.size;
     caseTitle.textContent = doc.title;
     caseBody.textContent = doc.body;
@@ -2276,8 +2585,10 @@ function inspectNearest() {
         collectedEvidence: Array.from(collectedEvidence),
         collectedDocuments: Array.from(collectedDocuments.entries()),
         collectedBatteries: Array.from(collectedBatteries),
+        readLoreNotes: Array.from(readLoreNotes),
         inspected: inspected,
-        blackoutTriggered: blackoutTriggered
+        blackoutTriggered: blackoutTriggered,
+        level: currentLevel
       };
       caption.textContent = "Progress checkpoint saved.";
       sayLine("Aarav", "A backup power console. The terminal says security log saved.");
@@ -2293,6 +2604,7 @@ function inspectNearest() {
     const text = hit.object.userData.loreText;
     const lbl = hit.object.userData.loreLabel;
     if (!text) return;
+    readLoreNotes.add(lbl);
     caption.textContent = `\u201c${text}\u201d`;
     sayLine("Aarav", `Found something pinned here: ${lbl}.`);
     addTaskLog(`Read environmental log: ${lbl}.`);
@@ -2313,6 +2625,103 @@ function inspectNearest() {
     caption.textContent = "A sealed mechanical metronome. It ticks steadily without any winding.";
     sayLine("Aarav", "Wait, the scrawl on the door frame: 'the metronome doesn't need power.' It's completely sealed...");
     addTaskLog("Inspected the sealed metronome.");
+    return;
+  }
+
+  if (type === "valve") {
+    const valveId = hit.object.userData.valveId;
+    if (valvesActivated.has(valveId)) {
+      caption.textContent = "This fuel line is already primed.";
+      sayLine("Aarav", "The valve is turned all the way.");
+    } else {
+      valvesActivated.add(valveId);
+      generatorPressure += 33.3;
+      caption.textContent = `${hit.object.userData.interactionLabel} turned. Pressure line priming... (${valvesActivated.size}/3)`;
+      sayLine("Aarav", "Okay, that's one line open. I hear fuel rushing through the pipes.");
+      if (audioManager) {
+        audioManager.playSound("door_creak", { volume: 0.5 });
+      }
+      addTaskLog(`Primed ${hit.object.userData.interactionLabel}.`);
+      updateObjectivesSystem();
+    }
+    return;
+  }
+
+  if (type === "generator_lever") {
+    if (generatorActive) {
+      caption.textContent = "The generator is humming loudly. Backup power is online.";
+      sayLine("Aarav", "It's running. No need to pull the starter again.");
+      return;
+    }
+    if (valvesActivated.size < 3) {
+      caption.textContent = "The lever is locked. The pressure lines are cold. Prime all 3 fuel valves first.";
+      sayLine("Aarav", "Nothing happens. The fuel lines aren't primed yet.");
+      if (audioManager) {
+        audioManager.playSound("door_latch", { volume: 0.5 });
+      }
+    } else {
+      generatorActive = true;
+      generatorPressure = 100;
+      hit.object.rotation.x = 0.52;
+      caption.textContent = "The generator starter roars to life! Power grid online.";
+      sayLine("Aarav", "Yes! The lights... wait, they are turning red.");
+      if (audioManager) {
+        audioManager.playSound("generator_start", { volume: 0.9 });
+      }
+      addTaskLog("Activated backup generator. Power restored.");
+      updateObjectivesSystem();
+      
+      blackoutTriggered = true;
+      isBlackoutActive = true;
+      
+      flickerLights.forEach((lightObj, index) => {
+        lightObj.base = 0.42;
+        lightObj.light.color.setHex(0xb22822);
+      });
+      
+      meeraState = AiState.CHASE;
+      meeraSpeed = 1.48;
+      if (scene.userData.meeraCharacter) {
+        scene.userData.meeraCharacter.position.set(0, 0, -32);
+        scene.userData.meeraCharacter.visible = true;
+      }
+      
+      queueStory([
+        ["Professor Kulkarni", "Aarav! The main sensor logs are peaking! Powering the backup grid woke the neural array. You must run!"],
+        ["Aarav", "What is that sound? Something's coming up from the sensory chamber!"]
+      ]);
+    }
+    return;
+  }
+
+  if (type === "exit_terminal") {
+    if (!generatorActive) {
+      caption.textContent = "Terminal display is blank. Power grid offline.";
+      sayLine("Aarav", "No power. I need to get the generator running first.");
+    } else {
+      document.exitPointerLock?.();
+      setGameState(GameState.CHOICE);
+      
+      const totalLoreNotes = collectedEvidence.size;
+      if (totalLoreNotes >= 5) {
+        choiceEndingA.disabled = false;
+        choiceEndingA.style.background = "#3c2f25";
+        choiceEndingA.style.color = "#e5d4bc";
+        choiceEndingA.style.border = "1px solid #584435";
+        choiceEndingA.style.cursor = "pointer";
+        choiceEndingA.textContent = "Protocol A: Public Broadcast (All Lore Collected)";
+      } else {
+        choiceEndingA.disabled = true;
+        choiceEndingA.style.background = "#2a221d";
+        choiceEndingA.style.color = "#8e8379";
+        choiceEndingA.style.border = "1px dashed #3a322d";
+        choiceEndingA.style.cursor = "not-allowed";
+        choiceEndingA.textContent = `Protocol A: Public Broadcast (Locked - ${totalLoreNotes}/5 Lore Notes)`;
+      }
+      
+      caption.textContent = "Accessing Main Operations Terminal. Select system protocol.";
+      addTaskLog("Accessed exit operations terminal.");
+    }
     return;
   }
 }
@@ -2507,6 +2916,64 @@ function triggerWin() {
   addTaskLog("Aarav escaped through the basement. Evidence filed.");
 }
 
+function triggerEnding(endingId) {
+  setGameState(GameState.WIN);
+  document.exitPointerLock?.();
+  
+  if (audioManager) {
+    audioManager.fadeAmbientOut(3.0);
+  }
+
+  const kicker = document.querySelector("#win-screen .kicker");
+  const title = document.querySelector("#win-screen h2");
+  
+  if (endingId === "A") {
+    if (kicker) kicker.textContent = "Ending A: Whistleblower";
+    if (title) title.textContent = "The Truth Released";
+    if (winDetail) {
+      winDetail.innerHTML = `Aarav initiated a public broadcast of the 2004 sensory isolation data, exposing Ravenswood's illegal cognitive experiments. <strong>Meera's story is finally known.</strong> The facility was permanently closed following a federal probe.`;
+    }
+    playTone(220, 2.0, 0.3, "sine");
+    window.setTimeout(() => playTone(330, 2.0, 0.3, "sine"), 300);
+    window.setTimeout(() => playTone(440, 2.5, 0.4, "sine"), 600);
+    addTaskLog("Ending A achieved: Truth Broadcasted.");
+  } else if (endingId === "B") {
+    if (kicker) kicker.textContent = "Ending B: Compliance";
+    if (title) title.textContent = "The Files Sealed";
+    if (winDetail) {
+      winDetail.innerHTML = `Aarav securely transferred all data directly to Professor Kulkarni. Within hours, the server was wiped and the basement staircase was walled over with fresh concrete. <strong>Aarav received his degree, and the silence remains.</strong>`;
+    }
+    playTone(180, 1.8, 0.4, "triangle");
+    window.setTimeout(() => playTone(150, 2.2, 0.5, "triangle"), 400);
+    addTaskLog("Ending B achieved: Files delivered to Kulkarni.");
+  } else if (endingId === "C") {
+    if (kicker) kicker.textContent = "Ending C: Trapped in the Loop";
+    if (title) title.textContent = "Lost in the Hum";
+    if (winDetail) {
+      winDetail.innerHTML = `Aarav manually cut all power grids and stayed in the dark with Meera, matching the metronome's ticking. <strong>No one ever found him, but the backup grid still hums at 12Hz...</strong>`;
+    }
+    playTone(55, 3.0, 0.8, "sawtooth");
+    addTaskLog("Ending C achieved: Stayed in the dark.");
+  } else if (endingId === "D") {
+    if (kicker) kicker.textContent = "Ending D: Escape";
+    if (title) title.textContent = "Survival";
+    if (winDetail) {
+      winDetail.innerHTML = `Aarav triggered the emergency release hatch and escaped into the cold morning air, leaving the data behind. <strong>He survived, but the weight of what he left behind will follow him forever.</strong>`;
+    }
+    playTone(220, 1.8, 0.28, "sine");
+    window.setTimeout(() => playTone(277, 1.8, 0.18, "sine"), 420);
+    window.setTimeout(() => playTone(330, 2.2, 0.22, "sine"), 840);
+    addTaskLog("Ending D achieved: Emergency escape.");
+  }
+  
+  const totalTime = Math.round(clock.elapsedTime);
+  const mins = Math.floor(totalTime / 60);
+  const secs = totalTime % 60;
+  if (winStats) {
+    winStats.textContent = `Escape time: ${mins}m ${secs}s — Total Lore Files Collected: ${collectedEvidence.size}/5`;
+  }
+}
+
 function resetGame() {
   if (activeCheckpoint) {
     fear = 0;
@@ -2529,6 +2996,35 @@ function resetGame() {
       activeCheckpoint.collectedBatteries.forEach(b => collectedBatteries.add(b));
     }
     
+    readLoreNotes.clear();
+    if (activeCheckpoint.readLoreNotes) {
+      activeCheckpoint.readLoreNotes.forEach(n => readLoreNotes.add(n));
+    }
+    
+    currentLevel = activeCheckpoint.level || 1;
+    activeLevelGroup = currentLevel === 1 ? level1Group : level2Group;
+    level1Group.visible = currentLevel === 1;
+    level2Group.visible = currentLevel === 2;
+    
+    colliders.length = 0;
+    interactables.length = 0;
+    doors.length = 0;
+    evidenceItems.length = 0;
+    batteryItems.length = 0;
+    flickerLights.length = 0;
+    valvesActivated.clear();
+    generatorActive = false;
+    generatorPressure = 0;
+    
+    clearGroup(level1Group);
+    clearGroup(level2Group);
+    
+    if (currentLevel === 1) {
+      buildCorridor();
+    } else {
+      buildLevel2();
+    }
+    
     camera.position.set(...activeCheckpoint.position);
     camera.rotation.set(0, 0, 0);
     yaw = 0;
@@ -2545,6 +3041,26 @@ function resetGame() {
     collectedEvidence.clear();
     collectedDocuments.clear();
     collectedBatteries.clear();
+    readLoreNotes.clear();
+    
+    currentLevel = 1;
+    activeLevelGroup = level1Group;
+    level1Group.visible = true;
+    level2Group.visible = false;
+    
+    colliders.length = 0;
+    interactables.length = 0;
+    doors.length = 0;
+    evidenceItems.length = 0;
+    batteryItems.length = 0;
+    flickerLights.length = 0;
+    valvesActivated.clear();
+    generatorActive = false;
+    generatorPressure = 0;
+    
+    clearGroup(level1Group);
+    clearGroup(level2Group);
+    buildCorridor();
     
     camera.position.set(0, 1.7, 8);
     camera.rotation.set(0, 0, 0);
@@ -2552,6 +3068,12 @@ function resetGame() {
     pitch = 0;
   }
   
+  const kicker = document.querySelector("#win-screen .kicker");
+  const title = document.querySelector("#win-screen h2");
+  if (kicker) kicker.textContent = "Case Closed";
+  if (title) title.textContent = "You Escaped";
+  
+  if (choiceScreen) choiceScreen.classList.remove("open");
   if (inventoryPanel) inventoryPanel.classList.remove("open");
   if (settingsPanel) settingsPanel.classList.remove("open");
   if (gameoverScreen) gameoverScreen.classList.remove("open");
@@ -2812,6 +3334,23 @@ playAgainButton?.addEventListener("click", () => {
 
 quitToMenu.addEventListener("click", () => {
   setGameState(GameState.MENU);
+});
+
+choiceEndingA?.addEventListener("click", () => {
+  choiceScreen.classList.remove("open");
+  triggerEnding("A");
+});
+choiceEndingB?.addEventListener("click", () => {
+  choiceScreen.classList.remove("open");
+  triggerEnding("B");
+});
+choiceEndingC?.addEventListener("click", () => {
+  choiceScreen.classList.remove("open");
+  triggerEnding("C");
+});
+choiceEndingD?.addEventListener("click", () => {
+  choiceScreen.classList.remove("open");
+  triggerEnding("D");
 });
 
 // Apply Initial Settings on Startup

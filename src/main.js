@@ -289,6 +289,7 @@ let meeraFirstWhisperPlayed = false;
 let kulkarniCallPlayed = false;
 let meeraSecondEventPlayed = false;
 let activeCountdownFlicker = false;
+let meeraDiaryReacted = false;
 let basementGateGroup = null;
 let blackoutTriggered = false;
 let isBlackoutActive = false;
@@ -2143,6 +2144,16 @@ function inspectNearest() {
     caption.textContent = `\u201c${text}\u201d`;
     sayLine("Aarav", `Found something pinned here: ${lbl}.`);
     addTaskLog(`Read environmental log: ${lbl}.`);
+
+    if (lbl === "Meera's Diary Page" && !meeraDiaryReacted) {
+      meeraDiaryReacted = true;
+      window.setTimeout(() => {
+        queueStory([
+          ["Aarav", "October 2004... that was right before the department shut down the Cognitive studies."],
+          ["Aarav", "Professor Kulkarni was the lead supervisor back then. What did they do to her?"]
+        ]);
+      }, 5500);
+    }
     return;
   }
 }
@@ -2438,6 +2449,7 @@ function resetGame() {
     kulkarniCallPlayed = false;
     meeraSecondEventPlayed = false;
     activeCountdownFlicker = false;
+    meeraDiaryReacted = false;
   }
   
   updateObjectivesSystem();

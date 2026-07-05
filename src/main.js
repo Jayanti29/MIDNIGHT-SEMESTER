@@ -306,6 +306,7 @@ let meeraState = AiState.INACTIVE;
 let meeraPatrolDir = -1;
 let meeraSpeed = 1.0;
 let activeCheckpoint = null;
+const shakeOffset = new THREE.Vector3();
 let storyQueue = [];
 let pointerLocked = false;
 let flashlightLight = null;
@@ -1777,6 +1778,9 @@ function canOccupy(position) {
 }
 
 function updateState(delta) {
+  camera.position.sub(shakeOffset);
+  shakeOffset.set(0, 0, 0);
+
   if (gameState === GameState.MENU) return;
   
   if (gameState === GameState.PLAYING && !blackoutTriggered && camera.position.z < -10) {
@@ -1899,8 +1903,8 @@ function updateState(delta) {
       
       if (distToPlayer < 4.5 && meeraState === AiState.CHASE) {
         fear = Math.min(100, fear + delta * 24);
-        camera.position.x += (Math.random() - 0.5) * 0.045;
-        camera.position.y += (Math.random() - 0.5) * 0.045;
+        shakeOffset.x = (Math.random() - 0.5) * 0.045;
+        shakeOffset.y = (Math.random() - 0.5) * 0.045;
       }
       
       if (distToPlayer < 1.15 && gameState === GameState.PLAYING) {
@@ -2006,6 +2010,7 @@ function updateState(delta) {
   });
 
   updateInteractionPrompt();
+  camera.position.add(shakeOffset);
 }
 
 function getFocusedInteractable(maxDistance = 4) {

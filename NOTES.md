@@ -100,10 +100,11 @@ This repository is currently a local Three.js horror prototype. It does not cont
 - **Win screen**: Evidence count, escape time, fear% shown. Play Again clears checkpoint and fully restarts.
 - **Full restart**: introPlayed and meeraWarned reset correctly for clean new-game experience.
 
-### Known Issues / Deferred to Phase 5
-- meeraWarned declared and reset but never actively read (old code removed in Task 45). Remove in Phase 5 cleanup.
-- Battery cylinders always restore on checkpoint-reset regardless of mid-run pickup state (simplification; per-item tracking is Phase 5).
-- Ghost may clip through closed doors in rare corner cases — Meera's vector is not blocked by AABB. Path-finding improvement deferred to Phase 5.
-- Camera Y shake during ghost proximity can briefly push player above floor (magnitude 0.045 acceptable; clamp in Phase 5).
-- No ambient duck on WIN state transition. Background audio fades missing. Deferred to Phase 5 audio polish.
+### Resolved Issues (Phase 6 Polish)
+- Unused `meeraWarned` variable declared and reset but never read (removed declaration and resets).
+- Battery cylinders always restore on checkpoint-reset (resolved by implementing per-cylinder battery pickup state tracking).
+- Ghost clips through closed doors (resolved by implementing proximity door-opening logic for Meera's AI).
+- Camera Y shake pushes player above floor or causes X coordinate drift (resolved by implementing a non-drifting visual-only camera shake system).
+- No ambient duck on WIN/GAMEOVER state transitions (resolved by implementing linear audio ramping to fade out ambient audio on state changes and restore on restart).
+
 

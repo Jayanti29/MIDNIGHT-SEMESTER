@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 73/500**
+Commit counter: **Commit 74/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -76,3 +76,4 @@ Commit counter: **Commit 73/500**
 - **Commit 71/500**: Completed Phase 6 Task 74. Implemented dynamic door-opening behavior for Meera's ghost AI, preventing her from clipping through closed doors by forcing them open with creak SFX on proximity.
 - **Commit 72/500**: Completed Phase 6 Task 75. Fixed physical camera position drift during ghost chase camera shakes by implementing a separate visual-only shake offset vector.
 - **Commit 73/500**: Completed Phase 6 Task 76. Implemented smooth background ambient audio loop fade-outs on Game Over and Win screen transitions, restoring audio levels on game retry/reset.
+- **Commit 74/500**: Completed Phase 6 Task 77. Updated NOTES.md to mark all deferred known issues from Phase 5/6 as fully resolved.

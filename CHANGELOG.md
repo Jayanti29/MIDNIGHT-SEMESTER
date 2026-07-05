@@ -5,7 +5,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] — Commits 61–76
+## [Unreleased] — Commits 61–77
 
 ### Phase 6 — Narrative & Environmental Polish
 

@@ -1621,6 +1621,60 @@ function buildDebrisItem(position, name) {
   return group;
 }
 
+let windowRainTexture = null;
+let windowRainCanvas = null;
+let windowRainCtx = null;
+let windowRainDrops = [];
+
+function initWindowRainTexture() {
+  windowRainCanvas = document.createElement("canvas");
+  windowRainCanvas.width = 256;
+  windowRainCanvas.height = 256;
+  windowRainCtx = windowRainCanvas.getContext("2d");
+
+  // Initialize rain drops running down the window pane
+  for (let i = 0; i < 30; i++) {
+    windowRainDrops.push({
+      x: Math.random() * 256,
+      y: Math.random() * 256,
+      speed: Math.random() * 80 + 40,
+      length: Math.random() * 8 + 4,
+      width: Math.random() * 1.5 + 0.5
+    });
+  }
+
+  windowRainTexture = new THREE.CanvasTexture(windowRainCanvas);
+  windowRainTexture.wrapS = THREE.RepeatWrapping;
+  windowRainTexture.wrapT = THREE.RepeatWrapping;
+  materials.glass.alphaMap = windowRainTexture;
+  materials.glass.transparent = true;
+}
+
+function updateWindowRain(delta) {
+  if (!windowRainCtx) return;
+  // Clear with a faint blue transparency
+  windowRainCtx.fillStyle = "rgba(200, 210, 215, 0.25)";
+  windowRainCtx.fillRect(0, 0, 256, 256);
+
+  // Draw rain trails
+  windowRainCtx.fillStyle = "rgba(255, 255, 255, 0.95)";
+  windowRainDrops.forEach(drop => {
+    windowRainCtx.fillRect(drop.x, drop.y, drop.width, drop.length);
+    // Draw trail
+    windowRainCtx.fillStyle = "rgba(255, 255, 255, 0.35)";
+    windowRainCtx.fillRect(drop.x, drop.y - drop.length, drop.width, drop.length);
+    windowRainCtx.fillStyle = "rgba(255, 255, 255, 0.95)";
+
+    drop.y += drop.speed * delta;
+    if (drop.y > 256) {
+      drop.y = -drop.length;
+      drop.x = Math.random() * 256;
+    }
+  });
+
+  windowRainTexture.needsUpdate = true;
+}
+
 function buildRainSystem() {
   const count = 350;
   const geom = new THREE.BufferGeometry();
@@ -1643,6 +1697,8 @@ function buildRainSystem() {
   thunderLight = new THREE.DirectionalLight(0xbbe2f7, 0.0);
   thunderLight.position.set(-8, 4, -20);
   scene.add(thunderLight);
+
+  initWindowRainTexture();
 }
 
 function updateRain(delta) {
@@ -1656,6 +1712,7 @@ function updateRain(delta) {
     }
   }
   rainPoints.geometry.attributes.position.needsUpdate = true;
+  updateWindowRain(delta);
 }
 
 function updateThunder(delta) {
@@ -1668,6 +1725,17 @@ function updateThunder(delta) {
   
   if (thunderLight.intensity > 0) {
     thunderLight.intensity -= delta * 7.5;
+    if (scene && scene.fog) {
+      const decay = Math.min(1, thunderLight.intensity / 5.2);
+      const r = 8 + decay * 170;
+      const g = 7 + decay * 210;
+      const b = 6 + decay * 230;
+      scene.fog.color.setRGB(r / 255, g / 255, b / 255);
+    }
+  } else {
+    if (scene && scene.fog) {
+      scene.fog.color.setHex(0x080706);
+    }
   }
 }
 

@@ -40,7 +40,7 @@ npm run preview
 
 ---
 
-## Features (v0.2.0-advanced)
+## Features (v0.2.1-advanced)
 
 ### Gameplay
 - **3-evidence progressive unlock** — collect Dr. Verma Memo, Watchman's Logbook, and Meera's ID to advance through locked doors and reach the basement gate
@@ -103,7 +103,7 @@ npm run preview
 | 5 | Polish & Performance | ✅ Done (commits 51–58) |
 | 6 | Narrative & Environmental Polish | ✅ Done (commits 59–74) |
 | 7–10 | AI, Multiple Levels, VR, Local Multiplayer | ✅ Done (commits 75–79) |
-| 11–15 | Locker Hiding, HUD Soundwaves, Scoreboards, Rain/Thunder, Accessibility Controls | ✅ Done (commits 80–85) |
+| 11–15 | Locker Hiding, HUD Soundwaves, Scoreboards, Rain/Thunder, Accessibility Controls | ✅ Done (commits 80–86) |
 
 See [PROGRESS.md](PROGRESS.md) for the full 500-commit log and [NOTES.md](NOTES.md) for known issues and deferred work.
 

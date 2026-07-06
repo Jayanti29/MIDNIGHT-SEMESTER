@@ -5,6 +5,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.2.1-advanced] — 2026-07-06
+
+### Added
+- Real-time screen brightness / gamma calibration slider in Comfort Settings modal.
+- Character selection dropdown profile selectors (Aarav, Priya, Prof. Kulkarni, Rohan, Sam) with dynamic custom procedural visual parts (glasses, long hair, baseball cap visor, suit colors).
+- Dossier folder investigator desk settings menu design with polaroid photo frames displaying character preview sketches.
+- Realistic panel doors: added physical framing pillars, double-sided beveled inset panel trims, and brass plates with lever-handle doorknobs.
+- Red spider lily flower clusters (with green stems and crimson petal crosses) scattered along the Level 1 corridor corners.
+- Contorted limbs (twisted head/neck and arm angles) and gaping circular mouth cavity on Meera the ghost model.
+- Flashlight SpotLight projection cookie overlays, projecting dust noise and lens ring details on walls.
+
+### Changed
+- Integrated flashlight cookies and brightness ranges across player, player 2, and Sam flashlights.
+
 ## [0.2.0-advanced] — 2026-07-06
 
 ### Added
@@ -22,7 +36,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Operations Terminal lock check: corrected check to count read lore notes (out of 8) instead of primary evidence files.
 - Scoreboard lore count: display environmental lore note collections out of 8 instead of 5.
 
-## [Unreleased] — Commits 61–84
+## [Unreleased] — Commits 61–86
 
 ### Phase 15 — a11y Accessibility & Comfort Auditing
 

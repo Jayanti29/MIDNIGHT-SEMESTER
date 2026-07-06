@@ -5,7 +5,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [Unreleased] — Commits 61–78
+## [0.2.0-advanced] — 2026-07-06
+
+### Added
+- Distressed horror main menu UI design with left-aligned vertical stack and brush gradient fade.
+- Customizable Player Profiles (P1/P2 names and suit colors) inside Settings panel, persisted to localStorage.
+- Detailed character model enhancements: procedural hair blocks, glowing sphere eyes, student backpacks, and metallic flashlight models.
+- Keyboard-bound Space/Enter shortcuts for advancing dialogue subtitles during gameplay.
+- Greenish peeling concrete wall textures and tiled checkerboard floor textures with blood splashes and grime overlays.
+
+### Changed
+- Brightened global lighting: increased hemisphere light, moon light, flashlight, and lamp point lights.
+- Reduced fog density to 0.012 to ensure clear player visibility down corridors.
+
+### Fixed
+- Operations Terminal lock check: corrected check to count read lore notes (out of 8) instead of primary evidence files.
+- Scoreboard lore count: display environmental lore note collections out of 8 instead of 5.
+
+## [Unreleased] — Commits 61–84
 
 ### Phase 15 — a11y Accessibility & Comfort Auditing
 

@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 84/500**
+Commit counter: **Commit 85/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -87,3 +87,4 @@ Commit counter: **Commit 84/500**
 - **Commit 82/500**: Completed Phase 13 Tasks 122-126. Implemented Game Run Statistics scoreboard tracking speedrun duration, locker hides, distraction cans thrown, peak fear level, and stamina drained, with profile high score records persisted in localStorage.
 - **Commit 83/500**: Completed Phase 14 Tasks 128-133. Implemented dynamic procedural environment systems including exterior rain drop falling particles, window lightning directional light flashes, and deep bassy thunder rumble sound effects synthesized programmatically via low-pass Web Audio nodes.
 - **Commit 84/500**: Completed Phase 15 Tasks 135-141. Implemented a11y comfort accessibility controls including subtitles display toggles, camera shake damping sliders, mouse-look vertical axis inversion, screen-reader semantic ARIA dialog roles, and initial setup localStorage loader updates.
+- **Commit 85/500**: Completed visual, HUD, character aesthetics and dialogue progression fixes. Implemented grimy checkerboard floor and peeling greenish wall textures, raised overall brightness, updated point lights and flashlight SpotLight settings. Refactored procedural player and ghost meshes to add backpacks, eyes, long hair profiles, and physical flashlight model objects. Added name/color profile selectors in Settings modal, resolved dialogue cursor locking by binding Spacebar/Enter key progression, fixed Protocol A Ending unlock, and revised win scoreboard stats out of /8 lore collectibles.

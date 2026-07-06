@@ -4501,6 +4501,58 @@ function executeCommand(cmdStr) {
   }
 }
 
+/**
+ * updateMeeraAnimations — Meera Iyer (Antagonist) Animation State
+ *
+ * Deliberately "off" timing from the player walk cycle:
+ * - Idle: slow asymmetric head-tilt sway, one shoulder raised
+ * - Patrol: lurching walk at 0.6× normal frequency with uneven arm swing
+ * - Chase: fast reaching stride with both arms extended forward
+ */
+function updateMeeraAnimations(meera, state, time) {
+  const d = meera.userData;
+  if (!d.hips || !d.leftLeg || !d.rightLeg) return;
+
+  if (state === AiState.INACTIVE || !meera.visible) return;
+
+  if (state === AiState.CHASE) {
+    // Sprint-reach: fast stride, arms out
+    const cycle = time * 5.2;
+    d.leftLeg.rotation.x = Math.sin(cycle) * 0.54;
+    d.rightLeg.rotation.x = -Math.sin(cycle) * 0.54;
+    d.leftArm.rotation.x = -0.85 + Math.sin(cycle * 0.7) * 0.15;  // arms reaching forward
+    d.rightArm.rotation.x = -0.85 - Math.sin(cycle * 0.7) * 0.15;
+    d.hips.position.y = 0.9 + Math.abs(Math.sin(cycle * 2)) * 0.05;
+    // Neck tilts forward during chase (hunched)
+    if (d.neck) d.neck.rotation.x = 0.28 + Math.sin(time * 3.1) * 0.04;
+    if (d.neck) d.neck.rotation.z = -0.18;
+
+  } else if (state === AiState.PATROL) {
+    // Lurching walk: slow + uneven. Left/right legs out of phase by non-integer
+    const cycleL = time * 2.3;
+    const cycleR = time * 2.3 + 1.9; // asymmetric offset — not π, so it looks wrong
+    d.leftLeg.rotation.x = Math.sin(cycleL) * 0.35;
+    d.rightLeg.rotation.x = Math.sin(cycleR) * 0.35;
+    // Arm swing also off-phase
+    d.leftArm.rotation.x = Math.sin(cycleL + 0.9) * 0.2;
+    d.rightArm.rotation.x = -Math.sin(cycleL + 0.9) * 0.2;
+    d.hips.position.y = 0.88 + Math.abs(Math.sin(cycleL * 1.8)) * 0.03;
+    // Slight head-loll
+    if (d.neck) d.neck.rotation.z = Math.sin(time * 1.3) * 0.12 - 0.28;
+
+  } else {
+    // Idle sway: breathing rhythm is slower, head-tilt is asymmetric
+    const s = time * 0.8;
+    d.hips.position.y = 0.88 + Math.sin(s) * 0.018;
+    d.leftArm.rotation.z = 0.12 + Math.sin(s * 1.1) * 0.04;
+    d.rightArm.rotation.z = -0.35 - Math.sin(s * 0.9) * 0.04;  // one arm hangs lower
+    if (d.neck) d.neck.rotation.z = -0.32 + Math.sin(s * 1.4) * 0.06;  // persistent tilt
+    if (d.neck) d.neck.rotation.x = 0.18 + Math.sin(s * 0.7) * 0.03;
+    d.leftLeg.rotation.x = 0;
+    d.rightLeg.rotation.x = 0;
+  }
+}
+
 function animate() {
   const delta = Math.min(clock.getDelta(), 0.05);
   updateMovement(delta);
@@ -4523,8 +4575,7 @@ function animate() {
     updateHumanoidAnimations(samCharacter, speed, time);
   }
   if (scene.userData.meeraCharacter) {
-    const speed = meeraState === AiState.CHASE ? 0.8 : (meeraState === AiState.PATROL ? 0.35 : 0);
-    updateHumanoidAnimations(scene.userData.meeraCharacter, speed, time);
+    updateMeeraAnimations(scene.userData.meeraCharacter, meeraState, time);
   }
   if (apparitionGhost) {
     updateHumanoidAnimations(apparitionGhost, 0.2, time);

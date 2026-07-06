@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 103/500**
+Commit counter: **Commit 104/500**
 
 ## Commits Log
+- **Commit 104/500**: NPC survivor updateNpcSurvivorAnimations — nervous fidget idle, hunched follow walk, panicked flee sprint.
 - **Commit 103/500**: Diegetic HUD — hidden flat meters, ink-dot crosshair with 'x' on interactable, adaptive fear-scaled heartbeat.
 - **Commit 102/500**: Added AnimationStateMachine class — shared idle/walk/run/reach/hide/death transitions for all characters.
 - **Commit 101/500**: Added updateMeeraAnimations — lurching patrol, reaching chase, asymmetric idle sway for antagonist.

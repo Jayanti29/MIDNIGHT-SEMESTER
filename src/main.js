@@ -4606,6 +4606,68 @@ class AnimationStateMachine {
  * - Patrol: lurching walk at 0.6× normal frequency with uneven arm swing
  * - Chase: fast reaching stride with both arms extended forward
  */
+/**
+ * updateNpcSurvivorAnimations — Fellow Student NPC (Sam / survivor)
+ *
+ * States:
+ *  "idle"   — nervous fidget: arms hugging torso, occasional glance left/right
+ *  "follow" — normal scared walk, slightly hunched, shorter stride
+ *  "flee"   — fast sprint with panicked uneven arm flail
+ */
+function updateNpcSurvivorAnimations(npc, state, time) {
+  const d = npc.userData;
+  if (!d.hips || !d.leftLeg || !d.rightLeg) return;
+
+  if (state === "flee") {
+    // Panic sprint: fast uneven stride, arms wild
+    const c = time * 9.8;
+    d.leftLeg.rotation.x = Math.sin(c) * 0.62;
+    d.rightLeg.rotation.x = -Math.sin(c + 0.4) * 0.58; // slight phase offset
+    if (d.leftArm) d.leftArm.rotation.x = -Math.sin(c) * 0.55;
+    if (d.rightArm) d.rightArm.rotation.x = Math.sin(c + 0.2) * 0.48;
+    if (d.leftArm) d.leftArm.rotation.z = Math.sin(c * 0.5) * 0.25;
+    if (d.rightArm) d.rightArm.rotation.z = -Math.sin(c * 0.5) * 0.25;
+    d.hips.position.y = 0.88 + Math.abs(Math.sin(c * 2)) * 0.07;
+    // Hunch forward while running
+    if (d.spine) d.spine.rotation.x = 0.18;
+
+  } else if (state === "follow") {
+    // Scared following walk — shorter stride, hunched shoulders
+    const c = time * 5.5;
+    d.leftLeg.rotation.x = Math.sin(c) * 0.30;
+    d.rightLeg.rotation.x = -Math.sin(c) * 0.30;
+    if (d.leftArm) d.leftArm.rotation.x = -Math.sin(c) * 0.18;
+    if (d.rightArm) d.rightArm.rotation.x = Math.sin(c) * 0.18;
+    // Arms hugging inward a bit
+    if (d.leftArm) d.leftArm.rotation.z = 0.22;
+    if (d.rightArm) d.rightArm.rotation.z = -0.22;
+    d.hips.position.y = 0.89 + Math.abs(Math.sin(c * 2)) * 0.03;
+    if (d.spine) d.spine.rotation.x = 0.08;
+
+  } else {
+    // Nervous idle: fidgeting, arms crossed, occasional head glance
+    const s = time * 1.6;
+    d.hips.position.y = 0.9 + Math.sin(s) * 0.012;
+    d.leftLeg.rotation.x = 0;
+    d.rightLeg.rotation.x = 0;
+    // Arms crossed over torso
+    if (d.leftArm) {
+      d.leftArm.rotation.z = 0.35 + Math.sin(s * 1.2) * 0.04;
+      d.leftArm.rotation.x = 0.28 + Math.sin(s * 0.8) * 0.03;
+    }
+    if (d.rightArm) {
+      d.rightArm.rotation.z = -0.35 - Math.sin(s * 1.1) * 0.04;
+      d.rightArm.rotation.x = 0.26 + Math.sin(s * 0.9) * 0.03;
+    }
+    // Occasional head glance: snaps left or right every ~3s
+    if (d.neck) {
+      d.neck.rotation.y = Math.sin(s * 0.4) * 0.22; // slow glance
+      d.neck.rotation.x = 0.06;
+    }
+    if (d.spine) d.spine.rotation.x = 0.10; // slight hunch
+  }
+}
+
 function updateMeeraAnimations(meera, state, time) {
   const d = meera.userData;
   if (!d.hips || !d.leftLeg || !d.rightLeg) return;
@@ -4668,8 +4730,7 @@ function animate() {
     updateHumanoidAnimations(player2Character, speed, time);
   }
   if (samCharacter) {
-    const speed = samState === "follow" ? 0.35 : 0;
-    updateHumanoidAnimations(samCharacter, speed, time);
+    updateNpcSurvivorAnimations(samCharacter, samState, time);
   }
   if (scene.userData.meeraCharacter) {
     updateMeeraAnimations(scene.userData.meeraCharacter, meeraState, time);

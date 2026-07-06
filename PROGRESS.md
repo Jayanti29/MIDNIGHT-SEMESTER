@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 82/500**
+Commit counter: **Commit 83/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -85,3 +85,4 @@ Commit counter: **Commit 82/500**
 - **Commit 80/500**: Completed Phase 11 Tasks 108-113. Implemented interactive Hiding spots (lockers/wardrobes) to avoid detection, pickable rusted debris cans, keybind shortcuts to throw cans, synthesized metallic clang Web Audio impacts, and updated Meera AI to route patrol target tracking to clang coordinates.
 - **Commit 81/500**: Completed Phase 12 Tasks 115-120. Implemented sensory Sound Wave HUD indicators, Hold Breath locker stamina mechanics, exhaustion gasp sound alarms, and Meera search visual memory AI overrides to pursue targets directly inside locker coordinates.
 - **Commit 82/500**: Completed Phase 13 Tasks 122-126. Implemented Game Run Statistics scoreboard tracking speedrun duration, locker hides, distraction cans thrown, peak fear level, and stamina drained, with profile high score records persisted in localStorage.
+- **Commit 83/500**: Completed Phase 14 Tasks 128-133. Implemented dynamic procedural environment systems including exterior rain drop falling particles, window lightning directional light flashes, and deep bassy thunder rumble sound effects synthesized programmatically via low-pass Web Audio nodes.

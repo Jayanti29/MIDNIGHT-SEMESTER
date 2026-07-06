@@ -383,6 +383,9 @@ let statStaminaDrained = 0;
 let statTimesHidden = 0;
 let statCansThrown = 0;
 let statFearPeak = 0;
+let rainPoints = null;
+let thunderLight = null;
+let thunderTimer = 10.0;
 let vrController1 = null;
 let vrController2 = null;
 let vrControllerGrip1 = null;
@@ -1416,6 +1419,90 @@ function buildDebrisItem(position, name) {
   tagInteractable(can, "debris_can", "Rusted Can");
   can.userData.parentGroup = group;
   return group;
+}
+
+function buildRainSystem() {
+  const count = 350;
+  const geom = new THREE.BufferGeometry();
+  const positions = new Float32Array(count * 3);
+  for (let i = 0; i < count; i++) {
+    positions[i * 3] = (Math.random() - 0.5) * 16 - 6;
+    positions[i * 3 + 1] = Math.random() * 8 + 1;
+    positions[i * 3 + 2] = -Math.random() * 52 - 2;
+  }
+  geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+  const mat = new THREE.PointsMaterial({
+    color: 0x5a6d7a,
+    size: 0.08,
+    transparent: true,
+    opacity: 0.45
+  });
+  rainPoints = new THREE.Points(geom, mat);
+  scene.add(rainPoints);
+
+  thunderLight = new THREE.DirectionalLight(0xbbe2f7, 0.0);
+  thunderLight.position.set(-8, 4, -20);
+  scene.add(thunderLight);
+}
+
+function updateRain(delta) {
+  if (!rainPoints) return;
+  const pos = rainPoints.geometry.attributes.position.array;
+  const count = pos.length / 3;
+  for (let i = 0; i < count; i++) {
+    pos[i * 3 + 1] -= delta * 12.0;
+    if (pos[i * 3 + 1] < -0.5) {
+      pos[i * 3 + 1] = Math.random() * 8 + 4;
+    }
+  }
+  rainPoints.geometry.attributes.position.needsUpdate = true;
+}
+
+function updateThunder(delta) {
+  if (!thunderLight) return;
+  thunderTimer -= delta;
+  if (thunderTimer <= 0) {
+    thunderTimer = Math.random() * 20 + 12;
+    triggerThunderFlash();
+  }
+  
+  if (thunderLight.intensity > 0) {
+    thunderLight.intensity -= delta * 7.5;
+  }
+}
+
+function triggerThunderFlash() {
+  if (!thunderLight) return;
+  thunderLight.intensity = 5.2;
+  if (audioCtx) {
+    playThunderRumble();
+  }
+}
+
+function playThunderRumble() {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  const bq = audioCtx.createBiquadFilter();
+  
+  osc.type = "sawtooth";
+  osc.frequency.setValueAtTime(32, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(12, audioCtx.currentTime + 1.8);
+  
+  bq.type = "lowpass";
+  bq.frequency.setValueAtTime(65, audioCtx.currentTime);
+  bq.frequency.exponentialRampToValueAtTime(15, audioCtx.currentTime + 1.8);
+  
+  gain.gain.setValueAtTime(0.0, audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.35, audioCtx.currentTime + 0.15);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 2.0);
+  
+  osc.connect(bq);
+  bq.connect(gain);
+  gain.connect(audioCtx.destination);
+  
+  osc.start();
+  osc.stop(audioCtx.currentTime + 2.1);
 }
 
 function addLabel(text, position, size = 0.34) {
@@ -3565,6 +3652,8 @@ function animate() {
   const delta = Math.min(clock.getDelta(), 0.05);
   updateMovement(delta);
   updateState(delta);
+  updateRain(delta);
+  updateThunder(delta);
   
   if (coopMode) {
     const width = window.innerWidth;
@@ -3722,6 +3811,7 @@ function startGame({ lockPointer = true } = {}) {
   initAudio();
   setupPlayer2();
   setupUiSounds();
+  buildRainSystem();
   runStartTime = Date.now();
   statStaminaDrained = 0;
   statTimesHidden = 0;

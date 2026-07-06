@@ -7,6 +7,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] — Commits 61–78
 
+### Phase 14 — Procedural Rain & Lightning Systems
+
+#### Added
+- 3D Points particle system (`THREE.Points`) outside corridor windows simulating falling rain drops
+- Exterior directional lighting (`thunderLight`) casting long side shadows during thunderstorm flashes
+- Randomly timed lightning trigger system decaying dynamically inside the frame loop
+- Programmatically synthesized bassy thunder rumble SFX utilizing low-frequency saw oscillators and low-pass Web Audio filters
+
 ### Phase 13 — Game Run Statistics & Saved Profiles
 
 #### Added

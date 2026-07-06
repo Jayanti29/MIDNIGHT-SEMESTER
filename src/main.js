@@ -13,6 +13,12 @@ const batteryText = document.querySelector("#battery");
 const batteryMeter = document.querySelector("#battery-meter");
 const batteryText2 = document.querySelector("#battery2");
 const batteryMeter2 = document.querySelector("#battery2-meter");
+const batteryPanelP1 = document.querySelector("#hud-p1 .hud-panel");
+const batteryPanelP2 = document.querySelector("#hud-p2 .hud-panel");
+const settingP1Name = document.querySelector("#setting-p1-name");
+const settingP1Color = document.querySelector("#setting-p1-color");
+const settingP2Name = document.querySelector("#setting-p2-name");
+const settingP2Color = document.querySelector("#setting-p2-color");
 const fearText = document.querySelector("#fear");
 const fearMeter = document.querySelector("#fear-meter");
 const fearText2 = document.querySelector("#fear2");
@@ -132,7 +138,7 @@ loadingManager.onError = (url) => {
 
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020303);
-scene.fog = new THREE.FogExp2(0x070706, 0.026);
+scene.fog = new THREE.FogExp2(0x070706, 0.012);
 
 const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.1, 180);
 camera.position.set(0, 1.7, 8);
@@ -297,7 +303,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.05;
+renderer.toneMappingExposure = 1.25;
 renderer.xr.enabled = true;
 
 const clock = new THREE.Clock();
@@ -323,6 +329,10 @@ let sprintExhausted = false;
 const collectedEvidence = new Set();
 const collectedBatteries = new Set();
 const readLoreNotes = new Set();
+let p1Name = localStorage.getItem("setting-p1-name") || "Aarav";
+let p1Color = localStorage.getItem("setting-p1-color") || "0xa87c5c";
+let p2Name = localStorage.getItem("setting-p2-name") || "Rohan";
+let p2Color = localStorage.getItem("setting-p2-color") || "0x3f5b7a";
 let xrSession = null;
 let activeLineTimer = 0;
 let introPlayed = false;
@@ -1316,17 +1326,146 @@ function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#
   return texture;
 }
 
-const floorTexture = proceduralTexture({ base: "#2b1f17", grain: "#4a3426", scratches: "#6a5541", scale: 1.5 });
+function createCheckerboardTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext("2d");
+  
+  // Base check pattern
+  const tileSize = 64; // 8x8 grid
+  for (let row = 0; row < 8; row++) {
+    for (let col = 0; col < 8; col++) {
+      ctx.fillStyle = (row + col) % 2 === 0 ? "#8b8375" : "#2d3532";
+      ctx.fillRect(col * tileSize, row * tileSize, tileSize, tileSize);
+      
+      // Tile borders
+      ctx.strokeStyle = "rgba(10, 10, 10, 0.45)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(col * tileSize, row * tileSize, tileSize, tileSize);
+    }
+  }
+
+  // Add grime and noise
+  for (let i = 0; i < 200; i++) {
+    const x = Math.random() * 512;
+    const y = Math.random() * 512;
+    const size = Math.random() * 30 + 10;
+    const alpha = Math.random() * 0.15;
+    ctx.fillStyle = `rgba(10, 12, 10, ${alpha})`;
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  // Add blood splatters
+  for (let i = 0; i < 8; i++) {
+    const x = Math.random() * 512;
+    const y = Math.random() * 512;
+    const size = Math.random() * 15 + 5;
+    ctx.fillStyle = `rgba(75, 12, 10, ${Math.random() * 0.5 + 0.35})`;
+    
+    // Main drop
+    ctx.beginPath();
+    ctx.arc(x, y, size, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Spatters radiating outward
+    for (let j = 0; j < 6; j++) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = Math.random() * size * 2.5;
+      const spSize = Math.random() * (size * 0.3);
+      ctx.beginPath();
+      ctx.arc(x + Math.cos(angle) * dist, y + Math.sin(angle) * dist, spSize, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  return texture;
+}
+
+function createPeelingWallTexture() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext("2d");
+  
+  // Base concrete color (greenish-cyan/grey)
+  ctx.fillStyle = "#3e4a45";
+  ctx.fillRect(0, 0, 512, 512);
+
+  // Peeling plaster/paint spots (expose concrete color `#5a5349`)
+  for (let i = 0; i < 15; i++) {
+    const x = Math.random() * 512;
+    const y = Math.random() * 512;
+    const radius = Math.random() * 45 + 15;
+    ctx.fillStyle = "#5a5349";
+    
+    // Irregular blob
+    ctx.beginPath();
+    for (let angle = 0; angle < Math.PI * 2; angle += 0.4) {
+      const r = radius + (Math.random() - 0.5) * 12;
+      ctx.lineTo(x + Math.cos(angle) * r, y + Math.sin(angle) * r);
+    }
+    ctx.closePath();
+    ctx.fill();
+
+    // Peeling edge
+    ctx.strokeStyle = "rgba(20, 18, 16, 0.45)";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+  }
+
+  // Add general grime and water stains
+  for (let i = 0; i < 120; i++) {
+    const alpha = Math.random() * 0.12;
+    ctx.fillStyle = i % 2 === 0 ? `rgba(0,0,0,${alpha})` : `rgba(255,240,210,${alpha})`;
+    ctx.beginPath();
+    const x = Math.random() * 512;
+    const y = Math.random() * 512;
+    ctx.moveTo(x, y);
+    ctx.lineTo(x + (Math.random() - 0.5) * 40, y + Math.random() * 120); // vertical drips
+    ctx.strokeStyle = ctx.fillStyle;
+    ctx.lineWidth = Math.random() * 4 + 1;
+    ctx.stroke();
+  }
+
+  // Add blood spray/scratches
+  for (let i = 0; i < 4; i++) {
+    const x = Math.random() * 512;
+    const y = Math.random() * 512;
+    ctx.fillStyle = `rgba(60, 10, 8, ${Math.random() * 0.4 + 0.2})`;
+    ctx.beginPath();
+    ctx.arc(x, y, Math.random() * 8 + 3, 0, Math.PI * 2);
+    ctx.fill();
+    // splash drip
+    ctx.fillRect(x - 2, y, Math.random() * 4 + 1, Math.random() * 50 + 20);
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.wrapS = THREE.RepeatWrapping;
+  texture.wrapT = THREE.RepeatWrapping;
+  texture.colorSpace = THREE.SRGBColorSpace;
+  texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+  return texture;
+}
+
+const floorTexture = createCheckerboardTexture();
 floorTexture.repeat.set(2.5, 18);
-const wallTexture = proceduralTexture({ base: "#514b40", grain: "#393329", scratches: "#746b5b", scale: 0.7 });
+const wallTexture = createPeelingWallTexture();
 wallTexture.repeat.set(2, 10);
 const woodTexture = proceduralTexture({ base: "#23150f", grain: "#4b2c1d", scratches: "#70513a", scale: 1.2 });
 woodTexture.repeat.set(1, 4);
 
 const materials = {
-  wall: new THREE.MeshStandardMaterial({ color: 0x736a5a, map: wallTexture, roughness: 0.88, metalness: 0.02 }),
+  wall: new THREE.MeshStandardMaterial({ color: 0xffffff, map: wallTexture, roughness: 0.88, metalness: 0.02 }),
   darkWood: new THREE.MeshStandardMaterial({ color: 0x4b2c1d, map: woodTexture, roughness: 0.74 }),
-  floor: new THREE.MeshStandardMaterial({ color: 0x6b4d35, map: floorTexture, roughness: 0.7 }),
+  floor: new THREE.MeshStandardMaterial({ color: 0xffffff, map: floorTexture, roughness: 0.7 }),
   brass: new THREE.MeshStandardMaterial({ color: 0xaa7a36, roughness: 0.38, metalness: 0.68 }),
   paper: new THREE.MeshStandardMaterial({ color: 0xd4c0a0, roughness: 0.92 }),
   fabric: new THREE.MeshStandardMaterial({ color: 0x4f564c, roughness: 0.95 }),
@@ -1628,6 +1767,7 @@ function createCharacter({ name, position, color, ghostly = false }) {
   const group = new THREE.Group();
   group.name = name;
   group.position.set(...position);
+
   const material = new THREE.MeshStandardMaterial({
     color,
     roughness: 0.74,
@@ -1637,37 +1777,108 @@ function createCharacter({ name, position, color, ghostly = false }) {
     emissiveIntensity: ghostly ? 0.28 : 0
   });
 
-  const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.28, 0.82, 8, 16), material);
-  body.position.y = 1.05;
-  body.castShadow = !ghostly;
-  group.add(body);
+  const shirtMat = material;
+  const pantsMat = new THREE.MeshStandardMaterial({ color: 0x1f2630, roughness: 0.8 });
+  const hairMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+  const eyeMat = new THREE.MeshBasicMaterial({ color: ghostly ? 0xd02222 : 0x222222 });
 
-  const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 16), material);
-  head.position.y = 1.7;
-  head.castShadow = !ghostly;
-  group.add(head);
+  if (ghostly) {
+    // Ghostly figure
+    // Lower body dress (white gown)
+    const dress = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.45, 1.1, 8), materials.paper);
+    dress.position.y = 0.55;
+    group.add(dress);
 
-  const shoulder = new THREE.Mesh(new THREE.BoxGeometry(0.78, 0.12, 0.18), material);
-  shoulder.position.y = 1.42;
-  shoulder.castShadow = !ghostly;
-  group.add(shoulder);
+    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 0.6, 8, 16), material);
+    body.position.y = 1.15;
+    group.add(body);
 
-  const armGeometry = new THREE.CapsuleGeometry(0.055, 0.62, 6, 10);
-  [-0.42, 0.42].forEach((x) => {
-    const arm = new THREE.Mesh(armGeometry, material);
-    arm.position.set(x, 1.1, 0);
-    arm.rotation.z = x < 0 ? -0.16 : 0.16;
-    arm.castShadow = !ghostly;
-    group.add(arm);
-  });
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 16), material);
+    head.position.y = 1.7;
+    group.add(head);
 
-  const legGeometry = new THREE.CapsuleGeometry(0.07, 0.64, 6, 10);
-  [-0.12, 0.12].forEach((x) => {
-    const leg = new THREE.Mesh(legGeometry, material);
-    leg.position.set(x, 0.38, 0);
-    leg.castShadow = !ghostly;
-    group.add(leg);
-  });
+    // Glowing red eyes
+    const eyeGeo = new THREE.SphereGeometry(0.035, 8, 8);
+    const leftEye = new THREE.Mesh(eyeGeo, new THREE.MeshBasicMaterial({ color: 0xb22822 }));
+    leftEye.position.set(-0.08, 1.74, 0.18);
+    group.add(leftEye);
+    const rightEye = new THREE.Mesh(eyeGeo, new THREE.MeshBasicMaterial({ color: 0xb22822 }));
+    rightEye.position.set(0.08, 1.74, 0.18);
+    group.add(rightEye);
+
+    // Long hair framing the face (references 1 & 2 hair profile)
+    const leftHair = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.72, 0.16), hairMat);
+    leftHair.position.set(-0.19, 1.4, 0.06);
+    group.add(leftHair);
+    const rightHair = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.72, 0.16), hairMat);
+    rightHair.position.set(0.19, 1.4, 0.06);
+    group.add(rightHair);
+    const backHair = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.72, 0.08), hairMat);
+    backHair.position.set(0, 1.4, -0.16);
+    group.add(backHair);
+  } else {
+    // Student figure
+    // Legs (pants)
+    const legGeometry = new THREE.CapsuleGeometry(0.075, 0.64, 6, 10);
+    [-0.12, 0.12].forEach((x) => {
+      const leg = new THREE.Mesh(legGeometry, pantsMat);
+      leg.position.set(x, 0.38, 0);
+      leg.castShadow = true;
+      group.add(leg);
+    });
+
+    // Torso (Shirt color)
+    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.65, 8), shirtMat);
+    body.position.y = 1.05;
+    body.castShadow = true;
+    group.add(body);
+
+    const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 16), material);
+    head.position.y = 1.7;
+    head.castShadow = true;
+    group.add(head);
+
+    const shoulder = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.12, 0.18), shirtMat);
+    shoulder.position.y = 1.42;
+    shoulder.castShadow = true;
+    group.add(shoulder);
+
+    // Arms
+    const armGeometry = new THREE.CapsuleGeometry(0.055, 0.62, 6, 10);
+    [-0.4, 0.4].forEach((x) => {
+      const arm = new THREE.Mesh(armGeometry, shirtMat);
+      arm.position.set(x, 1.1, 0);
+      arm.rotation.z = x < 0 ? -0.16 : 0.16;
+      arm.castShadow = true;
+      group.add(arm);
+    });
+
+    // Student Backpack (red or brown box)
+    const backpack = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.48, 0.18), materials.bookRed);
+    backpack.position.set(0, 1.15, -0.18);
+    backpack.castShadow = true;
+    group.add(backpack);
+
+    // Eyes
+    const eyeGeo = new THREE.SphereGeometry(0.03, 8, 8);
+    const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
+    leftEye.position.set(-0.08, 1.74, 0.18);
+    group.add(leftEye);
+    const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
+    rightEye.position.set(0.08, 1.74, 0.18);
+    group.add(rightEye);
+
+    // Hair Cap
+    const cap = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.08, 0.26), hairMat);
+    cap.position.set(0, 1.9, 0.02);
+    group.add(cap);
+
+    // Flashlight prop in right hand pointing forward
+    const flashlightProp = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.25, 8), materials.brass);
+    flashlightProp.position.set(0.42, 1.0, 0.18);
+    flashlightProp.rotation.x = Math.PI / 2;
+    group.add(flashlightProp);
+  }
 
   addToActiveLevel(group);
   return group;
@@ -1722,7 +1933,7 @@ function buildCorridor() {
   }
 
   for (let z = 4; z > -48; z -= 10) {
-    const lamp = new THREE.PointLight(0xffc987, 1.1, 8, 2.1);
+    const lamp = new THREE.PointLight(0xffc987, 2.2, 16, 1.5);
     lamp.position.set(0, 3.35, z);
     lamp.castShadow = true;
     addToActiveLevel(lamp);
@@ -1960,7 +2171,7 @@ function buildLevel2() {
   buildExitTerminalMesh([0, 0, -38.5]);
 
   for (let z = 5; z > -36; z -= 12) {
-    const lamp = new THREE.PointLight(0x73d08a, 0.88, 7, 2.0);
+    const lamp = new THREE.PointLight(0x73d08a, 1.8, 14, 1.5);
     lamp.position.set(0, 2.65, z);
     lamp.castShadow = true;
     addToActiveLevel(lamp);
@@ -2218,13 +2429,13 @@ function initLoreNotes() {
 }
 
 function addAtmosphere() {
-  scene.add(new THREE.HemisphereLight(0x6d766f, 0x080706, 0.18));
-  const moon = new THREE.DirectionalLight(0xb0c6ff, 0.42);
+  scene.add(new THREE.HemisphereLight(0x6d766f, 0x080706, 0.35));
+  const moon = new THREE.DirectionalLight(0xb0c6ff, 0.72);
   moon.position.set(-5, 9, 9);
   moon.castShadow = true;
   scene.add(moon);
 
-  const flashlight = new THREE.SpotLight(0xffe0a4, 3.4, 24, Math.PI / 7, 0.58, 1.15);
+  const flashlight = new THREE.SpotLight(0xffe0a4, 5.5, 30, Math.PI / 6.5, 0.6, 1.0);
   flashlight.position.set(0, 0, 0);
   flashlight.target.position.set(0, 0, -1);
   camera.add(flashlight);
@@ -2643,7 +2854,7 @@ function updateState(delta) {
       camera2.remove(player2Flashlight);
       camera2.remove(player2Flashlight.target);
     }
-    let targetIntensity2 = 3.4 * (battery2 / 100 + 0.1);
+    let targetIntensity2 = 5.5 * (battery2 / 100 + 0.1);
     if (flashlightOn2) {
       if (battery2 < 35 && battery2 > 0) {
         const lowFlicker2 = Math.sin(clock.elapsedTime * 22) > 0.3 ? 1.0 : (Math.random() > 0.45 ? 0.18 : 0.02);
@@ -2654,8 +2865,14 @@ function updateState(delta) {
       player2Flashlight.intensity = 0;
     }
 
-    if (batteryText2) batteryText2.textContent = `${Math.round(battery2)}%`;
+    if (batteryText2) {
+      batteryText2.textContent = `${Math.round(battery2)}%`;
+      batteryText2.style.color = battery2 > 50 ? "#73d08a" : (battery2 > 20 ? "#ffc87a" : "#ff5555");
+    }
     if (batteryMeter2) batteryMeter2.value = battery2;
+    if (batteryPanelP2) {
+      batteryPanelP2.classList.toggle("battery-low", battery2 < 20);
+    }
     if (fearText2) fearText2.textContent = `${Math.round(fear2)}%`;
     if (fearMeter2) fearMeter2.value = fear2;
   }
@@ -2668,7 +2885,7 @@ function updateState(delta) {
     camera.remove(flashlightLight);
     camera.remove(flashlightLight.target);
   }
-  let targetIntensity = 3.4 * (battery / 100 + 0.1);
+  let targetIntensity = 5.5 * (battery / 100 + 0.1);
   if (flashlightOn) {
     if (battery < 35 && battery > 0) {
       // Low battery flickering
@@ -2682,8 +2899,14 @@ function updateState(delta) {
   camera.userData.flashlightProp.visible = true;
   camera.userData.flashlightProp.userData.gauge.scale.x = Math.max(0.08, battery / 100);
   camera.userData.flashlightProp.userData.gauge.material.color.set(battery > 35 ? 0x73d08a : 0xc9493c);
-  if (batteryText) batteryText.textContent = `${Math.round(battery)}%`;
+  if (batteryText) {
+    batteryText.textContent = `${Math.round(battery)}%`;
+    batteryText.style.color = battery > 50 ? "#73d08a" : (battery > 20 ? "#ffc87a" : "#ff5555");
+  }
   if (batteryMeter) batteryMeter.value = battery;
+  if (batteryPanelP1) {
+    batteryPanelP1.classList.toggle("battery-low", battery < 20);
+  }
   if (fearText) fearText.textContent = `${Math.round(fear)}%`;
   if (fearMeter) fearMeter.value = fear;
   
@@ -3059,12 +3282,18 @@ function updateInteractionPrompt() {
   }
 }
 
+function translateSpeakerName(name) {
+  if (name === "Aarav") return p1Name;
+  if (name === "Rohan") return p2Name;
+  return name;
+}
+
 function sayLine(name, text, duration = 5600) {
   if (!subtitlesEnabled) {
     dialogue.classList.remove("open");
     return;
   }
-  speaker.textContent = name;
+  speaker.textContent = translateSpeakerName(name);
   line.textContent = text;
   dialogue.classList.add("open");
   
@@ -3491,7 +3720,7 @@ function inspectObject(hit, isPlayer2 = false) {
       document.exitPointerLock?.();
       setGameState(GameState.CHOICE);
       
-      const totalLoreNotes = collectedEvidence.size;
+      const totalLoreNotes = readLoreNotes.size;
       if (totalLoreNotes >= 5) {
         choiceEndingA.disabled = false;
         choiceEndingA.style.background = "#3c2f25";
@@ -3774,13 +4003,13 @@ function setupPlayer2() {
   camera2.layers.enable(0);
   camera2.layers.enable(2);
 
-  player2Character = createCharacter({ name: "Rohan", position: [0.8, 0, 8], color: 0x3f5b7a });
+  player2Character = createCharacter({ name: p2Name, position: [0.8, 0, 8], color: parseInt(p2Color) });
   player2Character.layers.set(1);
   player2Character.traverse(child => {
     if (child.isMesh) child.layers.set(1);
   });
 
-  scene.userData.player1Character = createCharacter({ name: "Aarav", position: [0, 0, 8], color: 0x8c5d3f });
+  scene.userData.player1Character = createCharacter({ name: p1Name, position: [0, 0, 8], color: parseInt(p1Color) });
   scene.userData.player1Character.layers.set(2);
   scene.userData.player1Character.traverse(child => {
     if (child.isMesh) child.layers.set(2);
@@ -3987,7 +4216,7 @@ function triggerEnding(endingId) {
   }
   
   const speedrunDuration = Math.round((Date.now() - runStartTime) / 1000);
-  const docsCollected = collectedEvidence.size;
+  const docsCollected = readLoreNotes.size;
 
   let bestTime = parseInt(localStorage.getItem("ms_best_time") || "9999");
   let bestDocs = parseInt(localStorage.getItem("ms_best_docs") || "0");
@@ -4006,7 +4235,7 @@ function triggerEnding(endingId) {
 <div style="text-align: left; background: rgba(14, 11, 9, 0.95); padding: 16px; border: 1px solid #584435; border-radius: 6px; display: flex; flex-direction: column; gap: 8px; font-family: monospace; color: #d8c39f; font-size: 0.82rem; width: 100%; box-sizing: border-box; margin-top: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.8);">
   <div style="color: #ffc87a; font-weight: bold; font-size: 0.9rem; text-align: center; border-bottom: 1px solid #584435; padding-bottom: 6px; margin-bottom: 6px;">RUN SCOREBOARD</div>
   <div style="display: flex; justify-content: space-between;"><span>ESCAPE TIME:</span><span style="color: #73d08a;">${speedrunDuration}s</span></div>
-  <div style="display: flex; justify-content: space-between;"><span>LORE COLLECTED:</span><span style="color: #73d08a;">${docsCollected}/5</span></div>
+  <div style="display: flex; justify-content: space-between;"><span>LORE COLLECTED:</span><span style="color: #73d08a;">${docsCollected}/8</span></div>
   <div style="display: flex; justify-content: space-between;"><span>TIMES HID IN CABINETS:</span><span style="color: #73d08a;">${statTimesHidden}</span></div>
   <div style="display: flex; justify-content: space-between;"><span>DISTRACTIONS THROWN:</span><span style="color: #73d08a;">${statCansThrown}</span></div>
   <div style="display: flex; justify-content: space-between;"><span>MAX PEAK FEAR:</span><span style="color: #73d08a;">${Math.round(statFearPeak)}%</span></div>
@@ -4014,7 +4243,7 @@ function triggerEnding(endingId) {
   <div style="border-top: 1px dashed rgba(88, 68, 53, 0.4); margin: 6px 0;"></div>
   <div style="color: #73d08a; font-weight: bold; text-align: center;">ALL-TIME BESTS</div>
   <div style="display: flex; justify-content: space-between;"><span>FASTEST ESCAPE:</span><span style="color: #ffc87a;">${bestTime}s</span></div>
-  <div style="display: flex; justify-content: space-between;"><span>MAX COLLECTED LORE:</span><span style="color: #ffc87a;">${bestDocs}/5</span></div>
+  <div style="display: flex; justify-content: space-between;"><span>MAX COLLECTED LORE:</span><span style="color: #ffc87a;">${bestDocs}/8</span></div>
 </div>
     `;
   }
@@ -4304,6 +4533,15 @@ document.addEventListener("mousemove", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  // SUBTITLE DIALOGUE KEYBOARD PROGRESSION (while locked)
+  if (dialogue.classList.contains("open")) {
+    if (event.code === "Space" || event.code === "Enter") {
+      event.preventDefault();
+      showNextStoryLine();
+      return;
+    }
+  }
+
   if (event.code === "Backquote") {
     event.preventDefault();
     if (debugConsoleOpen) {
@@ -4504,6 +4742,23 @@ settingInvertMouse.addEventListener("change", (event) => {
   caption.textContent = `Mouse look vertical axis: ${invertMouseLook ? "Inverted" : "Normal"}`;
 });
 
+settingP1Name?.addEventListener("input", (event) => {
+  p1Name = event.target.value || "Aarav";
+  localStorage.setItem("setting-p1-name", p1Name);
+});
+settingP1Color?.addEventListener("change", (event) => {
+  p1Color = event.target.value;
+  localStorage.setItem("setting-p1-color", p1Color);
+});
+settingP2Name?.addEventListener("input", (event) => {
+  p2Name = event.target.value || "Rohan";
+  localStorage.setItem("setting-p2-name", p2Name);
+});
+settingP2Color?.addEventListener("change", (event) => {
+  p2Color = event.target.value;
+  localStorage.setItem("setting-p2-color", p2Color);
+});
+
 closeInventory.addEventListener("click", toggleInventory);
 restartButton.addEventListener("click", () => {
   resetGame();
@@ -4568,6 +4823,11 @@ if (savedInvertMouse !== null) {
   invertMouseLook = savedInvertMouse === "true";
   settingInvertMouse.checked = invertMouseLook;
 }
+
+if (settingP1Name) settingP1Name.value = p1Name;
+if (settingP1Color) settingP1Color.value = p1Color;
+if (settingP2Name) settingP2Name.value = p2Name;
+if (settingP2Color) settingP2Color.value = p2Color;
 
 window.addEventListener("resize", () => {
   const aspect = window.innerWidth / window.innerHeight;

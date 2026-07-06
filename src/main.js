@@ -2241,7 +2241,7 @@ function createBookshelf(position, rotation = 0) {
   return group;
 }
 
-function createProceduralHumanoidSkeleton({ name, position, isGhost = false, identity = "" }) {
+function createProceduralHumanoidSkeleton({ name, position, isGhost = false, identity = "", outfitColorOverride = null, hairStyleOverride = null }) {
   const hips = new THREE.Bone();
   hips.name = "mixamorigHips";
   hips.position.set(0, 0.9, 0);
@@ -2302,7 +2302,7 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   group.position.set(...position);
   group.add(hips);
   group.bind(skeleton);
-  let outfitColor = 0x243f5e;
+  let outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x243f5e;
   let hairColor = 0x111111;
   let hairLength = "short";
   let hasGlasses = false;
@@ -2312,19 +2312,34 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
     hairLength = "long";
   } else {
     if (identity === "Priya") {
-      outfitColor = 0xd4af37;
+      outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0xd4af37;
       hairLength = "long";
     } else if (identity === "Kulkarni") {
-      outfitColor = 0x5a5a5a;
+      outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x5a5a5a;
       hairColor = 0x8c8c8c;
       hasGlasses = true;
     } else if (identity === "Sam") {
-      outfitColor = 0x56382a;
+      outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x56382a;
       hasCap = true;
     } else if (identity === "Rohan") {
-      outfitColor = 0x2f4c34;
+      outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x2f4c34;
     }
   }
+
+  // Handle hairStyleOverride explicitly
+  if (hairStyleOverride) {
+    if (hairStyleOverride === "long") {
+      hairLength = "long";
+      hasCap = false;
+    } else if (hairStyleOverride === "cap") {
+      hairLength = "short";
+      hasCap = true;
+    } else if (hairStyleOverride === "short") {
+      hairLength = "short";
+      hasCap = false;
+    }
+  }
+
   const outfitMat = new THREE.MeshStandardMaterial({
     color: outfitColor,
     roughness: 0.74,
@@ -2337,11 +2352,13 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   const hairMat = new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.9 });
   const eyeMat = new THREE.MeshBasicMaterial({ color: isGhost ? 0xb22822 : 0x222222 });
   const body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.55, 8), outfitMat);
+  body.name = "body";
   body.position.y = 0.28;
   body.castShadow = true;
   body.receiveShadow = true;
   spine.add(body);
   const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 12), skinMat);
+  headMesh.name = "head_sphere";
   headMesh.position.y = 0.12;
   headMesh.castShadow = true;
   head.add(headMesh);
@@ -2352,18 +2369,22 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   rightEye.position.set(0.07, 0.14, 0.14);
   head.add(rightEye);
   const armL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.06), outfitMat);
+  armL.name = "left_arm";
   armL.position.y = -0.21;
   armL.castShadow = true;
   leftArm.add(armL);
   const armR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.06), outfitMat);
+  armR.name = "right_arm";
   armR.position.y = -0.21;
   armR.castShadow = true;
   rightArm.add(armR);
   const legL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.48, 0.08), outfitMat);
+  legL.name = "left_leg";
   legL.position.y = -0.24;
   legL.castShadow = true;
   leftLeg.add(legL);
   const legR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.48, 0.08), outfitMat);
+  legR.name = "right_leg";
   legR.position.y = -0.24;
   legR.castShadow = true;
   rightLeg.add(legR);
@@ -2382,21 +2403,26 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   if (hasCap) {
     const capMat = new THREE.MeshStandardMaterial({ color: 0x243f5e, roughness: 0.8 });
     const capDome = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 12), capMat);
+    capDome.name = "cap_dome";
     capDome.position.set(0, 0.22, 0);
     head.add(capDome);
     const capVisor = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.02, 0.12), capMat);
+    capVisor.name = "cap_visor";
     capVisor.position.set(0, 0.2, 0.18);
     head.add(capVisor);
   } else {
     const hairCap = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.08, 0.22), hairMat);
+    hairCap.name = "hair_short_cap";
     hairCap.position.set(0, 0.26, 0.02);
     head.add(hairCap);
   }
   if (hairLength === "long") {
     const lockL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.52, 0.1), hairMat);
+    lockL.name = "hair_long_L";
     lockL.position.set(-0.16, 0.06, 0.04);
     head.add(lockL);
     const lockR = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.52, 0.1), hairMat);
+    lockR.name = "hair_long_R";
     lockR.position.set(0.16, 0.06, 0.04);
     head.add(lockR);
   }
@@ -2453,8 +2479,15 @@ function updateHumanoidAnimations(humanoid, speed, time) {
   }
 }
 
-function createCharacter({ name, position, color, ghostly = false, identity = "" }) {
-  const group = createProceduralHumanoidSkeleton({ name, position, isGhost: ghostly, identity });
+function createCharacter({ name, position, color, ghostly = false, identity = "", outfitColorOverride = null, hairStyleOverride = null }) {
+  const group = createProceduralHumanoidSkeleton({ 
+    name, 
+    position, 
+    isGhost: ghostly, 
+    identity, 
+    outfitColorOverride, 
+    hairStyleOverride 
+  });
   return group;
 }
 
@@ -3164,7 +3197,7 @@ function updateMovement(delta) {
   camera.position.y = 1.7;
 
   // Sync Player 1 model
-  if (coopMode && scene.userData.player1Character) {
+  if (scene.userData.player1Character) {
     scene.userData.player1Character.position.copy(camera.position);
     scene.userData.player1Character.position.y = 0;
     scene.userData.player1Character.rotation.set(0, yaw, 0);

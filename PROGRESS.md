@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 95/500**
+Commit counter: **Commit 96/500**
 
 ## Commits Log
+- **Commit 96/500**: Extended createProceduralHumanoidSkeleton to accept outfit color and hair style overrides.
 - **Commit 95/500**: Implemented CSS selectors for swatches, highlight buttons, and active tabs in styles.css.
 - **Commit 94/500**: Integrated character select screen DOM structure in index.html.
 - **Commit 93/500**: Established style-guide.md visual design specifications for horror case-file UI.

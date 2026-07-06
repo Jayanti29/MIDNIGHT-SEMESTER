@@ -1443,11 +1443,26 @@ function initAudio() {
   audioManager.buffers.set("ui_pause_close", createUiPauseCloseBuffer(audioCtx));
   audioManager.buffers.set("debris_impact", createDebrisImpactBuffer(audioCtx));
 
-  heartbeatTimer = window.setInterval(() => {
-    if (!document.body.classList.contains("started")) return;
-    playTone(64, 0.11, 0.04 + fear / 900, "sine");
-    window.setTimeout(() => playTone(52, 0.08, 0.025 + fear / 1400, "sine"), 140);
-  }, 1180);
+  // Adaptive heartbeat: rate and volume scale with fear — silent below 30%, rapid at 80%+
+  function scheduleNextHeartbeat() {
+    if (!document.body.classList.contains("started")) {
+      heartbeatTimer = window.setTimeout(scheduleNextHeartbeat, 2000);
+      return;
+    }
+    const activeFear = Math.max(fear, coopMode ? fear2 : 0);
+    if (activeFear < 30) {
+      // Nearly silent below fear threshold
+      heartbeatTimer = window.setTimeout(scheduleNextHeartbeat, 2400);
+      return;
+    }
+    // Interval: 1200ms at fear=30 → 480ms at fear=100
+    const interval = THREE.MathUtils.lerp(1200, 480, (activeFear - 30) / 70);
+    const vol = THREE.MathUtils.lerp(0.022, 0.11, (activeFear - 30) / 70);
+    playTone(58, 0.10, vol, "sine");
+    window.setTimeout(() => playTone(46, 0.07, vol * 0.7, "sine"), 145);
+    heartbeatTimer = window.setTimeout(scheduleNextHeartbeat, interval);
+  }
+  scheduleNextHeartbeat();
 }
 
 function playTone(frequency, duration = 0.3, volume = 0.08, type = "sine") {
@@ -3839,9 +3854,9 @@ function updateInteractionPrompt() {
   const hit = getFocusedInteractable();
   if (!hit) {
     interactionPrompt.hidden = true;
-    if (reticleP1) reticleP1.classList.remove("active");
+    if (reticleP1) reticleP1.classList.remove("on-interactable");
   } else {
-    if (reticleP1) reticleP1.classList.add("active");
+    if (reticleP1) reticleP1.classList.add("on-interactable");
     interactionPrompt.hidden = false;
     const type = hit.object.userData.interactionType;
     if (type === "door") {

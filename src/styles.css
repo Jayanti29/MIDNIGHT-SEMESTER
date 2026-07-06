@@ -210,6 +210,13 @@ meter::-webkit-meter-even-less-good-value {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.52);
   backdrop-filter: blur(12px);
   transition: all 0.3s ease;
+  /* === DIEGETIC HUD — flat meter panels are hidden === */
+  display: none !important;
+}
+
+/* Keep HUD panels visible only if explicitly re-enabled for co-op debug */
+.hud-panel.hud-visible {
+  display: flex !important;
 }
 
 .hud-panel.battery-low {
@@ -222,6 +229,54 @@ meter::-webkit-meter-even-less-good-value {
   0% { background: rgba(9, 10, 10, 0.68); }
   50% { background: rgba(45, 12, 10, 0.85); }
   100% { background: rgba(9, 10, 10, 0.68); }
+}
+
+/* === Diegetic Ink-Dot Crosshair === */
+#reticle-p1,
+#reticle-p2 {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.75);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.6);
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  transition: all 0.12s ease;
+  z-index: 20;
+}
+
+/* When near an interactable — becomes a small ink 'x' */
+#reticle-p1.on-interactable,
+#reticle-p2.on-interactable {
+  width: 14px;
+  height: 14px;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  /* Render as 'x' via pseudo elements */
+  overflow: visible;
+}
+
+#reticle-p1.on-interactable::before,
+#reticle-p2.on-interactable::before,
+#reticle-p1.on-interactable::after,
+#reticle-p2.on-interactable::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 2px;
+  background: rgba(255, 200, 135, 0.9);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+#reticle-p1.on-interactable::after,
+#reticle-p2.on-interactable::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
 }
 
 .notebook-prop {

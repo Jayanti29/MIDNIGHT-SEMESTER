@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 102/500**
+Commit counter: **Commit 103/500**
 
 ## Commits Log
+- **Commit 103/500**: Diegetic HUD — hidden flat meters, ink-dot crosshair with 'x' on interactable, adaptive fear-scaled heartbeat.
 - **Commit 102/500**: Added AnimationStateMachine class — shared idle/walk/run/reach/hide/death transitions for all characters.
 - **Commit 101/500**: Added updateMeeraAnimations — lurching patrol, reaching chase, asymmetric idle sway for antagonist.
 - **Commit 100/500**: Added Continue Case button to main menu with localStorage character restore — no re-prompt.

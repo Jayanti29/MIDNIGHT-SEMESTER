@@ -1,0 +1,166 @@
+{
+  "blocks": [
+    {
+      "id": "gate_sector",
+      "position": [0, 0, 15],
+      "rooms": [
+        {
+          "name": "Guard Cabin",
+          "type": "cabin",
+          "offset": [-4, 0, 0],
+          "size": [4, 3, 4],
+          "props": ["desk", "chair", "locker"]
+        }
+      ]
+    },
+    {
+      "id": "academic_sector",
+      "position": [0, 0, -18],
+      "rooms": [
+        {
+          "name": "Classroom 101",
+          "type": "classroom",
+          "offset": [-6, 0, 0],
+          "size": [6, 3.8, 8],
+          "props": ["desk", "chair", "blackboard", "bookshelf"]
+        },
+        {
+          "name": "Classroom 102",
+          "type": "classroom",
+          "offset": [6, 0, 0],
+          "size": [6, 3.8, 8],
+          "props": ["desk", "chair", "blackboard"]
+        },
+        {
+          "name": "Computer Lab",
+          "type": "lab",
+          "offset": [-6, 0, -10],
+          "size": [6, 3.8, 10],
+          "props": ["desk", "chair", "noticeboard"]
+        },
+        {
+          "name": "Library",
+          "type": "library",
+          "offset": [6, 0, -10],
+          "size": [6, 3.8, 10],
+          "props": ["bookshelf", "desk", "chair"]
+        },
+        {
+          "name": "Staff Room",
+          "type": "office",
+          "offset": [-6, 0, -22],
+          "size": [6, 3.8, 6],
+          "props": ["desk", "chair", "cupboard"]
+        },
+        {
+          "name": "Principal Office",
+          "type": "office",
+          "offset": [6, 0, -22],
+          "size": [6, 3.8, 6],
+          "props": ["desk", "chair", "cupboard"]
+        }
+      ]
+    },
+    {
+      "id": "hostel_sector",
+      "position": [0, 0, -70],
+      "rooms": [
+        {
+          "name": "Dorm 201",
+          "type": "dorm",
+          "offset": [-5, 0, 0],
+          "size": [4, 3, 4],
+          "props": ["bed", "desk", "chair", "cupboard"]
+        },
+        {
+          "name": "Dorm 202",
+          "type": "dorm",
+          "offset": [5, 0, 0],
+          "size": [4, 3, 4],
+          "props": ["bed", "desk", "chair"]
+        },
+        {
+          "name": "Dorm 203",
+          "type": "dorm",
+          "offset": [-5, 0, -6],
+          "size": [4, 3, 4],
+          "props": ["bed", "desk", "chair", "cupboard"]
+        },
+        {
+          "name": "Dorm 204",
+          "type": "dorm",
+          "offset": [5, 0, -6],
+          "size": [4, 3, 4],
+          "props": ["bed", "desk", "chair"]
+        },
+        {
+          "name": "Dorm 205",
+          "type": "dorm",
+          "offset": [-5, 0, -12],
+          "size": [4, 3, 4],
+          "props": ["bed", "desk", "chair"]
+        },
+        {
+          "name": "Dorm 206",
+          "type": "dorm",
+          "offset": [5, 0, -12],
+          "size": [4, 3, 4],
+          "props": ["bed", "desk", "chair", "cupboard"]
+        },
+        {
+          "name": "Warden Office",
+          "type": "office",
+          "offset": [-5, 0, -18],
+          "size": [4, 3, 4],
+          "props": ["desk", "chair", "locker"]
+        },
+        {
+          "name": "Hostel Washroom",
+          "type": "bathroom",
+          "offset": [5, 0, -18],
+          "size": [4, 3, 4],
+          "props": ["cupboard"]
+        }
+      ]
+    },
+    {
+      "id": "canteen_sector",
+      "position": [-20, 0, -45],
+      "rooms": [
+        {
+          "name": "Student Canteen",
+          "type": "canteen",
+          "offset": [0, 0, 0],
+          "size": [10, 3.5, 10],
+          "props": ["desk", "chair", "noticeboard"]
+        }
+      ]
+    },
+    {
+      "id": "restricted_sector",
+      "position": [0, -6, -45],
+      "rooms": [
+        {
+          "name": "Basement Maintenance Corridor",
+          "type": "basement",
+          "offset": [0, 0, 0],
+          "size": [6, 3, 14],
+          "props": ["locker"]
+        },
+        {
+          "name": "Restricted Trial Chamber",
+          "type": "restricted",
+          "offset": [0, 0, -14],
+          "size": [8, 3.5, 8],
+          "props": ["desk", "chair", "locker"]
+        }
+      ]
+    }
+  ],
+  "connections": [
+    {"from": "gate_sector", "to": "academic_sector", "gate": true},
+    {"from": "academic_sector", "to": "canteen_sector", "door": true},
+    {"from": "academic_sector", "to": "hostel_sector", "door": true},
+    {"from": "hostel_sector", "to": "restricted_sector", "locked": true}
+  ]
+}

@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 98/500**
+Commit counter: **Commit 99/500**
 
 ## Commits Log
+- **Commit 99/500**: Wired p1OutfitColor and p1HairStyle into solo player character spawn inside startGame.
 - **Commit 98/500**: Implemented rotating 3D preview renderer, spot lights, and scene managers for character customization.
 - **Commit 97/500**: Declared global state variables for p1OutfitColor and p1HairStyle in main.js.
 - **Commit 96/500**: Extended createProceduralHumanoidSkeleton to accept outfit color and hair style overrides.

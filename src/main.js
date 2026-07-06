@@ -4724,7 +4724,7 @@ function setupPlayer2() {
     if (child.isMesh) child.layers.set(1);
   });
 
-  scene.userData.player1Character = createCharacter({ name: p1Name, position: [0, 0, 8], color: 0xffffff, identity: p1Model });
+  scene.userData.player1Character = createCharacter({ name: p1Name, position: [0, 0, 8], color: 0xffffff, identity: p1Model, outfitColorOverride: p1OutfitColor, hairStyleOverride: p1HairStyle });
   scene.userData.player1Character.layers.set(2);
   scene.userData.player1Character.traverse(child => {
     if (child.isMesh) child.layers.set(2);
@@ -4772,6 +4772,24 @@ function startGame({ lockPointer = true } = {}) {
   statTimesHidden = 0;
   statCansThrown = 0;
   statFearPeak = 0;
+
+  // Spawn solo player character (always, even outside coop mode)
+  if (!scene.userData.player1Character) {
+    scene.userData.player1Character = createCharacter({
+      name: p1Name,
+      position: [0, 0, 8],
+      color: 0xffffff,
+      identity: p1Model,
+      outfitColorOverride: p1OutfitColor,
+      hairStyleOverride: p1HairStyle
+    });
+    // In solo mode hide the own-body mesh from the first-person camera
+    scene.userData.player1Character.traverse(child => {
+      if (child.isMesh) child.layers.enable(0);
+    });
+    scene.add(scene.userData.player1Character);
+  }
+
   startScreen.classList.add("hidden");
   setGameState(GameState.PLAYING);
   if (lockPointer) requestPointerLock();
@@ -5224,9 +5242,121 @@ if (new URLSearchParams(window.location.search).has("vr")) {
 }
 renderer.setAnimationLoop(animate);
 
+// Setup character selection screen listeners
+const charSelectScreen = document.getElementById("character-select-screen");
+const btnCharAarav = document.getElementById("btn-char-aarav");
+const btnCharPriya = document.getElementById("btn-char-priya");
+const btnCharRohan = document.getElementById("btn-char-rohan");
+const btnCharSam = document.getElementById("btn-char-sam");
+const btnCharRandomize = document.getElementById("btn-char-randomize");
+const btnCharConfirm = document.getElementById("btn-char-confirm");
+
+function selectVariantHandler(variant, activeBtn) {
+  selectedVariant = variant;
+  [btnCharAarav, btnCharPriya, btnCharRohan, btnCharSam].forEach(btn => btn?.classList.remove("active"));
+  activeBtn?.classList.add("active");
+  
+  if (variant === "Aarav") {
+    selectedOutfitColor = "#243f5e";
+    selectedHairStyle = "short";
+  } else if (variant === "Priya") {
+    selectedOutfitColor = "#d4af37";
+    selectedHairStyle = "long";
+  } else if (variant === "Rohan") {
+    selectedOutfitColor = "#2f4c34";
+    selectedHairStyle = "short";
+  } else if (variant === "Sam") {
+    selectedOutfitColor = "#56382a";
+    selectedHairStyle = "cap";
+  }
+  
+  updateSwatchHighlights();
+  updatePreviewModel();
+}
+
+if (btnCharAarav) btnCharAarav.addEventListener("click", () => selectVariantHandler("Aarav", btnCharAarav));
+if (btnCharPriya) btnCharPriya.addEventListener("click", () => selectVariantHandler("Priya", btnCharPriya));
+if (btnCharRohan) btnCharRohan.addEventListener("click", () => selectVariantHandler("Rohan", btnCharRohan));
+if (btnCharSam) btnCharSam.addEventListener("click", () => selectVariantHandler("Sam", btnCharSam));
+
+const swatchBtns = document.querySelectorAll("#outfit-swatches .swatch-btn");
+swatchBtns.forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    selectedOutfitColor = e.target.getAttribute("data-color");
+    swatchBtns.forEach(b => b.classList.remove("active"));
+    e.target.classList.add("active");
+    updatePreviewModel();
+  });
+});
+
+const hairBtns = document.querySelectorAll("#hair-swatches .hair-style-btn");
+hairBtns.forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    selectedHairStyle = e.target.getAttribute("data-style");
+    hairBtns.forEach(b => b.classList.remove("active"));
+    e.target.classList.add("active");
+    updatePreviewModel();
+  });
+});
+
+function updateSwatchHighlights() {
+  swatchBtns.forEach(btn => {
+    if (btn.getAttribute("data-color") === selectedOutfitColor) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+  hairBtns.forEach(btn => {
+    if (btn.getAttribute("data-style") === selectedHairStyle) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
+}
+
+btnCharRandomize?.addEventListener("click", () => {
+  const variants = ["Aarav", "Priya", "Rohan", "Sam"];
+  const randVar = variants[Math.floor(Math.random() * variants.length)];
+  const colors = ["#243f5e", "#d4af37", "#56382a"];
+  const randColor = colors[Math.floor(Math.random() * colors.length)];
+  const styles = ["short", "long", "cap"];
+  const randStyle = styles[Math.floor(Math.random() * styles.length)];
+
+  selectedVariant = randVar;
+  selectedOutfitColor = randColor;
+  selectedHairStyle = randStyle;
+
+  const mapping = { Aarav: btnCharAarav, Priya: btnCharPriya, Rohan: btnCharRohan, Sam: btnCharSam };
+  [btnCharAarav, btnCharPriya, btnCharRohan, btnCharSam].forEach(btn => btn?.classList.remove("active"));
+  mapping[randVar]?.classList.add("active");
+
+  updateSwatchHighlights();
+  updatePreviewModel();
+});
+
+btnCharConfirm?.addEventListener("click", () => {
+  charSelectActive = false;
+  if (charSelectScreen) charSelectScreen.style.display = "none";
+
+  p1Model = selectedVariant;
+  p1OutfitColor = selectedOutfitColor;
+  p1HairStyle = selectedHairStyle;
+  localStorage.setItem("setting-p1-model", p1Model);
+  localStorage.setItem("setting-p1-outfit-color", p1OutfitColor);
+  localStorage.setItem("setting-p1-hair-style", p1HairStyle);
+
+  startGame();
+});
+
 startButton.addEventListener("click", () => {
   coopMode = false;
-  startGame();
+  startScreen.classList.add("hidden");
+  if (charSelectScreen) charSelectScreen.style.display = "block";
+  charSelectActive = true;
+  initCharacterSelect();
+  animateCharacterSelect();
 });
 coopButton.addEventListener("click", () => {
   coopMode = true;

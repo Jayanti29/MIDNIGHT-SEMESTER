@@ -794,6 +794,18 @@ class GameStateManager {
     if (winScreen) {
       if (nextState === GameState.WIN) {
         winScreen.classList.add("open");
+        // Trigger epilogue typewriter after stamp delay
+        const epilogueEl = document.getElementById("win-epilogue");
+        if (epilogueEl) {
+          epilogueEl.textContent = "";
+          const epilogue = "The corridor was quiet for the first time since midnight. Aarav walked out into the pre-dawn fog, the evidence drive warm in his pocket. Block A would never open again.";
+          let i = 0;
+          const typeInterval = window.setInterval(() => {
+            epilogueEl.textContent += epilogue[i];
+            i++;
+            if (i >= epilogue.length) clearInterval(typeInterval);
+          }, 38);
+        }
       } else {
         winScreen.classList.remove("open");
       }

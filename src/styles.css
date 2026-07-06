@@ -1320,3 +1320,66 @@ body:not(.started) .quick-actions {
   border-style: solid !important;
   box-shadow: inset 0 0 10px rgba(178, 40, 34, 0.12);
 }
+
+/* === STAMP SLAM ANIMATIONS === */
+@keyframes stamp-slam {
+  0%   { transform: rotate(10deg) scale(2.8); opacity: 0; }
+  55%  { transform: rotate(10deg) scale(0.95); opacity: 1; }
+  70%  { transform: rotate(10deg) scale(1.05); }
+  100% { transform: rotate(10deg) scale(1.0); opacity: 1; }
+}
+
+@keyframes folder-slide-close {
+  0%   { transform: translateY(0) scaleY(1); opacity: 1; }
+  100% { transform: translateY(60px) scaleY(0.05); opacity: 0; }
+}
+
+@keyframes folder-appear {
+  0%   { transform: translateY(40px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+#gameover-screen .case-stamp,
+#win-screen .case-stamp {
+  animation: stamp-slam 0.55s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+  animation-delay: 0.45s;
+}
+
+#gameover-screen {
+  animation: folder-appear 0.4s ease both;
+}
+
+#win-screen {
+  animation: folder-appear 0.4s ease both;
+}
+
+/* Pause menu: folder spine tab styling */
+#pause-menu {
+  animation: folder-appear 0.3s ease both;
+}
+
+/* === WIN EPILOGUE TYPEWRITER === */
+#win-epilogue {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.88rem;
+  color: #4b3a2a;
+  line-height: 1.6;
+  border-left: 3px solid #b22822;
+  padding-left: 10px;
+  margin: 12px 0 0;
+  min-height: 1.4em;
+  white-space: pre-wrap;
+}
+
+/* === LOADING SCREEN LORE SNIPPET === */
+#loading-lore-text {
+  font-family: "Courier New", Courier, monospace;
+  font-size: 0.82rem;
+  color: #a49b8b;
+  max-width: 480px;
+  line-height: 1.55;
+  margin: 10px auto 0;
+  text-align: center;
+  min-height: 2.5em;
+}
+

@@ -64,6 +64,9 @@ const settingSfxVolume = document.querySelector("#setting-sfx-volume");
 const settingAmbientVolume = document.querySelector("#setting-ambient-volume");
 const settingMouseSensitivity = document.querySelector("#setting-mouse-sensitivity");
 const settingFov = document.querySelector("#setting-fov");
+const settingSubtitles = document.querySelector("#setting-subtitles");
+const settingCamShake = document.querySelector("#setting-cam-shake");
+const settingInvertMouse = document.querySelector("#setting-invert-mouse");
 const inventoryPanel = document.querySelector("#inventory-panel");
 const inventoryList = document.querySelector("#inventory-list");
 const inventoryDetail = document.querySelector("#inventory-detail");
@@ -386,6 +389,9 @@ let statFearPeak = 0;
 let rainPoints = null;
 let thunderLight = null;
 let thunderTimer = 10.0;
+let subtitlesEnabled = true;
+let camShakeMultiplier = 1.0;
+let invertMouseLook = false;
 let vrController1 = null;
 let vrController2 = null;
 let vrControllerGrip1 = null;
@@ -2841,8 +2847,8 @@ function updateState(delta) {
           } else {
             if (!godModeActive) fear = Math.min(100, fear + delta * 24);
           }
-          shakeOffset.x = (Math.random() - 0.5) * 0.045;
-          shakeOffset.y = (Math.random() - 0.5) * 0.045;
+          shakeOffset.x = (Math.random() - 0.5) * 0.045 * camShakeMultiplier;
+          shakeOffset.y = (Math.random() - 0.5) * 0.045 * camShakeMultiplier;
         }
         
         if (targetCamera && targetDist < 1.15 && gameState === GameState.PLAYING && !godModeActive) {
@@ -3054,6 +3060,10 @@ function updateInteractionPrompt() {
 }
 
 function sayLine(name, text, duration = 5600) {
+  if (!subtitlesEnabled) {
+    dialogue.classList.remove("open");
+    return;
+  }
   speaker.textContent = name;
   line.textContent = text;
   dialogue.classList.add("open");
@@ -4288,7 +4298,7 @@ document.addEventListener("pointerlockerror", () => {
 document.addEventListener("mousemove", (event) => {
   if (!pointerLocked || gameState !== GameState.PLAYING || debugConsoleOpen) return;
   yaw -= event.movementX * 0.0022 * mouseSensitivity;
-  pitch -= event.movementY * 0.002 * mouseSensitivity;
+  pitch += (invertMouseLook ? 1 : -1) * event.movementY * 0.002 * mouseSensitivity;
   pitch = THREE.MathUtils.clamp(pitch, -1.1, 1.1);
   camera.rotation.set(pitch, yaw, 0, "YXZ");
 });
@@ -4473,6 +4483,27 @@ settingFov.addEventListener("input", (event) => {
   caption.textContent = `Field of View: ${fovVal}°`;
 });
 
+settingSubtitles.addEventListener("change", (event) => {
+  subtitlesEnabled = event.target.checked;
+  localStorage.setItem("setting-subtitles", subtitlesEnabled);
+  caption.textContent = `Subtitles: ${subtitlesEnabled ? "Enabled" : "Disabled"}`;
+  if (!subtitlesEnabled) {
+    dialogue.classList.remove("open");
+  }
+});
+
+settingCamShake.addEventListener("input", (event) => {
+  camShakeMultiplier = parseFloat(event.target.value);
+  localStorage.setItem("setting-cam-shake", camShakeMultiplier);
+  caption.textContent = `Camera Shake scale: ${Math.round(camShakeMultiplier * 100)}%`;
+});
+
+settingInvertMouse.addEventListener("change", (event) => {
+  invertMouseLook = event.target.checked;
+  localStorage.setItem("setting-invert-mouse", invertMouseLook);
+  caption.textContent = `Mouse look vertical axis: ${invertMouseLook ? "Inverted" : "Normal"}`;
+});
+
 closeInventory.addEventListener("click", toggleInventory);
 restartButton.addEventListener("click", () => {
   resetGame();
@@ -4520,6 +4551,24 @@ if (savedFov) {
   settingFov.value = 72;
 }
 
+const savedSubtitles = localStorage.getItem("setting-subtitles");
+if (savedSubtitles !== null) {
+  subtitlesEnabled = savedSubtitles === "true";
+  settingSubtitles.checked = subtitlesEnabled;
+}
+
+const savedCamShake = localStorage.getItem("setting-cam-shake");
+if (savedCamShake !== null) {
+  camShakeMultiplier = parseFloat(savedCamShake);
+  settingCamShake.value = savedCamShake;
+}
+
+const savedInvertMouse = localStorage.getItem("setting-invert-mouse");
+if (savedInvertMouse !== null) {
+  invertMouseLook = savedInvertMouse === "true";
+  settingInvertMouse.checked = invertMouseLook;
+}
+
 window.addEventListener("resize", () => {
   const aspect = window.innerWidth / window.innerHeight;
   camera.aspect = coopMode ? (aspect / 2) : aspect;
@@ -4557,7 +4606,7 @@ canvas.addEventListener("touchmove", (e) => {
       const dx = t.clientX - touchLookLastX;
       const dy = t.clientY - touchLookLastY;
       yaw -= dx * mouseSensitivity * 0.003;
-      pitch = THREE.MathUtils.clamp(pitch - dy * mouseSensitivity * 0.003, -1.1, 1.1);
+      pitch = THREE.MathUtils.clamp(pitch + (invertMouseLook ? 1 : -1) * dy * mouseSensitivity * 0.003, -1.1, 1.1);
       touchLookLastX = t.clientX;
       touchLookLastY = t.clientY;
     }
@@ -4587,7 +4636,7 @@ function pollGamepad() {
     if (lx >  dead) keys.add("KeyD"); else keys.delete("KeyD");
 
     if (Math.abs(rx) > dead) yaw -= rx * 0.035;
-    if (Math.abs(ry) > dead) pitch = THREE.MathUtils.clamp(pitch - ry * 0.028, -1.1, 1.1);
+    if (Math.abs(ry) > dead) pitch = THREE.MathUtils.clamp(pitch + (invertMouseLook ? 1 : -1) * ry * 0.028, -1.1, 1.1);
 
     if (pad.buttons[0]?.pressed) inspectNearest();
     if (pad.buttons[2]?.pressed) toggleFlashlight();

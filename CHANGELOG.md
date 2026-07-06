@@ -7,6 +7,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] — Commits 61–78
 
+### Phase 15 — a11y Accessibility & Comfort Auditing
+
+#### Added
+- Subtitle display settings toggle enabling dialogue captions hide/show support
+- Chase camera shake damping slider preventing high-frequency screen displacement triggers
+- Vertical mouse looking inversion option targeting keyboard, touch, and gamepads
+- Dialog structure upgrades mapping screen-reader semantic ARIA roles to all menu sections
+
 ### Phase 14 — Procedural Rain & Lightning Systems
 
 #### Added

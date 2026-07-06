@@ -110,14 +110,14 @@
         <p class="kicker">Task Log</p>
         <ol id="task-log-list"></ol>
       </section>
-      <section id="pause-menu" class="modal-menu">
+      <section id="pause-menu" class="modal-menu" role="dialog" aria-modal="true" aria-label="Pause Menu">
         <p class="kicker">Paused</p>
         <h2>Midnight Semester</h2>
         <button id="resume-button" type="button">Resume</button>
         <button id="pause-settings" type="button">Settings</button>
         <button id="quit-to-menu" type="button">Quit to Menu</button>
       </section>
-      <section id="settings-panel" class="modal-menu">
+      <section id="settings-panel" class="modal-menu" role="dialog" aria-modal="true" aria-label="Settings Menu">
         <p class="kicker">Settings</p>
         <h2>Comfort And Audio</h2>
         <label>Master Volume <input id="setting-master-volume" type="range" min="0" max="1" step="0.01" value="0.8" /></label>
@@ -125,9 +125,12 @@
         <label>Ambient Volume <input id="setting-ambient-volume" type="range" min="0" max="1" step="0.01" value="0.8" /></label>
         <label>Mouse Sensitivity <input id="setting-mouse-sensitivity" type="range" min="0.5" max="3" step="0.1" value="1" /></label>
         <label>Field Of View <input id="setting-fov" type="range" min="60" max="90" step="1" value="72" /></label>
+        <label>Display Subtitles <input id="setting-subtitles" type="checkbox" checked /></label>
+        <label>Camera Shake Scale <input id="setting-cam-shake" type="range" min="0" max="1" step="0.1" value="1" /></label>
+        <label>Invert Mouse Look <input id="setting-invert-mouse" type="checkbox" /></label>
         <button id="close-settings" type="button">Close</button>
       </section>
-      <section id="inventory-panel" class="modal-menu" style="width: min(560px, calc(100vw - 48px));">
+      <section id="inventory-panel" class="modal-menu" role="dialog" aria-modal="true" aria-label="Case File Archive" style="width: min(560px, calc(100vw - 48px));">
         <p class="kicker">Case File Archive</p>
         <h2>Recovered Documents</h2>
         <div id="inventory-list" class="inventory-list">
@@ -139,20 +142,20 @@
         </div>
         <button id="close-inventory" type="button" style="margin-top: 14px;">Close</button>
       </section>
-      <section id="gameover-screen" class="modal-menu">
+      <section id="gameover-screen" class="modal-menu" role="dialog" aria-modal="true" aria-label="Heart Failure Screen">
         <p class="kicker" style="color: #b22822;">Heart Failure</p>
         <h2>You Collapsed</h2>
         <p id="gameover-reason" style="color: #a49b8b; font-size: 0.88rem; margin: 10px 0 16px;">The fear overcame Aarav.</p>
         <button id="restart-button" type="button">Restart</button>
       </section>
-      <section id="win-screen" class="modal-menu">
+      <section id="win-screen" class="modal-menu" role="dialog" aria-modal="true" aria-label="Escape Success Screen">
         <p class="kicker" style="color: #ffc87a;">Case Closed</p>
         <h2>You Escaped</h2>
         <p id="win-detail" style="color: #a49b8b; font-size: 0.88rem; margin: 10px 0 6px;">Aarav sealed the evidence log and escaped Block A before dawn.</p>
         <p id="win-stats" style="color: #6d8c6a; font-size: 0.78rem; margin: 0 0 16px;"></p>
         <button id="play-again-button" type="button">Play Again</button>
       </section>
-      <section id="choice-screen" class="modal-menu" style="width: min(600px, calc(100vw - 48px));">
+      <section id="choice-screen" class="modal-menu" role="dialog" aria-modal="true" aria-label="Ending Choice Selection Screen" style="width: min(600px, calc(100vw - 48px));">
         <p class="kicker" style="color: #ffc87a;">Operations Terminal</p>
         <h2>Select System Protocol</h2>
         <p id="choice-prompt-text" style="color: #a49b8b; font-size: 0.88rem; margin: 10px 0 16px;">

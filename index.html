@@ -67,6 +67,83 @@
           </svg>
         </div>
       </section>
+      <section id="character-select-screen" class="modal-menu dossier-folder" role="dialog" aria-modal="true" aria-label="Character Selection Dossier" style="width: min(840px, calc(100vw - 32px)); display: none;">
+        <div class="case-stamp unsolved" style="font-size: 1.1rem; top: 12px; right: 12px; transform: rotate(-5deg);">PROVISIONAL</div>
+        <p class="kicker">Personnel File Archive</p>
+        <h2>Subject Selection</h2>
+        
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px;">
+          <!-- Left Column: Variant Files -->
+          <div style="flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 10px;">
+            <p class="section-title">CHOOSE CANDIDATE</p>
+            
+            <!-- Variant Tabs -->
+            <div class="variant-tabs" style="display: flex; flex-direction: column; gap: 8px;">
+              <button id="btn-char-aarav" type="button" class="paper-btn active" style="text-align: left; padding: 12px;">
+                <strong>AARAV MEHTA</strong>
+                <span style="display: block; font-size: 0.72rem; text-transform: none; margin-top: 4px; color: #6e5a48; font-family: monospace;">Data Science student. Practical, deadline-stressed.</span>
+              </button>
+              <button id="btn-char-priya" type="button" class="paper-btn" style="text-align: left; padding: 12px;">
+                <strong>PRIYA SHARMA</strong>
+                <span style="display: block; font-size: 0.72rem; text-transform: none; margin-top: 4px; color: #6e5a48; font-family: monospace;">Electrical lab assistant. Resourceful, knows the grid.</span>
+              </button>
+              <button id="btn-char-rohan" type="button" class="paper-btn" style="text-align: left; padding: 12px;">
+                <strong>ROHAN VERMA</strong>
+                <span style="display: block; font-size: 0.72rem; text-transform: none; margin-top: 4px; color: #6e5a48; font-family: monospace;">Journalism intern. Investigating the 2005 Incident.</span>
+              </button>
+              <button id="btn-char-sam" type="button" class="paper-btn" style="text-align: left; padding: 12px;">
+                <strong>SAM SHEKHAR</strong>
+                <span style="display: block; font-size: 0.72rem; text-transform: none; margin-top: 4px; color: #6e5a48; font-family: monospace;">Sports captain. Athletic build, high stamina.</span>
+              </button>
+            </div>
+
+            <!-- Customization Swatches -->
+            <div style="margin-top: 10px; padding: 12px; background: rgba(0,0,0,0.03); border: 1px dashed #ad9e89; border-radius: 4px;">
+              <p class="section-title" style="margin-bottom: 8px;">SWATCH MODIFICATIONS</p>
+              
+              <div style="display: flex; flex-direction: column; gap: 8px;">
+                <div>
+                  <span style="font-family: monospace; font-size: 0.74rem; color: #5b4632; display: block; margin-bottom: 4px;">Outfit Shade:</span>
+                  <div id="outfit-swatches" style="display: flex; gap: 8px;">
+                    <button class="swatch-btn active" data-color="#243f5e" style="width: 24px; height: 24px; background: #243f5e; border: 2px solid #ecdcc9; border-radius: 2px; cursor: pointer; box-shadow: 0 0 0 1px #ad9e89;" type="button"></button>
+                    <button class="swatch-btn" data-color="#d4af37" style="width: 24px; height: 24px; background: #d4af37; border: 2px solid #ecdcc9; border-radius: 2px; cursor: pointer; box-shadow: 0 0 0 1px #ad9e89;" type="button"></button>
+                    <button class="swatch-btn" data-color="#56382a" style="width: 24px; height: 24px; background: #56382a; border: 2px solid #ecdcc9; border-radius: 2px; cursor: pointer; box-shadow: 0 0 0 1px #ad9e89;" type="button"></button>
+                  </div>
+                </div>
+                
+                <div style="margin-top: 4px;">
+                  <span style="font-family: monospace; font-size: 0.74rem; color: #5b4632; display: block; margin-bottom: 4px;">Hair Length / Style:</span>
+                  <div id="hair-swatches" style="display: flex; gap: 8px;">
+                    <button class="hair-style-btn active" data-style="short" style="font-family: monospace; font-size: 0.7rem; padding: 4px 8px; background: #faf4e8; border: 1px dashed #ad9e89; cursor: pointer;" type="button">SHORT</button>
+                    <button class="hair-style-btn" data-style="long" style="font-family: monospace; font-size: 0.7rem; padding: 4px 8px; background: #faf4e8; border: 1px dashed #ad9e89; cursor: pointer;" type="button">LONG</button>
+                    <button class="hair-style-btn" data-style="cap" style="font-family: monospace; font-size: 0.7rem; padding: 4px 8px; background: #faf4e8; border: 1px dashed #ad9e89; cursor: pointer;" type="button">CAP</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Right Column: Live 3D Preview Canvas -->
+          <div style="flex: 1; min-width: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+            <p class="section-title" style="align-self: flex-start; margin-bottom: 6px;">CANDIDATE DOSSIER PREVIEW</p>
+            
+            <div style="position: relative; background: #1c1109; border: 1px solid #ad9e89; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); border-radius: 4px; width: 100%; height: 260px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+              <!-- Canvas for Preview -->
+              <canvas id="char-preview-canvas" style="width: 100%; height: 100%; display: block;"></canvas>
+            </div>
+
+            <!-- Action controls -->
+            <div style="display: flex; gap: 10px; width: 100%; margin-top: 14px;">
+              <button id="btn-char-randomize" type="button" class="paper-btn" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem;">
+                🎲 RANDOMIZE
+              </button>
+              <button id="btn-char-confirm" type="button" class="paper-btn active" style="flex: 1.5; font-weight: bold; background: #b22822 !important; color: #fff !important; border-color: #b22822 !important; font-size: 0.95rem;">
+                CONFIRM FILE
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
       <section id="hud" aria-live="polite">
         <div id="hud-p1" style="position: absolute; left: 24px; top: 24px; z-index: 10; display: flex; flex-direction: column; gap: 8px;">
           <div class="hud-panel compact">

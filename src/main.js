@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
+import campusLayoutData from "./campus-layout.json";
 
 const canvas = document.querySelector("#game");
 const startScreen = document.querySelector("#start-screen");
@@ -343,6 +344,312 @@ let introPlayed = false;
 let audioCtx = null;
 let droneGain = null;
 let heartbeatTimer = 0;
+
+let frameCount = 0;
+let fpsSum = 0;
+let lastPerfLog = 0;
+
+function logPerformanceTelemetry(delta) {
+  frameCount++;
+  fpsSum += 1 / delta;
+  const now = performance.now();
+  if (now - lastPerfLog > 3000) {
+    const avgFps = Math.round(fpsSum / frameCount);
+    const drawCalls = renderer.info.render.calls;
+    const geometries = renderer.info.memory.geometries;
+    const textures = renderer.info.memory.textures;
+    console.log(`[PERFORMANCE] FPS: ${avgFps} | Draw Calls: ${drawCalls} | Memory: ${geometries} geometries, ${textures} textures`);
+    frameCount = 0;
+    fpsSum = 0;
+    lastPerfLog = now;
+  }
+}
+
+function playPaperRustle() {
+  if (!audioCtx) return;
+  const bufferSize = audioCtx.sampleRate * 0.12;
+  const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < bufferSize; i++) {
+    data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+  }
+  const noise = audioCtx.createBufferSource();
+  noise.buffer = buffer;
+  const filter = audioCtx.createBiquadFilter();
+  filter.type = "bandpass";
+  filter.frequency.value = 1600;
+  filter.Q.value = 3.5;
+  const gain = audioCtx.createGain();
+  gain.gain.value = 0.08 * sfxVolume;
+  noise.connect(filter);
+  filter.connect(gain);
+  gain.connect(audioCtx.destination);
+  noise.start();
+}
+
+function playPinClick() {
+  if (!audioCtx) return;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+  osc.type = "sine";
+  osc.frequency.setValueAtTime(2200, audioCtx.currentTime);
+  osc.frequency.exponentialRampToValueAtTime(80, audioCtx.currentTime + 0.05);
+  gain.gain.setValueAtTime(0.06 * sfxVolume, audioCtx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+  osc.start();
+  osc.stop(audioCtx.currentTime + 0.06);
+}
+
+const PropFactory = {
+  createDesk: (position, rotation = 0) => {
+    const group = new THREE.Group();
+    group.name = "desk";
+    group.position.set(...position);
+    group.rotation.y = rotation;
+    const top = new THREE.Mesh(new THREE.BoxGeometry(1.6, 0.08, 0.8), materials.darkWood);
+    top.position.y = 0.74;
+    top.castShadow = true;
+    top.receiveShadow = true;
+    group.add(top);
+    [[-0.7, -0.3], [0.7, -0.3], [-0.7, 0.3], [0.7, 0.3]].forEach(([x, z]) => {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.74, 0.08), materials.darkWood);
+      leg.position.set(x, 0.37, z);
+      leg.castShadow = true;
+      group.add(leg);
+    });
+    addToActiveLevel(group);
+    registerCollider(top);
+    return group;
+  },
+  createChair: (position, rotation = 0) => {
+    const group = new THREE.Group();
+    group.name = "chair";
+    group.position.set(...position);
+    group.rotation.y = rotation;
+    const seat = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.05, 0.45), materials.darkWood);
+    seat.position.y = 0.45;
+    seat.castShadow = true;
+    group.add(seat);
+    const back = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.05), materials.darkWood);
+    back.position.set(0, 0.68, -0.2);
+    back.castShadow = true;
+    group.add(back);
+    [[-0.2, -0.2], [0.2, -0.2], [-0.2, 0.2], [0.2, 0.2]].forEach(([x, z]) => {
+      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.45, 0.04), materials.darkWood);
+      leg.position.set(x, 0.225, z);
+      leg.castShadow = true;
+      group.add(leg);
+    });
+    addToActiveLevel(group);
+    registerCollider(seat);
+    return group;
+  },
+  createBed: (position, rotation = 0) => {
+    const group = new THREE.Group();
+    group.name = "bed";
+    group.position.set(...position);
+    group.rotation.y = rotation;
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.3, 1.9), materials.darkWood);
+    frame.position.y = 0.15;
+    frame.castShadow = true;
+    group.add(frame);
+    const mattress = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.15, 1.85), materials.paper);
+    mattress.position.y = 0.375;
+    group.add(mattress);
+    addToActiveLevel(group);
+    registerCollider(frame);
+    return group;
+  },
+  createLocker: (position, rotation = 0) => {
+    const group = new THREE.Group();
+    group.name = "locker";
+    group.position.set(...position);
+    group.rotation.y = rotation;
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.65, 1.8, 0.65), materials.brass);
+    body.position.y = 0.9;
+    body.castShadow = true;
+    body.receiveShadow = true;
+    group.add(body);
+    addToActiveLevel(group);
+    registerCollider(body);
+    return group;
+  },
+  createCupboard: (position, rotation = 0) => {
+    const group = new THREE.Group();
+    group.name = "cupboard";
+    group.position.set(...position);
+    group.rotation.y = rotation;
+    const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.0, 0.5), materials.darkWood);
+    body.position.y = 1.0;
+    body.castShadow = true;
+    group.add(body);
+    addToActiveLevel(group);
+    registerCollider(body);
+    return group;
+  },
+  createBlackboard: (position, rotation = 0) => {
+    const group = new THREE.Group();
+    group.name = "blackboard";
+    group.position.set(...position);
+    group.rotation.y = rotation;
+    const board = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.2, 0.05), new THREE.MeshStandardMaterial({ color: 0x1a2e26, roughness: 0.9 }));
+    board.position.y = 1.8;
+    board.castShadow = true;
+    group.add(board);
+    addToActiveLevel(group);
+    return group;
+  },
+  createBookshelf: (position, rotation = 0) => {
+    const group = new THREE.Group();
+    group.name = "bookshelf";
+    group.position.set(...position);
+    group.rotation.y = rotation;
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.9, 0.35), materials.darkWood);
+    frame.position.y = 0.95;
+    frame.castShadow = true;
+    group.add(frame);
+    addToActiveLevel(group);
+    registerCollider(frame);
+    return group;
+  },
+  createNoticeBoard: (position, rotation = 0) => {
+    const group = new THREE.Group();
+    group.name = "noticeboard";
+    group.position.set(...position);
+    group.rotation.y = rotation;
+    const board = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.0, 0.04), new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.95 }));
+    board.position.y = 1.6;
+    group.add(board);
+    addToActiveLevel(group);
+    return group;
+  },
+  createCeilingFan: (position) => {
+    const group = new THREE.Group();
+    group.name = "ceilingfan";
+    group.position.set(...position);
+    const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.5), materials.brass);
+    rod.position.y = -0.25;
+    group.add(rod);
+    const hub = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.12, 0.08), materials.brass);
+    hub.position.y = -0.5;
+    group.add(hub);
+    for (let i = 0; i < 3; i++) {
+      const blade = new THREE.Mesh(new THREE.BoxGeometry(0.65, 0.01, 0.08), materials.darkWood);
+      blade.position.y = -0.5;
+      blade.rotation.y = (i * Math.PI * 2) / 3;
+      blade.position.x = Math.sin(blade.rotation.y) * 0.32;
+      blade.position.z = Math.cos(blade.rotation.y) * 0.32;
+      group.add(blade);
+    }
+    addToActiveLevel(group);
+    return group;
+  },
+  createTubeLight: (position, flicker = false) => {
+    const group = new THREE.Group();
+    group.name = "tubelight";
+    group.position.set(...position);
+    const fixture = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.05, 0.08), materials.darkWood);
+    group.add(fixture);
+    const tube = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.15), materials.emission);
+    tube.rotation.z = Math.PI / 2;
+    tube.position.y = -0.04;
+    group.add(tube);
+    const light = new THREE.PointLight(0xfff9e6, 1.8, 12, 1.2);
+    light.position.y = -0.15;
+    light.castShadow = true;
+    group.add(light);
+    if (flicker) {
+      flickerLights.push({ light, base: 1.8, phase: Math.random() * Math.PI * 2 });
+    }
+    addToActiveLevel(group);
+    return group;
+  }
+};
+
+const RoomBuilder = {
+  buildRoom: (name, type, position, size) => {
+    const group = new THREE.Group();
+    group.name = name;
+    group.position.set(...position);
+    const [w, h, d] = size;
+    const floor = new THREE.Mesh(new THREE.BoxGeometry(w, 0.1, d), materials.floor);
+    floor.position.y = -0.05;
+    floor.receiveShadow = true;
+    group.add(floor);
+    const ceiling = new THREE.Mesh(new THREE.BoxGeometry(w, 0.1, d), materials.wall);
+    ceiling.position.y = h + 0.05;
+    group.add(ceiling);
+    const wallL = new THREE.Mesh(new THREE.BoxGeometry(0.1, h, d), materials.wall);
+    wallL.position.set(-w/2, h/2, 0);
+    wallL.castShadow = true;
+    wallL.receiveShadow = true;
+    group.add(wallL);
+    const wallR = new THREE.Mesh(new THREE.BoxGeometry(0.1, h, d), materials.wall);
+    wallR.position.set(w/2, h/2, 0);
+    wallR.castShadow = true;
+    wallR.receiveShadow = true;
+    group.add(wallR);
+    const wallB = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.1), materials.wall);
+    wallB.position.set(0, h/2, -d/2);
+    wallB.castShadow = true;
+    wallB.receiveShadow = true;
+    group.add(wallB);
+    const wallF = new THREE.Mesh(new THREE.BoxGeometry(w - 1.2, h, 0.1), materials.wall);
+    wallF.position.set(0.6, h/2, d/2);
+    wallF.castShadow = true;
+    wallF.receiveShadow = true;
+    group.add(wallF);
+    group.traverse(child => {
+      if (child.isMesh && child !== ceiling && child !== floor) {
+        registerCollider(child);
+      }
+    });
+    addToActiveLevel(group);
+    return group;
+  }
+};
+
+const CampusLayoutBuilder = {
+  buildCampus: (layoutData) => {
+    layoutData.blocks.forEach(block => {
+      const sectorGroup = new THREE.Group();
+      sectorGroup.name = block.id;
+      sectorGroup.position.set(...block.position);
+      addToActiveLevel(sectorGroup);
+      block.rooms.forEach(room => {
+        const roomPos = [
+          block.position[0] + room.offset[0],
+          block.position[1] + room.offset[1],
+          block.position[2] + room.offset[2]
+        ];
+        const roomGroup = RoomBuilder.buildRoom(room.name, room.type, roomPos, room.size);
+        room.props.forEach((propType, idx) => {
+          const xOffset = ((idx % 3) - 1) * (room.size[0] / 3.5);
+          const zOffset = (Math.floor(idx / 3) - 0.5) * (room.size[2] / 3.5);
+          const propPos = [
+            roomPos[0] + xOffset,
+            roomPos[1],
+            roomPos[2] + zOffset
+          ];
+          if (propType === "desk") PropFactory.createDesk(propPos);
+          if (propType === "chair") PropFactory.createChair(propPos);
+          if (propType === "bed") PropFactory.createBed(propPos);
+          if (propType === "locker") PropFactory.createLocker(propPos);
+          if (propType === "cupboard") PropFactory.createCupboard(propPos);
+          if (propType === "bookshelf") PropFactory.createBookshelf(propPos);
+          if (propType === "noticeboard") PropFactory.createNoticeBoard(propPos);
+        });
+        PropFactory.createTubeLight([roomPos[0], roomPos[1] + room.size[1] - 0.1, roomPos[2]], true);
+      });
+      box("corridor segment floor", [6, 0.1, 30], [block.position[0], -0.05, block.position[2]], materials.floor);
+      box("corridor segment ceiling", [6, 0.1, 30], [block.position[0], 3.85, block.position[2]], materials.wall);
+      PropFactory.createTubeLight([block.position[0], 3.7, block.position[2] - 8], false);
+      PropFactory.createTubeLight([block.position[0], 3.7, block.position[2] + 8], true);
+    });
+  }
+};
 let footstepTimer = 0.35;
 let meeraFirstWhisperPlayed = false;
 let kulkarniCallPlayed = false;
@@ -1934,217 +2241,220 @@ function createBookshelf(position, rotation = 0) {
   return group;
 }
 
-function createCharacter({ name, position, color, ghostly = false, identity = "" }) {
+function createProceduralHumanoidSkeleton({ name, position, isGhost = false, identity = "" }) {
+  const hips = new THREE.Bone();
+  hips.name = "mixamorigHips";
+  hips.position.set(0, 0.9, 0);
+  const spine = new THREE.Bone();
+  spine.name = "mixamorigSpine";
+  spine.position.set(0, 0.25, 0);
+  hips.add(spine);
+  const neck = new THREE.Bone();
+  neck.name = "mixamorigNeck";
+  neck.position.set(0, 0.38, 0);
+  spine.add(neck);
+  const head = new THREE.Bone();
+  head.name = "mixamorigHead";
+  head.position.set(0, 0.16, 0);
+  neck.add(head);
+  const leftShoulder = new THREE.Bone();
+  leftShoulder.name = "mixamorigLeftShoulder";
+  leftShoulder.position.set(-0.16, 0.32, 0);
+  spine.add(leftShoulder);
+  const leftArm = new THREE.Bone();
+  leftArm.name = "mixamorigLeftArm";
+  leftArm.position.set(-0.22, 0, 0);
+  leftShoulder.add(leftArm);
+  const rightShoulder = new THREE.Bone();
+  rightShoulder.name = "mixamorigRightShoulder";
+  rightShoulder.position.set(0.16, 0.32, 0);
+  spine.add(rightShoulder);
+  const rightArm = new THREE.Bone();
+  rightArm.name = "mixamorigRightArm";
+  rightArm.position.set(0.22, 0, 0);
+  rightShoulder.add(rightArm);
+  const leftUpLeg = new THREE.Bone();
+  leftUpLeg.name = "mixamorigLeftUpLeg";
+  leftUpLeg.position.set(-0.12, -0.08, 0);
+  hips.add(leftUpLeg);
+  const leftLeg = new THREE.Bone();
+  leftLeg.name = "mixamorigLeftLeg";
+  leftLeg.position.set(0, -0.38, 0);
+  leftUpLeg.add(leftLeg);
+  const rightUpLeg = new THREE.Bone();
+  rightUpLeg.name = "mixamorigRightUpLeg";
+  rightUpLeg.position.set(0.12, -0.08, 0);
+  hips.add(rightUpLeg);
+  const rightLeg = new THREE.Bone();
+  rightLeg.name = "mixamorigRightLeg";
+  rightLeg.position.set(0, -0.38, 0);
+  rightUpLeg.add(rightLeg);
+  const bones = [
+    hips, spine, neck, head,
+    leftShoulder, leftArm,
+    rightShoulder, rightArm,
+    leftUpLeg, leftLeg,
+    rightUpLeg, rightLeg
+  ];
+  const skeleton = new THREE.Skeleton(bones);
   const group = new THREE.Group();
   group.name = name;
   group.position.set(...position);
-
-  let outfitColor = color;
+  group.add(hips);
+  group.bind(skeleton);
+  let outfitColor = 0x243f5e;
   let hairColor = 0x111111;
-  let capStyle = "none";
-  let glassesStyle = false;
   let hairLength = "short";
-
-  if (!ghostly) {
-    if (identity === "Aarav") {
-      outfitColor = 0x243f5e; // Blue hoodie
-      hairLength = "short";
-    } else if (identity === "Priya") {
-      outfitColor = 0xd4af37; // Yellow jacket
+  let hasGlasses = false;
+  let hasCap = false;
+  if (isGhost) {
+    outfitColor = 0xc9d5cf;
+    hairLength = "long";
+  } else {
+    if (identity === "Priya") {
+      outfitColor = 0xd4af37;
       hairLength = "long";
     } else if (identity === "Kulkarni") {
-      outfitColor = 0x5a5a5a; // Grey tweed coat
-      hairColor = 0x8c8c8c; // Silver hair
-      glassesStyle = true;
-      hairLength = "short";
-    } else if (identity === "Rohan") {
-      outfitColor = 0x2f4c34; // Green windbreaker
-      hairLength = "short";
+      outfitColor = 0x5a5a5a;
+      hairColor = 0x8c8c8c;
+      hasGlasses = true;
     } else if (identity === "Sam") {
-      outfitColor = 0x56382a; // Leather brown jacket
-      capStyle = "baseball";
-      hairLength = "short";
+      outfitColor = 0x56382a;
+      hasCap = true;
+    } else if (identity === "Rohan") {
+      outfitColor = 0x2f4c34;
     }
   }
-
-  const material = new THREE.MeshStandardMaterial({
+  const outfitMat = new THREE.MeshStandardMaterial({
     color: outfitColor,
     roughness: 0.74,
-    transparent: ghostly,
-    opacity: ghostly ? 0.42 : 1,
-    emissive: ghostly ? outfitColor : 0x000000,
-    emissiveIntensity: ghostly ? 0.28 : 0
+    transparent: isGhost,
+    opacity: isGhost ? 0.45 : 1.0,
+    emissive: isGhost ? outfitColor : 0x000000,
+    emissiveIntensity: isGhost ? 0.28 : 0
   });
-
-  const shirtMat = material;
-  const pantsMat = new THREE.MeshStandardMaterial({ color: 0x1f2630, roughness: 0.8 });
+  const skinMat = outfitMat;
   const hairMat = new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.9 });
-  const eyeMat = new THREE.MeshBasicMaterial({ color: ghostly ? 0xd02222 : 0x222222 });
-
-  if (ghostly) {
-    // Ghostly figure
-    // Lower body dress (white gown)
-    const dress = new THREE.Mesh(new THREE.CylinderGeometry(0.32, 0.45, 1.1, 8), materials.paper);
-    dress.position.y = 0.55;
-    group.add(dress);
-
-    const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 0.6, 8, 16), material);
-    body.position.y = 1.15;
-    body.rotation.z = 0.08;
-    body.rotation.x = 0.12;
-    group.add(body);
-
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 16), material);
-    head.position.y = 1.7;
-    head.rotation.z = -0.36;
-    head.rotation.x = 0.24;
-    group.add(head);
-
-    // Glowing red eyes
-    const eyeGeo = new THREE.SphereGeometry(0.025, 8, 8);
-    const leftEye = new THREE.Mesh(eyeGeo, new THREE.MeshBasicMaterial({ color: 0xb22822 }));
-    leftEye.position.set(-0.08, 1.74, 0.16);
-    group.add(leftEye);
-    const rightEye = new THREE.Mesh(eyeGeo, new THREE.MeshBasicMaterial({ color: 0xb22822 }));
-    rightEye.position.set(0.08, 1.74, 0.16);
-    group.add(rightEye);
-
-    // Gaping circular mouth hollow (Image 2 creature mouth!)
-    const mouthGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.08, 12);
-    const mouthMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
-    const mouth = new THREE.Mesh(mouthGeo, mouthMat);
-    mouth.position.set(0, 1.62, 0.19);
-    mouth.rotation.x = Math.PI / 2;
-    group.add(mouth);
-
-    // Contorted arms (bent at unnatural angles!)
-    const armGeometry = new THREE.CapsuleGeometry(0.045, 0.62, 6, 10);
-    const leftArm = new THREE.Mesh(armGeometry, material);
-    leftArm.position.set(-0.35, 1.25, -0.1);
-    leftArm.rotation.set(-0.4, 0, -0.6);
-    group.add(leftArm);
-    
-    const rightArm = new THREE.Mesh(armGeometry, material);
-    rightArm.position.set(0.35, 1.35, 0.1);
-    rightArm.rotation.set(0.6, 0.3, 0.8);
-    group.add(rightArm);
-
-    // Long hair framing the face (references 1 & 2 hair profile)
-    const leftHair = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.72, 0.16), hairMat);
-    leftHair.position.set(-0.19, 1.4, 0.06);
-    leftHair.rotation.z = -0.1;
-    group.add(leftHair);
-    const rightHair = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.72, 0.16), hairMat);
-    rightHair.position.set(0.19, 1.4, 0.06);
-    rightHair.rotation.z = 0.1;
-    group.add(rightHair);
-    const backHair = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.72, 0.08), hairMat);
-    backHair.position.set(0, 1.4, -0.16);
-    group.add(backHair);
-  } else {
-    // Student figure
-    // Legs (pants)
-    const legGeometry = new THREE.CapsuleGeometry(0.075, 0.64, 6, 10);
-    [-0.12, 0.12].forEach((x) => {
-      const leg = new THREE.Mesh(legGeometry, pantsMat);
-      leg.position.set(x, 0.38, 0);
-      leg.castShadow = true;
-      group.add(leg);
-    });
-
-    // Torso (Shirt color)
-    const body = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.24, 0.65, 8), shirtMat);
-    body.position.y = 1.05;
-    body.castShadow = true;
-    group.add(body);
-
-    const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 16), material);
-    head.position.y = 1.7;
-    head.castShadow = true;
-    group.add(head);
-
-    const shoulder = new THREE.Mesh(new THREE.BoxGeometry(0.72, 0.12, 0.18), shirtMat);
-    shoulder.position.y = 1.42;
-    shoulder.castShadow = true;
-    group.add(shoulder);
-
-    // Arms
-    const armGeometry = new THREE.CapsuleGeometry(0.055, 0.62, 6, 10);
-    [-0.4, 0.4].forEach((x) => {
-      const arm = new THREE.Mesh(armGeometry, shirtMat);
-      arm.position.set(x, 1.1, 0);
-      arm.rotation.z = x < 0 ? -0.16 : 0.16;
-      arm.castShadow = true;
-      group.add(arm);
-    });
-
-    // Student Backpack (red or brown box)
-    const backpack = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.48, 0.18), materials.bookRed);
-    backpack.position.set(0, 1.15, -0.18);
-    backpack.castShadow = true;
-    group.add(backpack);
-
-    // Eyes
-    const eyeGeo = new THREE.SphereGeometry(0.03, 8, 8);
-    const leftEye = new THREE.Mesh(eyeGeo, eyeMat);
-    leftEye.position.set(-0.08, 1.74, 0.18);
-    group.add(leftEye);
-    const rightEye = new THREE.Mesh(eyeGeo, eyeMat);
-    rightEye.position.set(0.08, 1.74, 0.18);
-    group.add(rightEye);
-
-    // Glasses attachment (Kulkarni style!)
-    if (glassesStyle) {
-      const frameMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
-      const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.02), frameMat);
-      leftFrame.position.set(-0.08, 1.74, 0.19);
-      group.add(leftFrame);
-      const rightFrame = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.02), frameMat);
-      rightFrame.position.set(0.08, 1.74, 0.19);
-      group.add(rightFrame);
-      const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.015, 0.015), frameMat);
-      bridge.position.set(0, 1.74, 0.19);
-      group.add(bridge);
-    }
-
-    // Hair details
-    if (hairLength === "long") {
-      // Long hair strands (Priya style!)
-      const leftHair = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.12), hairMat);
-      leftHair.position.set(-0.19, 1.45, 0.06);
-      group.add(leftHair);
-      const rightHair = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.12), hairMat);
-      rightHair.position.set(0.19, 1.45, 0.06);
-      group.add(rightHair);
-      const backHair = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.6, 0.06), hairMat);
-      backHair.position.set(0, 1.45, -0.14);
-      group.add(backHair);
-    }
-
-    if (capStyle === "baseball") {
-      // Baseball cap (Sam style!)
-      const capMat = new THREE.MeshStandardMaterial({ color: 0x243f5e, roughness: 0.8 });
-      const capDome = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 12), capMat);
-      capDome.position.set(0, 1.84, 0);
-      group.add(capDome);
-      const capVisor = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.02, 0.14), capMat);
-      capVisor.position.set(0, 1.82, 0.22);
-      group.add(capVisor);
-    } else {
-      // Short hair cap
-      const cap = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.08, 0.26), hairMat);
-      cap.position.set(0, 1.9, 0.02);
-      group.add(cap);
-    }
-
-    // Flashlight prop in right hand pointing forward
-    const flashlightProp = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.25, 8), materials.brass);
-    flashlightProp.position.set(0.42, 1.0, 0.18);
-    flashlightProp.rotation.x = Math.PI / 2;
-    group.add(flashlightProp);
+  const eyeMat = new THREE.MeshBasicMaterial({ color: isGhost ? 0xb22822 : 0x222222 });
+  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.55, 8), outfitMat);
+  body.position.y = 0.28;
+  body.castShadow = true;
+  body.receiveShadow = true;
+  spine.add(body);
+  const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 12), skinMat);
+  headMesh.position.y = 0.12;
+  headMesh.castShadow = true;
+  head.add(headMesh);
+  const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 8), eyeMat);
+  leftEye.position.set(-0.07, 0.14, 0.14);
+  head.add(leftEye);
+  const rightEye = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 8), eyeMat);
+  rightEye.position.set(0.07, 0.14, 0.14);
+  head.add(rightEye);
+  const armL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.06), outfitMat);
+  armL.position.y = -0.21;
+  armL.castShadow = true;
+  leftArm.add(armL);
+  const armR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.06), outfitMat);
+  armR.position.y = -0.21;
+  armR.castShadow = true;
+  rightArm.add(armR);
+  const legL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.48, 0.08), outfitMat);
+  legL.position.y = -0.24;
+  legL.castShadow = true;
+  leftLeg.add(legL);
+  const legR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.48, 0.08), outfitMat);
+  legR.position.y = -0.24;
+  legR.castShadow = true;
+  rightLeg.add(legR);
+  if (hasGlasses) {
+    const frameMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+    const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.015, 0.015), frameMat);
+    bridge.position.set(0, 0.14, 0.16);
+    head.add(bridge);
+    const lensL = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.01), frameMat);
+    lensL.position.set(-0.06, 0.14, 0.16);
+    head.add(lensL);
+    const lensR = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, 0.01), frameMat);
+    lensR.position.set(0.06, 0.14, 0.16);
+    head.add(lensR);
   }
+  if (hasCap) {
+    const capMat = new THREE.MeshStandardMaterial({ color: 0x243f5e, roughness: 0.8 });
+    const capDome = new THREE.Mesh(new THREE.SphereGeometry(0.2, 16, 12), capMat);
+    capDome.position.set(0, 0.22, 0);
+    head.add(capDome);
+    const capVisor = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.02, 0.12), capMat);
+    capVisor.position.set(0, 0.2, 0.18);
+    head.add(capVisor);
+  } else {
+    const hairCap = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.08, 0.22), hairMat);
+    hairCap.position.set(0, 0.26, 0.02);
+    head.add(hairCap);
+  }
+  if (hairLength === "long") {
+    const lockL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.52, 0.1), hairMat);
+    lockL.position.set(-0.16, 0.06, 0.04);
+    head.add(lockL);
+    const lockR = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.52, 0.1), hairMat);
+    lockR.position.set(0.16, 0.06, 0.04);
+    head.add(lockR);
+  }
+  if (isGhost) {
+    neck.rotation.z = -0.32;
+    neck.rotation.x = 0.22;
+    leftShoulder.rotation.set(-0.4, 0.1, -0.5);
+    rightShoulder.rotation.set(0.5, -0.2, 0.7);
+    const mouth = new THREE.Mesh(new THREE.CylinderGeometry(0.038, 0.038, 0.08, 12), new THREE.MeshBasicMaterial({ color: 0x000000 }));
+    mouth.position.set(0, 0.07, 0.15);
+    mouth.rotation.x = Math.PI / 2;
+    head.add(mouth);
+  }
+  group.userData = {
+    skeleton,
+    hips,
+    leftLeg,
+    rightLeg,
+    leftArm,
+    rightArm,
+    leftShoulder,
+    rightShoulder,
+    neck,
+    spine,
+    head
+  };
+  return group;
+}
 
-  addToActiveLevel(group);
+function updateHumanoidAnimations(humanoid, speed, time) {
+  const hips = humanoid.userData.hips;
+  const leftLeg = humanoid.userData.leftLeg;
+  const rightLeg = humanoid.userData.rightLeg;
+  const leftArm = humanoid.userData.leftArm;
+  const rightArm = humanoid.userData.rightArm;
+  if (!hips || !leftLeg || !rightLeg) return;
+  if (speed > 0.05) {
+    const cycle = time * speed * 7.5;
+    leftLeg.rotation.x = Math.sin(cycle) * 0.42;
+    rightLeg.rotation.x = -Math.sin(cycle) * 0.42;
+    if (leftArm && rightArm) {
+      leftArm.rotation.x = -Math.sin(cycle) * 0.28;
+      rightArm.rotation.x = Math.sin(cycle) * 0.28;
+    }
+    hips.position.y = 0.9 + Math.abs(Math.sin(cycle * 2)) * 0.04;
+  } else {
+    hips.position.y = 0.9 + Math.sin(time * 1.5) * 0.015;
+    leftLeg.rotation.x = 0;
+    rightLeg.rotation.x = 0;
+    if (leftArm && rightArm) {
+      leftArm.rotation.z = 0.08 + Math.sin(time * 1.5) * 0.02;
+      rightArm.rotation.z = -0.08 - Math.sin(time * 1.5) * 0.02;
+    }
+  }
+}
+
+function createCharacter({ name, position, color, ghostly = false, identity = "" }) {
+  const group = createProceduralHumanoidSkeleton({ name, position, isGhost: ghostly, identity });
   return group;
 }
 
@@ -2217,47 +2527,15 @@ function buildSegmentedWall(x, side) {
 }
 
 function buildCorridor() {
-  box("floor", [8, 0.18, 62], [0, -0.1, -18], materials.floor, false);
-  box("ceiling", [8, 0.24, 62], [0, 3.8, -18], materials.wall, false);
-  buildSegmentedWall(-4, "left");
-  buildSegmentedWall(4, "right");
+  // Call data-driven campus layout builder! Loads gate, academic, dorm, canteens, and restricted basement
+  CampusLayoutBuilder.buildCampus(campusLayoutData);
 
-  for (let z = 5; z > -46; z -= 7) {
-    box("wood panel left", [0.34, 1.15, 3.5], [-3.82, 0.78, z], materials.darkWood, true, true, true);
-    box("wood panel right", [0.34, 1.15, 3.5], [3.82, 0.78, z - 2.6], materials.darkWood, true, true, true);
-    createDoor({ side: "left", z: z - 2.4, label: `Room ${Math.abs(Math.round(z - 2.4))} left door` });
-    createDoor({ side: "right", z: z + 0.6, label: `Room ${Math.abs(Math.round(z + 0.6))} right door` });
-    box("frame left", [0.22, 2.66, 1.42], [-3.54, 1.32, z - 2.4], materials.brass);
-    box("frame right", [0.22, 2.66, 1.42], [3.54, 1.32, z + 0.6], materials.brass);
-  }
-
-  for (let z = 4; z > -48; z -= 10) {
-    const lamp = new THREE.PointLight(0xffc987, 2.2, 16, 1.5);
-    lamp.position.set(0, 3.35, z);
-    lamp.castShadow = true;
-    addToActiveLevel(lamp);
-    flickerLights.push({ light: lamp, base: lamp.intensity, phase: Math.random() * Math.PI * 2 });
-    box("lamp shade", [1.1, 0.12, 0.55], [0, 3.28, z], materials.brass);
-    box("lamp glow", [0.72, 0.035, 0.26], [0, 3.2, z], materials.emission, false, false);
-  }
-
-  for (let z = 0; z > -42; z -= 14) {
-    box("rain window left", [0.035, 1.55, 1.9], [-3.84, 2.02, z - 4.8], materials.glass, false);
-    box("rain window right", [0.035, 1.55, 1.9], [3.84, 2.02, z - 8.2], materials.glass, false);
-  }
-
-  createBookshelf([-3.48, 0, -12], Math.PI / 2);
-  createBookshelf([3.48, 0, -20], -Math.PI / 2);
-  createStudyTable([0.8, 0, -8.4], 0.18);
-  createStudyTable([-1.1, 0, -29], -0.3);
-  buildDormRoom();
-  buildDocuments();
+  // Load remaining primary narrative items (Emergency Terminal console, Win Gate, etc.)
   scene.userData.kulkarni = createCharacter({ name: "Professor Kulkarni", position: [-2.4, 0, -15.5], color: 0xffffff, identity: "Kulkarni" });
   registerCollider(scene.userData.kulkarni);
   scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [2.6, 0, -34.5], color: 0xc9d5cf, ghostly: true, identity: "Meera" });
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 
-  // Basement Gate (Visual entry point for winning the game)
   basementGateGroup = new THREE.Group();
   basementGateGroup.name = "basement gate group";
   basementGateGroup.position.set(0, 0, -48);
@@ -2286,12 +2564,11 @@ function buildCorridor() {
   initLoreNotes();
   buildCheckpointConsole([2.8, 0, -18.5], "Emergency Terminal");
 
-  // Hiding spots & distractions (Phase 11)
   buildLocker([-2.2, 0, -20.0], "Corridor Locker 1");
   buildLocker([2.2, 0, -32.0], "Corridor Locker 2");
   buildDebrisItem([-1.8, 0, -14.0], "can_1");
   buildDebrisItem([1.8, 0, -28.0], "can_2");
-  addSpiderLilies(); // Red foliage growth on the floor (Image 3)
+  addSpiderLilies();
 }
 
 function clearGroup(group) {
@@ -4195,6 +4472,31 @@ function animate() {
   updateState(delta);
   updateRain(delta);
   updateThunder(delta);
+
+  // Procedural bone skeletal updates
+  const time = clock.elapsedTime;
+  if (scene.userData.player1Character) {
+    const speed = moveDirection.length();
+    updateHumanoidAnimations(scene.userData.player1Character, speed, time);
+  }
+  if (player2Character) {
+    const speed = moveDirection2.length();
+    updateHumanoidAnimations(player2Character, speed, time);
+  }
+  if (samCharacter) {
+    const speed = samState === "follow" ? 0.35 : 0;
+    updateHumanoidAnimations(samCharacter, speed, time);
+  }
+  if (scene.userData.meeraCharacter) {
+    const speed = meeraState === AiState.CHASE ? 0.8 : (meeraState === AiState.PATROL ? 0.35 : 0);
+    updateHumanoidAnimations(scene.userData.meeraCharacter, speed, time);
+  }
+  if (apparitionGhost) {
+    updateHumanoidAnimations(apparitionGhost, 0.2, time);
+  }
+
+  // Draw calls FPS telemetry
+  logPerformanceTelemetry(delta);
   
   if (coopMode) {
     const width = window.innerWidth;
@@ -4775,6 +5077,37 @@ function resetGame() {
 
 buildCorridor();
 addAtmosphere();
+
+// Folder tabs triggers
+const tabAudio = document.querySelector("#tab-audio");
+const tabGraphics = document.querySelector("#tab-graphics");
+const tabControls = document.querySelector("#tab-controls");
+const panelAudio = document.querySelector("#panel-audio");
+const panelGraphics = document.querySelector("#panel-graphics");
+const panelControls = document.querySelector("#panel-controls");
+
+function setActiveTab(activeTab, activePanel) {
+  [tabAudio, tabGraphics, tabControls].forEach(btn => btn?.classList.remove("active"));
+  [panelAudio, panelGraphics, panelControls].forEach(pnl => pnl?.classList.remove("active"));
+  activeTab?.classList.add("active");
+  activePanel?.classList.add("active");
+  playPaperRustle();
+}
+
+tabAudio?.addEventListener("click", () => setActiveTab(tabAudio, panelAudio));
+tabGraphics?.addEventListener("click", () => setActiveTab(tabGraphics, panelGraphics));
+tabControls?.addEventListener("click", () => setActiveTab(tabControls, panelControls));
+
+// Delegate click sounds to all buttons in DOM
+document.querySelectorAll("button").forEach(btn => {
+  btn.addEventListener("click", () => {
+    playPinClick();
+  });
+  btn.addEventListener("pointerenter", () => {
+    playPaperRustle();
+  });
+});
+
 if (new URLSearchParams(window.location.search).has("vr")) {
   setupVrEntry();
 }

@@ -350,6 +350,14 @@ let godModeActive = false;
 let infiniteBatteryActive = false;
 let debugConsoleOpen = false;
 let meeraSpeedMultiplier = 1.0;
+let isPlayerHidden = false;
+let isPlayer2Hidden = false;
+let player1PreLockerPos = null;
+let player2PreLockerPos = null;
+let p1DebrisCount = 0;
+let p2DebrisCount = 0;
+let activeNoiseEventZ = null;
+let noiseInvestigateTimer = 0;
 let vrController1 = null;
 let vrController2 = null;
 let vrControllerGrip1 = null;
@@ -866,6 +874,25 @@ function createUiHoverBuffer(ctx) {
   return buffer;
 }
 
+function createDebrisImpactBuffer(ctx) {
+  const sampleRate = ctx.sampleRate;
+  const duration = 1.0;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const env = Math.exp(-6 * t);
+    const res1 = Math.sin(2 * Math.PI * 880 * t) * 0.4;
+    const res2 = Math.sin(2 * Math.PI * 1350 * t) * 0.25;
+    const res3 = Math.sin(2 * Math.PI * 2200 * t) * 0.15;
+    const noise = (Math.random() * 2 - 1) * 0.2;
+    data[i] = (res1 + res2 + res3 + noise) * env * 0.55;
+  }
+  return buffer;
+}
+
 function createUiSelectBuffer(ctx) {
   const duration = 0.15;
   const sampleRate = ctx.sampleRate;
@@ -1057,6 +1084,7 @@ function initAudio() {
   audioManager.buffers.set("ui_select", createUiSelectBuffer(audioCtx));
   audioManager.buffers.set("ui_pause_open", createUiPauseOpenBuffer(audioCtx));
   audioManager.buffers.set("ui_pause_close", createUiPauseCloseBuffer(audioCtx));
+  audioManager.buffers.set("debris_impact", createDebrisImpactBuffer(audioCtx));
 
   heartbeatTimer = window.setInterval(() => {
     if (!document.body.classList.contains("started")) return;
@@ -1316,6 +1344,53 @@ function tagInteractable(object, type, label) {
   object.userData.interactionType = type;
   object.userData.interactionLabel = label;
   return object;
+}
+
+function buildLocker(position, label) {
+  const group = new THREE.Group();
+  group.position.set(...position);
+  
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x2e2720, roughness: 0.82 });
+  const frame = new THREE.Mesh(new THREE.BoxGeometry(0.85, 2.2, 0.85), frameMat);
+  frame.position.set(0, 1.1, 0);
+  frame.castShadow = true;
+  frame.receiveShadow = true;
+  group.add(frame);
+  
+  const doorSlat = new THREE.Mesh(new THREE.BoxGeometry(0.75, 2.0, 0.05), new THREE.MeshStandardMaterial({ color: 0x120d0a, roughness: 0.95 }));
+  doorSlat.position.set(0, 1.1, 0.41);
+  group.add(doorSlat);
+  
+  const handle = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.15, 0.04), new THREE.MeshStandardMaterial({ color: 0xaa7a36, metalness: 0.8, roughness: 0.3 }));
+  handle.position.set(-0.3, 1.1, 0.44);
+  group.add(handle);
+  
+  addToActiveLevel(group);
+  
+  tagInteractable(frame, "hiding_spot", label);
+  frame.userData.lockerGroup = group;
+  
+  registerCollider(frame);
+  return group;
+}
+
+function buildDebrisItem(position, name) {
+  const group = new THREE.Group();
+  group.position.set(...position);
+  group.name = name;
+  
+  const can = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.12, 0.12, 0.35, 8),
+    new THREE.MeshStandardMaterial({ color: 0x8a715f, roughness: 0.9, metalness: 0.3 })
+  );
+  can.position.set(0, 0.175, 0);
+  can.castShadow = true;
+  group.add(can);
+  
+  addToActiveLevel(group);
+  tagInteractable(can, "debris_can", "Rusted Can");
+  can.userData.parentGroup = group;
+  return group;
 }
 
 function addLabel(text, position, size = 0.34) {
@@ -1582,6 +1657,12 @@ function buildCorridor() {
   initBatteries();
   initLoreNotes();
   buildCheckpointConsole([2.8, 0, -18.5], "Emergency Terminal");
+
+  // Hiding spots & distractions (Phase 11)
+  buildLocker([-2.2, 0, -20.0], "Corridor Locker 1");
+  buildLocker([2.2, 0, -32.0], "Corridor Locker 2");
+  buildDebrisItem([-1.8, 0, -14.0], "can_1");
+  buildDebrisItem([1.8, 0, -28.0], "can_2");
 }
 
 function clearGroup(group) {
@@ -1784,6 +1865,10 @@ function buildLevel2() {
     ["Sam", "Aarav, is that you? Thank god. Kulkarni told me you went down here."],
     ["Sam", "I brought a backup light. Let's find the fuel valves and get this grid online together."]
   ]);
+
+  // Hiding spots & distractions (Phase 11)
+  buildLocker([-1.8, 0, -18.0], "Lab Locker 1");
+  buildDebrisItem([1.8, 0, -24.0], "can_3");
 }
 
 function buildDormRoom() {
@@ -2402,13 +2487,19 @@ function updateState(delta) {
   if (scene.userData.meeraCharacter) {
     const meera = scene.userData.meeraCharacter;
     
-    // Choose nearest player target
-    let targetCamera = camera;
-    let targetDist = meera.position.distanceTo(camera.position);
-    let targetFear = fear;
+    // Choose nearest player target, checking if they are hidden
+    let targetCamera = null;
+    let targetDist = Infinity;
+    let targetFear = 0;
     let targetIsP2 = false;
 
-    if (coopMode && camera2) {
+    if (!isPlayerHidden) {
+      targetCamera = camera;
+      targetDist = meera.position.distanceTo(camera.position);
+      targetFear = fear;
+    }
+
+    if (coopMode && camera2 && !isPlayer2Hidden) {
       const distToP2 = meera.position.distanceTo(camera2.position);
       if (distToP2 < targetDist) {
         targetCamera = camera2;
@@ -2439,12 +2530,20 @@ function updateState(delta) {
     }
     
     if (meeraState !== AiState.INACTIVE) {
-      meera.lookAt(targetCamera.position.x, meera.position.y, targetCamera.position.z);
+      // Revert to patrol if all players hide during a chase
+      if (!targetCamera && meeraState === AiState.CHASE) {
+        meeraState = AiState.PATROL;
+        addTaskLog("Threat lost visual track of targets.");
+      }
+
+      if (targetCamera) {
+        meera.lookAt(targetCamera.position.x, meera.position.y, targetCamera.position.z);
+      }
       
-      const targetFlashlightOn = targetIsP2 ? flashlightOn2 : flashlightOn;
-      const targetWantsSprint = targetIsP2 ? player2Keys.has("ShiftRight") : keys.has("ShiftLeft");
-      const targetSprintExhausted = targetIsP2 ? sprintExhausted2 : sprintExhausted;
-      const playerDetected = (targetFlashlightOn && targetDist < 15) || (targetDist < 7) || (targetSprintExhausted === false && targetWantsSprint && targetDist < 11);
+      const targetFlashlightOn = targetCamera ? (targetIsP2 ? flashlightOn2 : flashlightOn) : false;
+      const targetWantsSprint = targetCamera ? (targetIsP2 ? player2Keys.has("ShiftRight") : keys.has("ShiftLeft")) : false;
+      const targetSprintExhausted = targetCamera ? (targetIsP2 ? sprintExhausted2 : sprintExhausted) : false;
+      const playerDetected = targetCamera && ((targetFlashlightOn && targetDist < 15) || (targetDist < 7) || (targetSprintExhausted === false && targetWantsSprint && targetDist < 11));
       
       if (playerDetected && meeraState === AiState.PATROL) {
         meeraState = AiState.CHASE;
@@ -2454,16 +2553,27 @@ function updateState(delta) {
       
       if (meeraState === AiState.PATROL) {
         meeraSpeed = 1.2 * meeraSpeedMultiplier;
-        meera.position.z += meeraPatrolDir * meeraSpeed * delta;
-        const zMin = currentLevel === 1 ? -45 : -35;
-        const zMax = currentLevel === 1 ? -16 : 8;
-        if (meera.position.z < zMin) {
-          meeraPatrolDir = 1;
-        } else if (meera.position.z > zMax) {
-          meeraPatrolDir = -1;
+        if (activeNoiseEventZ !== null) {
+          const investigateDir = Math.sign(activeNoiseEventZ - meera.position.z);
+          meera.position.z += investigateDir * meeraSpeed * delta;
+          meera.lookAt(0, meera.position.y, activeNoiseEventZ);
+          
+          noiseInvestigateTimer -= delta;
+          if (noiseInvestigateTimer <= 0 || Math.abs(meera.position.z - activeNoiseEventZ) < 0.5) {
+            activeNoiseEventZ = null;
+          }
+        } else {
+          meera.position.z += meeraPatrolDir * meeraSpeed * delta;
+          const zMin = currentLevel === 1 ? -45 : -35;
+          const zMax = currentLevel === 1 ? -16 : 8;
+          if (meera.position.z < zMin) {
+            meeraPatrolDir = 1;
+          } else if (meera.position.z > zMax) {
+            meeraPatrolDir = -1;
+          }
         }
         meera.position.x = THREE.MathUtils.lerp(meera.position.x, 0, delta * 3);
-      } else if (meeraState === AiState.CHASE) {
+      } else if (meeraState === AiState.CHASE && targetCamera) {
         meeraSpeed = ((currentLevel === 2 ? 1.48 : 1.6) + (targetFear / 160)) * meeraSpeedMultiplier;
         const toPlayer = new THREE.Vector3().subVectors(targetCamera.position, meera.position);
         toPlayer.y = 0;
@@ -2497,7 +2607,7 @@ function updateState(delta) {
         }
       });
       
-      if (targetDist < 4.5 && meeraState === AiState.CHASE) {
+      if (targetCamera && targetDist < 4.5 && meeraState === AiState.CHASE) {
         if (targetIsP2) {
           if (!godModeActive) fear2 = Math.min(100, fear2 + delta * 24);
         } else {
@@ -2507,7 +2617,7 @@ function updateState(delta) {
         shakeOffset.y = (Math.random() - 0.5) * 0.045;
       }
       
-      if (targetDist < 1.15 && gameState === GameState.PLAYING && !godModeActive) {
+      if (targetCamera && targetDist < 1.15 && gameState === GameState.PLAYING && !godModeActive) {
         triggerGameOver(targetIsP2 ? "Rohan was caught by Meera's presence." : "Aarav was caught by Meera's presence.");
       }
     }
@@ -2808,6 +2918,57 @@ function inspectNearest2() {
 function inspectObject(hit, isPlayer2 = false) {
   const type = hit.object.userData.interactionType;
   const playerName = isPlayer2 ? "Rohan" : "Aarav";
+
+  if (type === "hiding_spot") {
+    if (!isPlayer2) {
+      if (!isPlayerHidden) {
+        isPlayerHidden = true;
+        player1PreLockerPos = camera.position.clone();
+        camera.position.set(hit.object.parent.position.x, 1.7, hit.object.parent.position.z + 0.1);
+        caption.textContent = "You are hidden inside the locker. Press [E] to step out.";
+        addTaskLog("Entered hiding spot.");
+        setFlashlight(false);
+      } else {
+        isPlayerHidden = false;
+        camera.position.copy(player1PreLockerPos || new THREE.Vector3(camera.position.x, 1.7, camera.position.z + 0.6));
+        caption.textContent = "You stepped out of the locker.";
+        addTaskLog("Exited hiding spot.");
+      }
+    } else {
+      if (!isPlayer2Hidden) {
+        isPlayer2Hidden = true;
+        player2PreLockerPos = camera2.position.clone();
+        camera2.position.set(hit.object.parent.position.x, 1.7, hit.object.parent.position.z + 0.1);
+        caption.textContent = "Player 2 is hidden inside the locker. Press [ShiftRight] to step out.";
+        addTaskLog("Player 2 entered hiding spot.");
+        setFlashlight2(false);
+      } else {
+        isPlayer2Hidden = false;
+        camera2.position.copy(player2PreLockerPos || new THREE.Vector3(camera2.position.x, 1.7, camera2.position.z + 0.6));
+        caption.textContent = "Player 2 stepped out of the locker.";
+        addTaskLog("Player 2 exited hiding spot.");
+      }
+    }
+    if (audioManager) audioManager.playSound("door_creak", { volume: 0.4 });
+    return;
+  }
+
+  if (type === "debris_can") {
+    const parent = hit.object.userData.parentGroup;
+    if (parent) {
+      parent.visible = false;
+    }
+    if (!isPlayer2) {
+      p1DebrisCount++;
+      caption.textContent = "Picked up a Rusted Can. Press [G] to throw it and create a distraction noise.";
+    } else {
+      p2DebrisCount++;
+      caption.textContent = "Player 2 picked up a Rusted Can. Press [G] to throw it and create a distraction noise.";
+    }
+    addTaskLog("Picked up debris can.");
+    if (audioManager) audioManager.playSound("ui_select", { volume: 0.3 });
+    return;
+  }
 
   if (type === "door") {
     const door = hit.object.userData.parentDoor;
@@ -3872,6 +4033,44 @@ document.addEventListener("keydown", (event) => {
       debugInput.value = "";
     }
     return;
+  }
+
+  if (event.code === "KeyG") {
+    if (gameState === GameState.PLAYING && !debugConsoleOpen) {
+      event.preventDefault();
+      if (p1DebrisCount > 0) {
+        p1DebrisCount--;
+        const throwDist = 12.0;
+        const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
+        const landZ = THREE.MathUtils.clamp(camera.position.z + dir.z * throwDist, -47.8, 8);
+        activeNoiseEventZ = landZ;
+        noiseInvestigateTimer = 5.0;
+        if (audioManager) audioManager.playSound("debris_impact", { volume: 0.85 });
+        caption.textContent = "Aarav threw a Rusted Can. A loud clang echoes.";
+        addTaskLog("Player 1 threw rusted can.");
+      } else {
+        caption.textContent = "You have no cans to throw.";
+      }
+    }
+  }
+
+  if (event.code === "KeyH" && coopMode) {
+    if (gameState === GameState.PLAYING && !debugConsoleOpen) {
+      event.preventDefault();
+      if (p2DebrisCount > 0) {
+        p2DebrisCount--;
+        const throwDist = 12.0;
+        const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera2.quaternion);
+        const landZ = THREE.MathUtils.clamp(camera2.position.z + dir.z * throwDist, -47.8, 8);
+        activeNoiseEventZ = landZ;
+        noiseInvestigateTimer = 5.0;
+        if (audioManager) audioManager.playSound("debris_impact", { volume: 0.85 });
+        caption.textContent = "Rohan threw a Rusted Can. A loud clang echoes.";
+        addTaskLog("Player 2 threw rusted can.");
+      } else {
+        caption.textContent = "Player 2 has no cans to throw.";
+      }
+    }
   }
 
   // Graceful Escape/Inventory closure first

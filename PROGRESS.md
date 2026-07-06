@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 79/500**
+Commit counter: **Commit 80/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -82,3 +82,4 @@ Commit counter: **Commit 79/500**
 - **Commit 77/500**: Completed Phase 8 Tasks 89-95. Implemented Local Split-Screen Co-op multiplayer mode with dual viewport rendering, independent fear/battery HUD meters, shared keyboard/gamepad input partitioning, and target-switching ghost AI.
 - **Commit 78/500**: Completed Phase 9 Tasks 97-100. Implemented full WebXR Controller integration, including laser pointer meshes, world-matrix controller raycasting (inspectNearestVR), controller trigger flashlight events, and thumbstick locomotion navigation.
 - **Commit 79/500**: Completed Phase 10 Tasks 102-106. Implemented in-game Developer Cheat Console toggled via tilde key, console command parser (/tp, /god, /ib, /skip, /ghostspeed, /loadlevel), text log output, input focus overrides, and integrated cheat guards.
+- **Commit 80/500**: Completed Phase 11 Tasks 108-113. Implemented interactive Hiding spots (lockers/wardrobes) to avoid detection, pickable rusted debris cans, keybind shortcuts to throw cans, synthesized metallic clang Web Audio impacts, and updated Meera AI to route patrol target tracking to clang coordinates.

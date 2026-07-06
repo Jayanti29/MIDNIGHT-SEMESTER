@@ -7,6 +7,16 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] — Commits 61–78
 
+### Phase 11 — Hiding Spots & Distractions
+
+#### Added
+- 3D tall wooden locker/wardrobe meshes with interactive entry/exit mechanics
+- Pickable rusted cans placed throughout the hostel wing and laboratory
+- Key bindings to throw debris cans (G for Player 1, H for Player 2)
+- Procedurally synthesized metallic clang impact SFX using Web Audio
+- Meera AI behavior refactor to route patrol pathfinding to distraction noise impact coordinates
+- Auto-deactivation of target tracking when all players hide inside lockers
+
 ### Phase 10 — Developer Debug Console & Cheats
 
 #### Added

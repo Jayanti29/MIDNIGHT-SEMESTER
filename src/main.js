@@ -16,9 +16,12 @@ const batteryMeter2 = document.querySelector("#battery2-meter");
 const batteryPanelP1 = document.querySelector("#hud-p1 .hud-panel");
 const batteryPanelP2 = document.querySelector("#hud-p2 .hud-panel");
 const settingP1Name = document.querySelector("#setting-p1-name");
-const settingP1Color = document.querySelector("#setting-p1-color");
+const settingP1Model = document.querySelector("#setting-p1-model");
 const settingP2Name = document.querySelector("#setting-p2-name");
-const settingP2Color = document.querySelector("#setting-p2-color");
+const settingP2Model = document.querySelector("#setting-p2-model");
+const settingBrightness = document.querySelector("#setting-brightness");
+const polaroidImagePlaceholder = document.querySelector("#polaroid-image-placeholder");
+const polaroidCaption = document.querySelector("#polaroid-caption");
 const fearText = document.querySelector("#fear");
 const fearMeter = document.querySelector("#fear-meter");
 const fearText2 = document.querySelector("#fear2");
@@ -330,9 +333,10 @@ const collectedEvidence = new Set();
 const collectedBatteries = new Set();
 const readLoreNotes = new Set();
 let p1Name = localStorage.getItem("setting-p1-name") || "Aarav";
-let p1Color = localStorage.getItem("setting-p1-color") || "0xa87c5c";
+let p1Model = localStorage.getItem("setting-p1-model") || "Aarav";
 let p2Name = localStorage.getItem("setting-p2-name") || "Rohan";
-let p2Color = localStorage.getItem("setting-p2-color") || "0x3f5b7a";
+let p2Model = localStorage.getItem("setting-p2-model") || "Rohan";
+let screenBrightness = parseFloat(localStorage.getItem("setting-brightness") || "1.25");
 let xrSession = null;
 let activeLineTimer = 0;
 let introPlayed = false;
@@ -1326,6 +1330,57 @@ function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#
   return texture;
 }
 
+function createFlashlightCookie() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext("2d");
+
+  // SpotLight projection cookie: black is no light, white is full beam
+  ctx.fillStyle = "#000000";
+  ctx.fillRect(0, 0, 256, 256);
+
+  const grad = ctx.createRadialGradient(128, 128, 0, 128, 128, 120);
+  grad.addColorStop(0, "rgba(255, 255, 255, 1)");
+  grad.addColorStop(0.3, "rgba(255, 255, 255, 0.9)");
+  grad.addColorStop(0.6, "rgba(255, 255, 255, 0.6)");
+  grad.addColorStop(0.85, "rgba(255, 255, 255, 0.18)");
+  grad.addColorStop(1, "rgba(255, 255, 255, 0)");
+  
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  ctx.arc(128, 128, 128, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Lens aberration rings (Image 3 realistic projection)
+  ctx.strokeStyle = "rgba(0, 0, 0, 0.22)";
+  ctx.lineWidth = 4;
+  ctx.beginPath();
+  ctx.arc(128, 128, 52, 0, Math.PI * 2);
+  ctx.stroke();
+
+  ctx.strokeStyle = "rgba(0, 0, 0, 0.28)";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  ctx.arc(128, 128, 92, 0, Math.PI * 2);
+  ctx.stroke();
+
+  // Lens dust details
+  ctx.fillStyle = "rgba(0, 0, 0, 0.45)";
+  for (let i = 0; i < 40; i++) {
+    const x = 128 + (Math.random() - 0.5) * 160;
+    const y = 128 + (Math.random() - 0.5) * 160;
+    const r = Math.random() * 2 + 0.6;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+  }
+
+  const texture = new THREE.CanvasTexture(canvas);
+  texture.colorSpace = THREE.SRGBColorSpace;
+  return texture;
+}
+
 function createCheckerboardTexture() {
   const canvas = document.createElement("canvas");
   canvas.width = 512;
@@ -1680,7 +1735,28 @@ function createDoor({ side, z, label }) {
   const locked = label.includes("Room 32 left") || label.includes("Room 29 right");
   group.userData = { type: "door", open: false, side, label, locked };
 
-  const panel = new THREE.Mesh(new THREE.BoxGeometry(0.18, 2.35, 1.18), materials.darkWood);
+  // 1. Realistic Door Frame
+  const frameMat = new THREE.MeshStandardMaterial({ color: 0x221711, roughness: 0.85 });
+  const frameLeft = new THREE.Mesh(new THREE.BoxGeometry(0.24, 2.45, 0.06), frameMat);
+  frameLeft.position.set(0, 0, -0.61);
+  frameLeft.castShadow = true;
+  frameLeft.receiveShadow = true;
+  group.add(frameLeft);
+
+  const frameRight = new THREE.Mesh(new THREE.BoxGeometry(0.24, 2.45, 0.06), frameMat);
+  frameRight.position.set(0, 0, 0.61);
+  frameRight.castShadow = true;
+  frameRight.receiveShadow = true;
+  group.add(frameRight);
+
+  const frameTop = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.06, 1.28), frameMat);
+  frameTop.position.set(0, 1.2, 0);
+  frameTop.castShadow = true;
+  frameTop.receiveShadow = true;
+  group.add(frameTop);
+
+  // 2. Main Door Panel
+  const panel = new THREE.Mesh(new THREE.BoxGeometry(0.14, 2.32, 1.14), materials.darkWood);
   panel.name = `${label} panel`;
   panel.castShadow = true;
   panel.receiveShadow = true;
@@ -1688,19 +1764,46 @@ function createDoor({ side, z, label }) {
   tagInteractable(panel, "door", label);
   group.add(panel);
 
-  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.07, 16, 12), materials.brass);
+  // 3. Beveled Panel Trims (Wood carvings details)
+  const trimMat = new THREE.MeshStandardMaterial({ color: 0x140c07, roughness: 0.9 });
+  [[-0.075, 1], [0.075, -1]].forEach(([xOffset]) => {
+    [0.48, -0.48].forEach((yPos) => {
+      [-0.22, 0.22].forEach((zPos) => {
+        const trim = new THREE.Mesh(new THREE.BoxGeometry(0.015, 0.62, 0.32), trimMat);
+        trim.position.set(xOffset, yPos, zPos);
+        trim.castShadow = true;
+        group.add(trim);
+      });
+    });
+  });
+
+  // 4. Brass backing plate & Lever doorknob
+  const knobPlate = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.38, 0.08), materials.brass);
+  knobPlate.position.set(-direction * 0.1, -0.06, 0.4);
+  knobPlate.userData.parentDoor = group;
+  tagInteractable(knobPlate, "door", label);
+  group.add(knobPlate);
+
+  const knob = new THREE.Mesh(new THREE.SphereGeometry(0.06, 16, 12), materials.brass);
   knob.name = `${label} knob`;
-  knob.position.set(-direction * 0.12, -0.06, 0.36);
+  knob.position.set(-direction * 0.12, -0.06, 0.4);
   knob.userData.parentDoor = group;
   tagInteractable(knob, "door", label);
   group.add(knob);
+
+  const handleLever = new THREE.Mesh(new THREE.CylinderGeometry(0.018, 0.018, 0.22, 8), materials.brass);
+  handleLever.position.set(-direction * 0.12, -0.06, 0.48);
+  handleLever.rotation.x = Math.PI / 2;
+  handleLever.userData.parentDoor = group;
+  tagInteractable(handleLever, "door", label);
+  group.add(handleLever);
 
   const sign = addLabel(label.replace(" door", "").toUpperCase(), [direction * 3.48, 1.92, z], 0.16);
   sign.rotation.y = direction < 0 ? Math.PI / 2 : -Math.PI / 2;
 
   addToActiveLevel(group);
   doors.push(group);
-  interactables.push(panel, knob);
+  interactables.push(panel, knob, knobPlate, handleLever);
   return group;
 }
 
@@ -1763,23 +1866,51 @@ function createBookshelf(position, rotation = 0) {
   return group;
 }
 
-function createCharacter({ name, position, color, ghostly = false }) {
+function createCharacter({ name, position, color, ghostly = false, identity = "" }) {
   const group = new THREE.Group();
   group.name = name;
   group.position.set(...position);
 
+  let outfitColor = color;
+  let hairColor = 0x111111;
+  let capStyle = "none";
+  let glassesStyle = false;
+  let hairLength = "short";
+
+  if (!ghostly) {
+    if (identity === "Aarav") {
+      outfitColor = 0x243f5e; // Blue hoodie
+      hairLength = "short";
+    } else if (identity === "Priya") {
+      outfitColor = 0xd4af37; // Yellow jacket
+      hairLength = "long";
+    } else if (identity === "Kulkarni") {
+      outfitColor = 0x5a5a5a; // Grey tweed coat
+      hairColor = 0x8c8c8c; // Silver hair
+      glassesStyle = true;
+      hairLength = "short";
+    } else if (identity === "Rohan") {
+      outfitColor = 0x2f4c34; // Green windbreaker
+      hairLength = "short";
+    } else if (identity === "Sam") {
+      outfitColor = 0x56382a; // Leather brown jacket
+      capStyle = "baseball";
+      hairLength = "short";
+    }
+  }
+
   const material = new THREE.MeshStandardMaterial({
-    color,
+    color: outfitColor,
     roughness: 0.74,
     transparent: ghostly,
     opacity: ghostly ? 0.42 : 1,
-    emissive: ghostly ? color : 0x000000,
+    emissive: ghostly ? outfitColor : 0x000000,
     emissiveIntensity: ghostly ? 0.28 : 0
   });
 
   const shirtMat = material;
   const pantsMat = new THREE.MeshStandardMaterial({ color: 0x1f2630, roughness: 0.8 });
-  const hairMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+  const hairMat = new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.9 });
   const eyeMat = new THREE.MeshBasicMaterial({ color: ghostly ? 0xd02222 : 0x222222 });
 
   if (ghostly) {
@@ -1791,27 +1922,53 @@ function createCharacter({ name, position, color, ghostly = false }) {
 
     const body = new THREE.Mesh(new THREE.CapsuleGeometry(0.24, 0.6, 8, 16), material);
     body.position.y = 1.15;
+    body.rotation.z = 0.08;
+    body.rotation.x = 0.12;
     group.add(body);
 
     const head = new THREE.Mesh(new THREE.SphereGeometry(0.22, 24, 16), material);
     head.position.y = 1.7;
+    head.rotation.z = -0.36;
+    head.rotation.x = 0.24;
     group.add(head);
 
     // Glowing red eyes
-    const eyeGeo = new THREE.SphereGeometry(0.035, 8, 8);
+    const eyeGeo = new THREE.SphereGeometry(0.025, 8, 8);
     const leftEye = new THREE.Mesh(eyeGeo, new THREE.MeshBasicMaterial({ color: 0xb22822 }));
-    leftEye.position.set(-0.08, 1.74, 0.18);
+    leftEye.position.set(-0.08, 1.74, 0.16);
     group.add(leftEye);
     const rightEye = new THREE.Mesh(eyeGeo, new THREE.MeshBasicMaterial({ color: 0xb22822 }));
-    rightEye.position.set(0.08, 1.74, 0.18);
+    rightEye.position.set(0.08, 1.74, 0.16);
     group.add(rightEye);
+
+    // Gaping circular mouth hollow (Image 2 creature mouth!)
+    const mouthGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.08, 12);
+    const mouthMat = new THREE.MeshBasicMaterial({ color: 0x000000 });
+    const mouth = new THREE.Mesh(mouthGeo, mouthMat);
+    mouth.position.set(0, 1.62, 0.19);
+    mouth.rotation.x = Math.PI / 2;
+    group.add(mouth);
+
+    // Contorted arms (bent at unnatural angles!)
+    const armGeometry = new THREE.CapsuleGeometry(0.045, 0.62, 6, 10);
+    const leftArm = new THREE.Mesh(armGeometry, material);
+    leftArm.position.set(-0.35, 1.25, -0.1);
+    leftArm.rotation.set(-0.4, 0, -0.6);
+    group.add(leftArm);
+    
+    const rightArm = new THREE.Mesh(armGeometry, material);
+    rightArm.position.set(0.35, 1.35, 0.1);
+    rightArm.rotation.set(0.6, 0.3, 0.8);
+    group.add(rightArm);
 
     // Long hair framing the face (references 1 & 2 hair profile)
     const leftHair = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.72, 0.16), hairMat);
     leftHair.position.set(-0.19, 1.4, 0.06);
+    leftHair.rotation.z = -0.1;
     group.add(leftHair);
     const rightHair = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.72, 0.16), hairMat);
     rightHair.position.set(0.19, 1.4, 0.06);
+    rightHair.rotation.z = 0.1;
     group.add(rightHair);
     const backHair = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.72, 0.08), hairMat);
     backHair.position.set(0, 1.4, -0.16);
@@ -1868,10 +2025,49 @@ function createCharacter({ name, position, color, ghostly = false }) {
     rightEye.position.set(0.08, 1.74, 0.18);
     group.add(rightEye);
 
-    // Hair Cap
-    const cap = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.08, 0.26), hairMat);
-    cap.position.set(0, 1.9, 0.02);
-    group.add(cap);
+    // Glasses attachment (Kulkarni style!)
+    if (glassesStyle) {
+      const frameMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
+      const leftFrame = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.02), frameMat);
+      leftFrame.position.set(-0.08, 1.74, 0.19);
+      group.add(leftFrame);
+      const rightFrame = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.08, 0.02), frameMat);
+      rightFrame.position.set(0.08, 1.74, 0.19);
+      group.add(rightFrame);
+      const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.015, 0.015), frameMat);
+      bridge.position.set(0, 1.74, 0.19);
+      group.add(bridge);
+    }
+
+    // Hair details
+    if (hairLength === "long") {
+      // Long hair strands (Priya style!)
+      const leftHair = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.12), hairMat);
+      leftHair.position.set(-0.19, 1.45, 0.06);
+      group.add(leftHair);
+      const rightHair = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.12), hairMat);
+      rightHair.position.set(0.19, 1.45, 0.06);
+      group.add(rightHair);
+      const backHair = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.6, 0.06), hairMat);
+      backHair.position.set(0, 1.45, -0.14);
+      group.add(backHair);
+    }
+
+    if (capStyle === "baseball") {
+      // Baseball cap (Sam style!)
+      const capMat = new THREE.MeshStandardMaterial({ color: 0x243f5e, roughness: 0.8 });
+      const capDome = new THREE.Mesh(new THREE.SphereGeometry(0.24, 16, 12), capMat);
+      capDome.position.set(0, 1.84, 0);
+      group.add(capDome);
+      const capVisor = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.02, 0.14), capMat);
+      capVisor.position.set(0, 1.82, 0.22);
+      group.add(capVisor);
+    } else {
+      // Short hair cap
+      const cap = new THREE.Mesh(new THREE.BoxGeometry(0.26, 0.08, 0.26), hairMat);
+      cap.position.set(0, 1.9, 0.02);
+      group.add(cap);
+    }
 
     // Flashlight prop in right hand pointing forward
     const flashlightProp = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.25, 8), materials.brass);
@@ -1882,6 +2078,41 @@ function createCharacter({ name, position, color, ghostly = false }) {
 
   addToActiveLevel(group);
   return group;
+}
+
+function addSpiderLilies() {
+  const lilyMat = new THREE.MeshStandardMaterial({ color: 0xb21818, roughness: 0.9, side: THREE.DoubleSide });
+  const lilyGeo = new THREE.BoxGeometry(0.08, 0.01, 0.08); // petal cross
+  
+  // Scatter lilies along the Level 1 corridor corners (x = -3.22 or 3.22, z between 12 and -48)
+  for (let i = 0; i < 75; i++) {
+    const side = Math.random() > 0.5 ? -3.22 : 3.22;
+    const z = Math.random() * 60 - 48;
+    
+    const cluster = new THREE.Group();
+    cluster.position.set(side + (Math.random() - 0.5) * 0.35, 0.015, z);
+    
+    // Draw cross star-shaped petals
+    const petalCount = Math.floor(Math.random() * 3) + 3;
+    for (let p = 0; p < petalCount; p++) {
+      const petal = new THREE.Mesh(lilyGeo, lilyMat);
+      petal.rotation.y = (p * Math.PI) / petalCount;
+      petal.rotation.x = (Math.random() - 0.5) * 0.2;
+      petal.position.x = (Math.random() - 0.5) * 0.08;
+      petal.position.z = (Math.random() - 0.5) * 0.08;
+      cluster.add(petal);
+    }
+    
+    // Green stem
+    const stem = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.005, 0.005, 0.08, 4),
+      new THREE.MeshStandardMaterial({ color: 0x224422 })
+    );
+    stem.position.y = 0.04;
+    cluster.add(stem);
+    
+    addToActiveLevel(cluster);
+  }
 }
 
 function buildSegmentedWall(x, side) {
@@ -1953,9 +2184,9 @@ function buildCorridor() {
   createStudyTable([-1.1, 0, -29], -0.3);
   buildDormRoom();
   buildDocuments();
-  scene.userData.kulkarni = createCharacter({ name: "Professor Kulkarni", position: [-2.4, 0, -15.5], color: 0x3f5f69 });
+  scene.userData.kulkarni = createCharacter({ name: "Professor Kulkarni", position: [-2.4, 0, -15.5], color: 0xffffff, identity: "Kulkarni" });
   registerCollider(scene.userData.kulkarni);
-  scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [2.6, 0, -34.5], color: 0xc9d5cf, ghostly: true });
+  scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [2.6, 0, -34.5], color: 0xc9d5cf, ghostly: true, identity: "Meera" });
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 
   // Basement Gate (Visual entry point for winning the game)
@@ -1992,6 +2223,7 @@ function buildCorridor() {
   buildLocker([2.2, 0, -32.0], "Corridor Locker 2");
   buildDebrisItem([-1.8, 0, -14.0], "can_1");
   buildDebrisItem([1.8, 0, -28.0], "can_2");
+  addSpiderLilies(); // Red foliage growth on the floor (Image 3)
 }
 
 function clearGroup(group) {
@@ -2180,12 +2412,13 @@ function buildLevel2() {
     box("lamp glow", [0.6, 0.03, 0.22], [0, 2.5, z], materials.emission, false, false);
   }
   
-  scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [0, 0, -32], color: 0xc9d5cf, ghostly: true });
+  scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [0, 0, -32], color: 0xc9d5cf, ghostly: true, identity: "Meera" });
   scene.userData.meeraCharacter.visible = false;
 
-  samCharacter = createCharacter({ name: "Sam", position: [1.2, 0, 7.5], color: 0xa87c5c });
+  samCharacter = createCharacter({ name: "Sam", position: [1.2, 0, 7.5], color: 0xffffff, identity: "Sam" });
   const samLight = new THREE.SpotLight(0xffecc2, 2.5, 14, Math.PI / 6, 0.45, 1.0);
   samLight.castShadow = true;
+  samLight.map = createFlashlightCookie();
   addToActiveLevel(samLight);
   addToActiveLevel(samLight.target);
   samFlashlight = samLight;
@@ -2438,6 +2671,7 @@ function addAtmosphere() {
   const flashlight = new THREE.SpotLight(0xffe0a4, 5.5, 30, Math.PI / 6.5, 0.6, 1.0);
   flashlight.position.set(0, 0, 0);
   flashlight.target.position.set(0, 0, -1);
+  flashlight.map = createFlashlightCookie(); // Project realistic lens dust cookie
   camera.add(flashlight);
   camera.add(flashlight.target);
   scene.add(camera);
@@ -3125,7 +3359,7 @@ function updateState(delta) {
   if (!meeraFinalEventPlayed && inspected === 3 && camera.position.z < -24.0 && gameState === GameState.PLAYING) {
     meeraFinalEventPlayed = true;
     activeApparitionWalk = true;
-    apparitionGhost = createCharacter({ name: "MeeraApparition", position: [-3.2, 0, -31.5], color: 0x9ed2c2, ghostly: true });
+    apparitionGhost = createCharacter({ name: "MeeraApparition", position: [-3.2, 0, -31.5], color: 0x9ed2c2, ghostly: true, identity: "Meera" });
     scene.add(apparitionGhost);
     apparitionGhost.rotation.y = Math.PI / 2; // looking right
     playWhisper();
@@ -4003,20 +4237,21 @@ function setupPlayer2() {
   camera2.layers.enable(0);
   camera2.layers.enable(2);
 
-  player2Character = createCharacter({ name: p2Name, position: [0.8, 0, 8], color: parseInt(p2Color) });
+  player2Character = createCharacter({ name: p2Name, position: [0.8, 0, 8], color: 0xffffff, identity: p2Model });
   player2Character.layers.set(1);
   player2Character.traverse(child => {
     if (child.isMesh) child.layers.set(1);
   });
 
-  scene.userData.player1Character = createCharacter({ name: p1Name, position: [0, 0, 8], color: parseInt(p1Color) });
+  scene.userData.player1Character = createCharacter({ name: p1Name, position: [0, 0, 8], color: 0xffffff, identity: p1Model });
   scene.userData.player1Character.layers.set(2);
   scene.userData.player1Character.traverse(child => {
     if (child.isMesh) child.layers.set(2);
   });
 
-  player2Flashlight = new THREE.SpotLight(0xffecc2, 3.4, 18, Math.PI / 6, 0.45, 1.0);
+  player2Flashlight = new THREE.SpotLight(0xffecc2, 5.5, 30, Math.PI / 6.5, 0.6, 1.0);
   player2Flashlight.castShadow = true;
+  player2Flashlight.map = createFlashlightCookie();
   camera2.add(player2Flashlight);
   camera2.add(player2Flashlight.target);
   
@@ -4745,19 +4980,51 @@ settingInvertMouse.addEventListener("change", (event) => {
 settingP1Name?.addEventListener("input", (event) => {
   p1Name = event.target.value || "Aarav";
   localStorage.setItem("setting-p1-name", p1Name);
+  updateDossierPreview();
 });
-settingP1Color?.addEventListener("change", (event) => {
-  p1Color = event.target.value;
-  localStorage.setItem("setting-p1-color", p1Color);
+settingP1Model?.addEventListener("change", (event) => {
+  p1Model = event.target.value;
+  localStorage.setItem("setting-p1-model", p1Model);
+  // Auto update default names
+  if (settingP1Name && (settingP1Name.value === "Aarav" || settingP1Name.value === "Priya" || settingP1Name.value === "Prof. Kulkarni")) {
+    p1Name = p1Model === "Kulkarni" ? "Prof. Kulkarni" : p1Model;
+    settingP1Name.value = p1Name;
+    localStorage.setItem("setting-p1-name", p1Name);
+  }
+  updateDossierPreview();
 });
 settingP2Name?.addEventListener("input", (event) => {
   p2Name = event.target.value || "Rohan";
   localStorage.setItem("setting-p2-name", p2Name);
 });
-settingP2Color?.addEventListener("change", (event) => {
-  p2Color = event.target.value;
-  localStorage.setItem("setting-p2-color", p2Color);
+settingP2Model?.addEventListener("change", (event) => {
+  p2Model = event.target.value;
+  localStorage.setItem("setting-p2-model", p2Model);
+  if (settingP2Name && (settingP2Name.value === "Rohan" || settingP2Name.value === "Sam" || settingP2Name.value === "Priya")) {
+    p2Name = p2Model;
+    settingP2Name.value = p2Name;
+    localStorage.setItem("setting-p2-name", p2Name);
+  }
 });
+settingBrightness?.addEventListener("input", (event) => {
+  screenBrightness = parseFloat(event.target.value);
+  localStorage.setItem("setting-brightness", String(screenBrightness));
+  renderer.toneMappingExposure = screenBrightness;
+  caption.textContent = `Screen Brightness (Exposure): ${Math.round(screenBrightness * 80)}%`;
+});
+
+function updateDossierPreview() {
+  if (!polaroidImagePlaceholder || !polaroidCaption) return;
+  polaroidCaption.textContent = p1Name;
+  if (p1Model === "Aarav") {
+    polaroidImagePlaceholder.textContent = "👨‍🎓";
+  } else if (p1Model === "Priya") {
+    polaroidImagePlaceholder.textContent = "👩‍🎓";
+  } else if (p1Model === "Kulkarni") {
+    polaroidImagePlaceholder.textContent = "👨‍½"; // Grey hair professor symbol representation
+    polaroidImagePlaceholder.innerHTML = "<span style='font-size: 2.2rem;'>👨‍🏫</span>";
+  }
+}
 
 closeInventory.addEventListener("click", toggleInventory);
 restartButton.addEventListener("click", () => {
@@ -4825,9 +5092,14 @@ if (savedInvertMouse !== null) {
 }
 
 if (settingP1Name) settingP1Name.value = p1Name;
-if (settingP1Color) settingP1Color.value = p1Color;
+if (settingP1Model) settingP1Model.value = p1Model;
 if (settingP2Name) settingP2Name.value = p2Name;
-if (settingP2Color) settingP2Color.value = p2Color;
+if (settingP2Model) settingP2Model.value = p2Model;
+if (settingBrightness) {
+  settingBrightness.value = screenBrightness;
+  renderer.toneMappingExposure = screenBrightness;
+}
+updateDossierPreview();
 
 window.addEventListener("resize", () => {
   const aspect = window.innerWidth / window.innerHeight;

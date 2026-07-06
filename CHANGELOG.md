@@ -15,9 +15,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Red spider lily flower clusters (with green stems and crimson petal crosses) scattered along the Level 1 corridor corners.
 - Contorted limbs (twisted head/neck and arm angles) and gaping circular mouth cavity on Meera the ghost model.
 - Flashlight SpotLight projection cookie overlays, projecting dust noise and lens ring details on walls.
+- Dynamic animated running window raindrops texture mapping on all hostel corridor glass panes.
+- Real-time lightning flash fog illumination, flickering the global fog color to pale blue when lightning flashes.
 
 ### Changed
 - Integrated flashlight cookies and brightness ranges across player, player 2, and Sam flashlights.
+- Shifted unreleased range to commits 61-87.
 
 ## [0.2.0-advanced] — 2026-07-06
 
@@ -36,7 +39,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Operations Terminal lock check: corrected check to count read lore notes (out of 8) instead of primary evidence files.
 - Scoreboard lore count: display environmental lore note collections out of 8 instead of 5.
 
-## [Unreleased] — Commits 61–86
+## [Unreleased] — Commits 61–87
 
 ### Phase 15 — a11y Accessibility & Comfort Auditing
 

@@ -4502,6 +4502,88 @@ function executeCommand(cmdStr) {
 }
 
 /**
+ * AnimationStateMachine — shared state machine for all humanoid characters.
+ * Owns: current state name, transition blend weight, and bone rotation targets.
+ * Usage: new AnimationStateMachine(humanoidGroup).setState("walk")
+ */
+class AnimationStateMachine {
+  static STATES = ["idle", "walk", "run", "reach", "hide", "death"];
+
+  constructor(humanoid) {
+    this.h = humanoid;
+    this.state = "idle";
+    this._blend = 0;
+    this._time = 0;
+  }
+
+  setState(newState) {
+    if (!AnimationStateMachine.STATES.includes(newState)) return;
+    if (this.state !== newState) {
+      this.state = newState;
+      this._blend = 0;
+    }
+  }
+
+  /** Call once per frame. dt = delta seconds, time = elapsed seconds */
+  update(dt, time) {
+    this._time = time;
+    this._blend = Math.min(1, this._blend + dt * 6); // 6 = fast crossfade
+    const d = this.h.userData;
+    if (!d.hips) return;
+
+    switch (this.state) {
+      case "walk": {
+        const c = time * 6.5;
+        d.leftLeg.rotation.x = Math.sin(c) * 0.42;
+        d.rightLeg.rotation.x = -Math.sin(c) * 0.42;
+        if (d.leftArm) d.leftArm.rotation.x = -Math.sin(c) * 0.28;
+        if (d.rightArm) d.rightArm.rotation.x = Math.sin(c) * 0.28;
+        d.hips.position.y = 0.9 + Math.abs(Math.sin(c * 2)) * 0.04;
+        break;
+      }
+      case "run": {
+        const c = time * 9.5;
+        d.leftLeg.rotation.x = Math.sin(c) * 0.58;
+        d.rightLeg.rotation.x = -Math.sin(c) * 0.58;
+        if (d.leftArm) d.leftArm.rotation.x = -Math.sin(c) * 0.42;
+        if (d.rightArm) d.rightArm.rotation.x = Math.sin(c) * 0.42;
+        d.hips.position.y = 0.9 + Math.abs(Math.sin(c * 2)) * 0.06;
+        break;
+      }
+      case "reach": {
+        if (d.leftArm) d.leftArm.rotation.x = -0.9;
+        if (d.rightArm) d.rightArm.rotation.x = -0.9;
+        d.leftLeg.rotation.x = 0;
+        d.rightLeg.rotation.x = 0;
+        d.hips.position.y = 0.9;
+        break;
+      }
+      case "hide": {
+        d.hips.position.y = 0.42;
+        d.leftLeg.rotation.x = -0.8;
+        d.rightLeg.rotation.x = -0.8;
+        if (d.spine) d.spine.rotation.x = 0.35;
+        break;
+      }
+      case "death": {
+        d.hips.position.y = 0.1;
+        d.hips.rotation.z = Math.PI / 2;
+        d.leftLeg.rotation.x = 0;
+        d.rightLeg.rotation.x = 0;
+        break;
+      }
+      default: { // idle
+        d.hips.position.y = 0.9 + Math.sin(time * 1.5) * 0.015;
+        d.leftLeg.rotation.x = 0;
+        d.rightLeg.rotation.x = 0;
+        if (d.leftArm) d.leftArm.rotation.z = 0.08 + Math.sin(time * 1.5) * 0.02;
+        if (d.rightArm) d.rightArm.rotation.z = -0.08 - Math.sin(time * 1.5) * 0.02;
+      }
+    }
+  }
+}
+
+/**
  * updateMeeraAnimations — Meera Iyer (Antagonist) Animation State
  *
  * Deliberately "off" timing from the player walk cycle:

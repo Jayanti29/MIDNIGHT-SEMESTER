@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 101/500**
+Commit counter: **Commit 102/500**
 
 ## Commits Log
+- **Commit 102/500**: Added AnimationStateMachine class — shared idle/walk/run/reach/hide/death transitions for all characters.
 - **Commit 101/500**: Added updateMeeraAnimations — lurching patrol, reaching chase, asymmetric idle sway for antagonist.
 - **Commit 100/500**: Added Continue Case button to main menu with localStorage character restore — no re-prompt.
 - **Commit 99/500**: Wired p1OutfitColor and p1HairStyle into solo player character spawn inside startGame.

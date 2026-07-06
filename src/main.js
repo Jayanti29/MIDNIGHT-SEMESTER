@@ -17,6 +17,16 @@ const fearText = document.querySelector("#fear");
 const fearMeter = document.querySelector("#fear-meter");
 const fearText2 = document.querySelector("#fear2");
 const fearMeter2 = document.querySelector("#fear2-meter");
+const noiseP1Text = document.querySelector("#noise-p1");
+const noiseP1Meter = document.querySelector("#noise-p1-meter");
+const breathP1Panel = document.querySelector("#breath-p1-panel");
+const breathP1Text = document.querySelector("#breath-p1-text");
+const breathP1Meter = document.querySelector("#breath-p1-meter");
+const noiseP2Text = document.querySelector("#noise-p2");
+const noiseP2Meter = document.querySelector("#noise-p2-meter");
+const breathP2Panel = document.querySelector("#breath-p2-panel");
+const breathP2Text = document.querySelector("#breath-p2-text");
+const breathP2Meter = document.querySelector("#breath-p2-meter");
 const debugConsole = document.querySelector("#debug-console");
 const debugInput = document.querySelector("#debug-input");
 const debugOutput = document.querySelector("#debug-output");
@@ -358,6 +368,15 @@ let p1DebrisCount = 0;
 let p2DebrisCount = 0;
 let activeNoiseEventZ = null;
 let noiseInvestigateTimer = 0;
+let isHoldingBreath = false;
+let isHoldingBreath2 = false;
+let p1BreathStamina = 100;
+let p2BreathStamina = 100;
+let lastPlayer1LockerInspected = null;
+let lastPlayer2LockerInspected = null;
+let lockerAlertState = false;
+let lockerTargetToInspect = null;
+let meeraLockerSearchTimer = 0;
 let vrController1 = null;
 let vrController2 = null;
 let vrControllerGrip1 = null;
@@ -2388,6 +2407,103 @@ function updateState(delta) {
     triggerBlackoutSequence();
   }
 
+  // Phase 12 - Hiding Spot Breath Simulation & Noise Level Calculations
+  if (gameState === GameState.PLAYING) {
+    if (isPlayerHidden) {
+      if (breathP1Panel) breathP1Panel.style.display = "flex";
+      if (keys.has("Space")) {
+        isHoldingBreath = true;
+        p1BreathStamina = Math.max(0, p1BreathStamina - delta * 24);
+        fear = Math.max(0, fear - delta * 4);
+      } else {
+        isHoldingBreath = false;
+        p1BreathStamina = Math.min(100, p1BreathStamina + delta * 18);
+        if (scene.userData.meeraCharacter && !godModeActive) {
+          const distToMeera = camera.position.distanceTo(scene.userData.meeraCharacter.position);
+          if (distToMeera < 8.0) {
+            fear = Math.min(100, fear + delta * 8.5);
+          }
+        }
+      }
+      
+      if (p1BreathStamina <= 0) {
+        isHoldingBreath = false;
+        activeNoiseEventZ = camera.position.z;
+        noiseInvestigateTimer = 6.0;
+        caption.textContent = "Aarav gasped for air! The ghost heard you!";
+        addTaskLog("Gasp for air gave away hiding spot!");
+        p1BreathStamina = 20;
+        if (audioManager) audioManager.playSound("jumpscare_stinger", { volume: 0.5 });
+      }
+    } else {
+      if (breathP1Panel) breathP1Panel.style.display = "none";
+      isHoldingBreath = false;
+      p1BreathStamina = 100;
+    }
+    if (breathP1Text) breathP1Text.textContent = `${Math.round(p1BreathStamina)}%`;
+    if (breathP1Meter) breathP1Meter.value = p1BreathStamina;
+
+    if (coopMode && camera2) {
+      if (isPlayer2Hidden) {
+        if (breathP2Panel) breathP2Panel.style.display = "flex";
+        if (player2Keys.has("Period")) {
+          isHoldingBreath2 = true;
+          p2BreathStamina = Math.max(0, p2BreathStamina - delta * 24);
+          fear2 = Math.max(0, fear2 - delta * 4);
+        } else {
+          isHoldingBreath2 = false;
+          p2BreathStamina = Math.min(100, p2BreathStamina + delta * 18);
+          if (scene.userData.meeraCharacter && !godModeActive) {
+            const distToMeera2 = camera2.position.distanceTo(scene.userData.meeraCharacter.position);
+            if (distToMeera2 < 8.0) {
+              fear2 = Math.min(100, fear2 + delta * 8.5);
+            }
+          }
+        }
+        
+        if (p2BreathStamina <= 0) {
+          isHoldingBreath2 = false;
+          activeNoiseEventZ = camera2.position.z;
+          noiseInvestigateTimer = 6.0;
+          caption.textContent = "Rohan gasped for air! The ghost heard you!";
+          addTaskLog("Player 2 gasped for air!");
+          p2BreathStamina = 20;
+          if (audioManager) audioManager.playSound("jumpscare_stinger", { volume: 0.5 });
+        }
+      } else {
+        if (breathP2Panel) breathP2Panel.style.display = "none";
+        isHoldingBreath2 = false;
+        p2BreathStamina = 100;
+      }
+      if (breathP2Text) breathP2Text.textContent = `${Math.round(p2BreathStamina)}%`;
+      if (breathP2Meter) breathP2Meter.value = p2BreathStamina;
+    }
+
+    let p1Noise = 6;
+    if (isPlayerHidden) {
+      p1Noise = isHoldingBreath ? 2 : 12;
+    } else {
+      const isP1Moving = Number(keys.has("KeyW")) - Number(keys.has("KeyS")) !== 0 || Number(keys.has("KeyD")) - Number(keys.has("KeyA")) !== 0;
+      const isP1Sprinting = keys.has("ShiftLeft") && isP1Moving && stamina > 0 && !sprintExhausted;
+      p1Noise = isP1Sprinting ? 85 : (isP1Moving ? 35 : 6);
+    }
+    if (noiseP1Text) noiseP1Text.textContent = `${Math.round(p1Noise)}%`;
+    if (noiseP1Meter) noiseP1Meter.value = p1Noise;
+
+    if (coopMode) {
+      let p2Noise = 6;
+      if (isPlayer2Hidden) {
+        p2Noise = isHoldingBreath2 ? 2 : 12;
+      } else {
+        const isP2Moving = Number(player2Keys.has("ArrowUp")) - Number(player2Keys.has("ArrowDown")) !== 0 || Number(player2Keys.has("ArrowLeft")) - Number(player2Keys.has("ArrowRight")) !== 0;
+        const isP2Sprinting = player2Keys.has("ShiftRight") && isP2Moving && stamina2 > 0 && !sprintExhausted2;
+        p2Noise = isP2Sprinting ? 85 : (isP2Moving ? 35 : 6);
+      }
+      if (noiseP2Text) noiseP2Text.textContent = `${Math.round(p2Noise)}%`;
+      if (noiseP2Meter) noiseP2Meter.value = p2Noise;
+    }
+  }
+
   if (flashlightOn && !infiniteBatteryActive) battery = Math.max(0, battery - delta * 1.15);
   if (battery <= 0 && flashlightOn) setFlashlight(false);
   
@@ -2530,95 +2646,112 @@ function updateState(delta) {
     }
     
     if (meeraState !== AiState.INACTIVE) {
-      // Revert to patrol if all players hide during a chase
-      if (!targetCamera && meeraState === AiState.CHASE) {
-        meeraState = AiState.PATROL;
-        addTaskLog("Threat lost visual track of targets.");
-      }
-
-      if (targetCamera) {
-        meera.lookAt(targetCamera.position.x, meera.position.y, targetCamera.position.z);
-      }
-      
-      const targetFlashlightOn = targetCamera ? (targetIsP2 ? flashlightOn2 : flashlightOn) : false;
-      const targetWantsSprint = targetCamera ? (targetIsP2 ? player2Keys.has("ShiftRight") : keys.has("ShiftLeft")) : false;
-      const targetSprintExhausted = targetCamera ? (targetIsP2 ? sprintExhausted2 : sprintExhausted) : false;
-      const playerDetected = targetCamera && ((targetFlashlightOn && targetDist < 15) || (targetDist < 7) || (targetSprintExhausted === false && targetWantsSprint && targetDist < 11));
-      
-      if (playerDetected && meeraState === AiState.PATROL) {
-        meeraState = AiState.CHASE;
-        playJumpscareStinger();
-        addTaskLog("Warning: Threat is pursuing you!");
-      }
-      
-      if (meeraState === AiState.PATROL) {
-        meeraSpeed = 1.2 * meeraSpeedMultiplier;
-        if (activeNoiseEventZ !== null) {
-          const investigateDir = Math.sign(activeNoiseEventZ - meera.position.z);
-          meera.position.z += investigateDir * meeraSpeed * delta;
-          meera.lookAt(0, meera.position.y, activeNoiseEventZ);
-          
-          noiseInvestigateTimer -= delta;
-          if (noiseInvestigateTimer <= 0 || Math.abs(meera.position.z - activeNoiseEventZ) < 0.5) {
-            activeNoiseEventZ = null;
-          }
-        } else {
-          meera.position.z += meeraPatrolDir * meeraSpeed * delta;
-          const zMin = currentLevel === 1 ? -45 : -35;
-          const zMax = currentLevel === 1 ? -16 : 8;
-          if (meera.position.z < zMin) {
-            meeraPatrolDir = 1;
-          } else if (meera.position.z > zMax) {
-            meeraPatrolDir = -1;
-          }
-        }
-        meera.position.x = THREE.MathUtils.lerp(meera.position.x, 0, delta * 3);
-      } else if (meeraState === AiState.CHASE && targetCamera) {
-        meeraSpeed = ((currentLevel === 2 ? 1.48 : 1.6) + (targetFear / 160)) * meeraSpeedMultiplier;
-        const toPlayer = new THREE.Vector3().subVectors(targetCamera.position, meera.position);
-        toPlayer.y = 0;
-        toPlayer.normalize();
-        meera.position.addScaledVector(toPlayer, meeraSpeed * delta);
+      if (lockerAlertState && lockerTargetToInspect) {
+        meeraSpeed = 1.65 * meeraSpeedMultiplier;
+        meera.lookAt(lockerTargetToInspect.position.x, meera.position.y, lockerTargetToInspect.position.z);
+        const toLocker = new THREE.Vector3().subVectors(lockerTargetToInspect.position, meera.position);
+        toLocker.y = 0;
+        const distToLocker = toLocker.length();
+        toLocker.normalize();
+        meera.position.addScaledVector(toLocker, meeraSpeed * delta);
         
-        if (targetIsP2) {
-          if (!godModeActive) fear2 = Math.min(100, fear2 + delta * 3.6);
-        } else {
-          if (!godModeActive) fear = Math.min(100, fear + delta * 3.6);
+        if (distToLocker < 1.45 && gameState === GameState.PLAYING && !godModeActive) {
+          lockerAlertState = false;
+          lockerTargetToInspect = null;
+          if (audioManager) audioManager.playSound("jumpscare_stinger", { volume: 1.0 });
+          triggerGameOver(coopMode ? "A player was caught by Meera inside the locker." : "Meera ripped open the locker door. Hiding could not save Aarav.");
         }
-        
-        if (targetDist > 18 && currentLevel === 1) {
+      } else {
+        // Revert to patrol if all players hide during a chase
+        if (!targetCamera && meeraState === AiState.CHASE) {
           meeraState = AiState.PATROL;
-          addTaskLog("Lost the ghost threat.");
+          addTaskLog("Threat lost visual track of targets.");
         }
-      }
-      
-      doors.forEach((door) => {
-        if (!door.userData.open) {
-          const dx = meera.position.x - door.position.x;
-          const dz = meera.position.z - door.position.z;
-          const dist2D = Math.sqrt(dx * dx + dz * dz);
-          if (dist2D < 1.6) {
-            door.userData.open = true;
-            door.userData.locked = false;
-            playDoorCreak(door, true);
-            caption.textContent = "A door creaks open behind the ghost's cold wind...";
-            addTaskLog(`Ghost opened closed door: ${door.userData.label}.`);
+
+        if (targetCamera) {
+          meera.lookAt(targetCamera.position.x, meera.position.y, targetCamera.position.z);
+        }
+        
+        const targetFlashlightOn = targetCamera ? (targetIsP2 ? flashlightOn2 : flashlightOn) : false;
+        const targetWantsSprint = targetCamera ? (targetIsP2 ? player2Keys.has("ShiftRight") : keys.has("ShiftLeft")) : false;
+        const targetSprintExhausted = targetCamera ? (targetIsP2 ? sprintExhausted2 : sprintExhausted) : false;
+        const playerDetected = targetCamera && ((targetFlashlightOn && targetDist < 15) || (targetDist < 7) || (targetSprintExhausted === false && targetWantsSprint && targetDist < 11));
+        
+        if (playerDetected && meeraState === AiState.PATROL) {
+          meeraState = AiState.CHASE;
+          playJumpscareStinger();
+          addTaskLog("Warning: Threat is pursuing you!");
+        }
+        
+        if (meeraState === AiState.PATROL) {
+          meeraSpeed = 1.2 * meeraSpeedMultiplier;
+          if (activeNoiseEventZ !== null) {
+            const investigateDir = Math.sign(activeNoiseEventZ - meera.position.z);
+            meera.position.z += investigateDir * meeraSpeed * delta;
+            meera.lookAt(0, meera.position.y, activeNoiseEventZ);
+            
+            noiseInvestigateTimer -= delta;
+            if (noiseInvestigateTimer <= 0 || Math.abs(meera.position.z - activeNoiseEventZ) < 0.5) {
+              activeNoiseEventZ = null;
+            }
+          } else {
+            meera.position.z += meeraPatrolDir * meeraSpeed * delta;
+            const zMin = currentLevel === 1 ? -45 : -35;
+            const zMax = currentLevel === 1 ? -16 : 8;
+            if (meera.position.z < zMin) {
+              meeraPatrolDir = 1;
+            } else if (meera.position.z > zMax) {
+              meeraPatrolDir = -1;
+            }
+          }
+          meera.position.x = THREE.MathUtils.lerp(meera.position.x, 0, delta * 3);
+        } else if (meeraState === AiState.CHASE && targetCamera) {
+          meeraSpeed = ((currentLevel === 2 ? 1.48 : 1.6) + (targetFear / 160)) * meeraSpeedMultiplier;
+          const toPlayer = new THREE.Vector3().subVectors(targetCamera.position, meera.position);
+          toPlayer.y = 0;
+          toPlayer.normalize();
+          meera.position.addScaledVector(toPlayer, meeraSpeed * delta);
+          
+          if (targetIsP2) {
+            if (!godModeActive) fear2 = Math.min(100, fear2 + delta * 3.6);
+          } else {
+            if (!godModeActive) fear = Math.min(100, fear + delta * 3.6);
+          }
+          
+          if (targetDist > 18 && currentLevel === 1) {
+            meeraState = AiState.PATROL;
+            addTaskLog("Lost the ghost threat.");
           }
         }
-      });
-      
-      if (targetCamera && targetDist < 4.5 && meeraState === AiState.CHASE) {
-        if (targetIsP2) {
-          if (!godModeActive) fear2 = Math.min(100, fear2 + delta * 24);
-        } else {
-          if (!godModeActive) fear = Math.min(100, fear + delta * 24);
+        
+        doors.forEach((door) => {
+          if (!door.userData.open) {
+            const dx = meera.position.x - door.position.x;
+            const dz = meera.position.z - door.position.z;
+            const dist2D = Math.sqrt(dx * dx + dz * dz);
+            if (dist2D < 1.6) {
+              door.userData.open = true;
+              door.userData.locked = false;
+              playDoorCreak(door, true);
+              caption.textContent = "A door creaks open behind the ghost's cold wind...";
+              addTaskLog(`Ghost opened closed door: ${door.userData.label}.`);
+            }
+          }
+        });
+        
+        if (targetCamera && targetDist < 4.5 && meeraState === AiState.CHASE) {
+          if (targetIsP2) {
+            if (!godModeActive) fear2 = Math.min(100, fear2 + delta * 24);
+          } else {
+            if (!godModeActive) fear = Math.min(100, fear + delta * 24);
+          }
+          shakeOffset.x = (Math.random() - 0.5) * 0.045;
+          shakeOffset.y = (Math.random() - 0.5) * 0.045;
         }
-        shakeOffset.x = (Math.random() - 0.5) * 0.045;
-        shakeOffset.y = (Math.random() - 0.5) * 0.045;
-      }
-      
-      if (targetCamera && targetDist < 1.15 && gameState === GameState.PLAYING && !godModeActive) {
-        triggerGameOver(targetIsP2 ? "Rohan was caught by Meera's presence." : "Aarav was caught by Meera's presence.");
+        
+        if (targetCamera && targetDist < 1.15 && gameState === GameState.PLAYING && !godModeActive) {
+          triggerGameOver(targetIsP2 ? "Rohan was caught by Meera's presence." : "Aarav was caught by Meera's presence.");
+        }
       }
     }
   }
@@ -2928,6 +3061,15 @@ function inspectObject(hit, isPlayer2 = false) {
         caption.textContent = "You are hidden inside the locker. Press [E] to step out.";
         addTaskLog("Entered hiding spot.");
         setFlashlight(false);
+
+        if (scene.userData.meeraCharacter && meeraState === AiState.CHASE) {
+          const distToMeera = camera.position.distanceTo(scene.userData.meeraCharacter.position);
+          if (distToMeera < 12.0) {
+            lockerAlertState = true;
+            lockerTargetToInspect = hit.object.parent;
+            addTaskLog("Ghost saw you hide inside the locker!");
+          }
+        }
       } else {
         isPlayerHidden = false;
         camera.position.copy(player1PreLockerPos || new THREE.Vector3(camera.position.x, 1.7, camera.position.z + 0.6));
@@ -2942,6 +3084,15 @@ function inspectObject(hit, isPlayer2 = false) {
         caption.textContent = "Player 2 is hidden inside the locker. Press [ShiftRight] to step out.";
         addTaskLog("Player 2 entered hiding spot.");
         setFlashlight2(false);
+
+        if (scene.userData.meeraCharacter && meeraState === AiState.CHASE) {
+          const distToMeera2 = camera2.position.distanceTo(scene.userData.meeraCharacter.position);
+          if (distToMeera2 < 12.0) {
+            lockerAlertState = true;
+            lockerTargetToInspect = hit.object.parent;
+            addTaskLog("Ghost saw Player 2 hide inside the locker!");
+          }
+        }
       } else {
         isPlayer2Hidden = false;
         camera2.position.copy(player2PreLockerPos || new THREE.Vector3(camera2.position.x, 1.7, camera2.position.z + 0.6));

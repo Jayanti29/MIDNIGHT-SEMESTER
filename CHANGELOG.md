@@ -7,6 +7,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] — Commits 61–78
 
+### Phase 12 — Sound Wave UI & Advanced Search AI
+
+#### Added
+- P1/P2 Noise level meters on HUD panels mapping noise from standing, walking, running, and sprinting
+- Hold Breath locker stamina mechanics (SPACE for Player 1, Period for Player 2) to reduce fear levels inside hiding cabinets
+- Exhaustion gasp noise events when holding breath stamina is depleted, alerting the ghost
+- Ghost search visual memory alert (`lockerAlertState`): Meera pursues players directly inside lockers if she spots them hiding
+
 ### Phase 11 — Hiding Spots & Distractions
 
 #### Added

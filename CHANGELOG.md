@@ -7,6 +7,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased] — Commits 61–78
 
+### Phase 13 — Game Run Statistics & Saved Profiles
+
+#### Added
+- Speedrun duration tracking set upon starting/restarting gameplay
+- Aggregated run statistics tracking locker hides, debris throws, fear peaks, and stamina drainage
+- Retro terminal-styled win scoreboard displaying run details side-by-side with personal records
+- Saved profile high score persistence (Fastest Escape Time, Max Documents Found) using browser localStorage
+
 ### Phase 12 — Sound Wave UI & Advanced Search AI
 
 #### Added

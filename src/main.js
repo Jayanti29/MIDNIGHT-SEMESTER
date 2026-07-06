@@ -377,6 +377,12 @@ let lastPlayer2LockerInspected = null;
 let lockerAlertState = false;
 let lockerTargetToInspect = null;
 let meeraLockerSearchTimer = 0;
+let runStartTime = 0;
+let runEndTime = 0;
+let statStaminaDrained = 0;
+let statTimesHidden = 0;
+let statCansThrown = 0;
+let statFearPeak = 0;
 let vrController1 = null;
 let vrController2 = null;
 let vrControllerGrip1 = null;
@@ -2242,6 +2248,7 @@ function updateMovement(delta) {
   const moving = forward !== 0 || strafe !== 0;
   const sprint = wantsSprint && moving && stamina > 0 && !sprintExhausted;
   stamina = THREE.MathUtils.clamp(stamina + (sprint ? -34 : 22) * delta, 0, 100);
+  if (sprint) statStaminaDrained += 34 * delta;
   if (stamina <= 0 && !sprintExhausted) {
     sprintExhausted = true;
     caption.textContent = "Aarav is winded. Release Shift to recover.";
@@ -2288,6 +2295,7 @@ function updateMovement(delta) {
     const moving2 = forward2 !== 0 || strafe2 !== 0;
     const sprint2 = wantsSprint2 && moving2 && stamina2 > 0 && !sprintExhausted2;
     stamina2 = THREE.MathUtils.clamp(stamina2 + (sprint2 ? -34 : 22) * delta, 0, 100);
+    if (sprint2) statStaminaDrained += 34 * delta;
     if (stamina2 <= 0 && !sprintExhausted2) {
       sprintExhausted2 = true;
     }
@@ -2587,6 +2595,7 @@ function updateState(delta) {
   if (fearMeter) fearMeter.value = fear;
   
   const activeFear = coopMode ? Math.max(fear, fear2) : fear;
+  if (activeFear > statFearPeak) statFearPeak = activeFear;
   vignette.style.opacity = String(0.35 + activeFear / 145);
 
   // Drive post-processing shader uniforms from fear level
@@ -3056,6 +3065,7 @@ function inspectObject(hit, isPlayer2 = false) {
     if (!isPlayer2) {
       if (!isPlayerHidden) {
         isPlayerHidden = true;
+        statTimesHidden++;
         player1PreLockerPos = camera.position.clone();
         camera.position.set(hit.object.parent.position.x, 1.7, hit.object.parent.position.z + 0.1);
         caption.textContent = "You are hidden inside the locker. Press [E] to step out.";
@@ -3079,6 +3089,7 @@ function inspectObject(hit, isPlayer2 = false) {
     } else {
       if (!isPlayer2Hidden) {
         isPlayer2Hidden = true;
+        statTimesHidden++;
         player2PreLockerPos = camera2.position.clone();
         camera2.position.set(hit.object.parent.position.x, 1.7, hit.object.parent.position.z + 0.1);
         caption.textContent = "Player 2 is hidden inside the locker. Press [ShiftRight] to step out.";
@@ -3711,6 +3722,11 @@ function startGame({ lockPointer = true } = {}) {
   initAudio();
   setupPlayer2();
   setupUiSounds();
+  runStartTime = Date.now();
+  statStaminaDrained = 0;
+  statTimesHidden = 0;
+  statCansThrown = 0;
+  statFearPeak = 0;
   startScreen.classList.add("hidden");
   setGameState(GameState.PLAYING);
   if (lockPointer) requestPointerLock();
@@ -3870,11 +3886,37 @@ function triggerEnding(endingId) {
     addTaskLog("Ending D achieved: Emergency escape.");
   }
   
-  const totalTime = Math.round(clock.elapsedTime);
-  const mins = Math.floor(totalTime / 60);
-  const secs = totalTime % 60;
+  const speedrunDuration = Math.round((Date.now() - runStartTime) / 1000);
+  const docsCollected = collectedEvidence.size;
+
+  let bestTime = parseInt(localStorage.getItem("ms_best_time") || "9999");
+  let bestDocs = parseInt(localStorage.getItem("ms_best_docs") || "0");
+
+  if (speedrunDuration < bestTime) {
+    bestTime = speedrunDuration;
+    localStorage.setItem("ms_best_time", String(bestTime));
+  }
+  if (docsCollected > bestDocs) {
+    bestDocs = docsCollected;
+    localStorage.setItem("ms_best_docs", String(bestDocs));
+  }
+
   if (winStats) {
-    winStats.textContent = `Escape time: ${mins}m ${secs}s — Total Lore Files Collected: ${collectedEvidence.size}/5`;
+    winStats.innerHTML = `
+<div style="text-align: left; background: rgba(14, 11, 9, 0.95); padding: 16px; border: 1px solid #584435; border-radius: 6px; display: flex; flex-direction: column; gap: 8px; font-family: monospace; color: #d8c39f; font-size: 0.82rem; width: 100%; box-sizing: border-box; margin-top: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.8);">
+  <div style="color: #ffc87a; font-weight: bold; font-size: 0.9rem; text-align: center; border-bottom: 1px solid #584435; padding-bottom: 6px; margin-bottom: 6px;">RUN SCOREBOARD</div>
+  <div style="display: flex; justify-content: space-between;"><span>ESCAPE TIME:</span><span style="color: #73d08a;">${speedrunDuration}s</span></div>
+  <div style="display: flex; justify-content: space-between;"><span>LORE COLLECTED:</span><span style="color: #73d08a;">${docsCollected}/5</span></div>
+  <div style="display: flex; justify-content: space-between;"><span>TIMES HID IN CABINETS:</span><span style="color: #73d08a;">${statTimesHidden}</span></div>
+  <div style="display: flex; justify-content: space-between;"><span>DISTRACTIONS THROWN:</span><span style="color: #73d08a;">${statCansThrown}</span></div>
+  <div style="display: flex; justify-content: space-between;"><span>MAX PEAK FEAR:</span><span style="color: #73d08a;">${Math.round(statFearPeak)}%</span></div>
+  <div style="display: flex; justify-content: space-between;"><span>STAMINA EXHAUSTED:</span><span style="color: #73d08a;">${Math.round(statStaminaDrained)} units</span></div>
+  <div style="border-top: 1px dashed rgba(88, 68, 53, 0.4); margin: 6px 0;"></div>
+  <div style="color: #73d08a; font-weight: bold; text-align: center;">ALL-TIME BESTS</div>
+  <div style="display: flex; justify-content: space-between;"><span>FASTEST ESCAPE:</span><span style="color: #ffc87a;">${bestTime}s</span></div>
+  <div style="display: flex; justify-content: space-between;"><span>MAX COLLECTED LORE:</span><span style="color: #ffc87a;">${bestDocs}/5</span></div>
+</div>
+    `;
   }
 }
 
@@ -4191,6 +4233,7 @@ document.addEventListener("keydown", (event) => {
       event.preventDefault();
       if (p1DebrisCount > 0) {
         p1DebrisCount--;
+        statCansThrown++;
         const throwDist = 12.0;
         const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
         const landZ = THREE.MathUtils.clamp(camera.position.z + dir.z * throwDist, -47.8, 8);
@@ -4210,6 +4253,7 @@ document.addEventListener("keydown", (event) => {
       event.preventDefault();
       if (p2DebrisCount > 0) {
         p2DebrisCount--;
+        statCansThrown++;
         const throwDist = 12.0;
         const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(camera2.quaternion);
         const landZ = THREE.MathUtils.clamp(camera2.position.z + dir.z * throwDist, -47.8, 8);

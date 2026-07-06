@@ -1,6 +1,6 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 87/500**
+Commit counter: **Commit 91/500**
 
 ## Commits Log
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.
@@ -90,5 +90,10 @@ Commit counter: **Commit 87/500**
 - **Commit 85/500**: Completed visual, HUD, character aesthetics and dialogue progression fixes. Implemented grimy checkerboard floor and peeling greenish wall textures, raised overall brightness, updated point lights and flashlight SpotLight settings. Refactored procedural player and ghost meshes to add backpacks, eyes, long hair profiles, and physical flashlight model objects. Added name/color profile selectors in Settings modal, resolved dialogue cursor locking by binding Spacebar/Enter key progression, fixed Protocol A Ending unlock, and revised win scoreboard stats out of /8 lore collectibles.
 - **Commit 86/500**: Completed visual, environment, ghost modeling, and dossier UI upgrades based on user reference files. Added real-time screen brightness/exposure slider to comfort settings. Built customized player character models (Aarav, Priya, Prof. Kulkarni, Rohan, Sam) carrying unique hairstyles, caps, suits, and spectacles, dynamically loaded and previewed in a handwritten investigator dossier settings file with polaroid photo frames. Created realistic doors with physical side-frames, double-sided beveled inset panel trims, and brass doorknob plates with horizontal handles. Modelled Meera the ghost with contorted, twisted arms and neck angles, and a circular gaping mouth cavity. Spawned clusters of red spider lily crosses and stems along the corridor corners of Level 1. Bound SpotLight projection maps to player and Sam flashlights to project dust particles and lens ring cookies.
 - **Commit 87/500**: Polished Phase 14 procedural environments. Created dynamic, animated running window raindrops texture canvas running trails mapped to corridor glass windows. Programmed real-time atmospheric fog color lighting illumination spikes that flash the surrounding fog color to a pale blue when lightning strikes, decaying back to black pitch darkness.
+- **Commit 88/500**: Overhauled main menu DOM screen to support a wood-framed corkboard panel layout with pinned polaroid pictures, connector threads, red restricted stamps, and pushpins.
+- **Commit 89/500**: Restructured Settings menus to support tabbed personnel folder panels (Audio, Comfort, Identity).
+- **Commit 90/500**: Added styling selectors for corkboard frame, polaroid clips, folder tab headers, index cards, redacted hover transitions, and unsolved status stamps in styles.css.
+- **Commit 91/500**: Implemented data-driven CampusLayoutBuilder, procedural PropFactory, RoomBuilder, Mixamo-rigged skeletons, procedural walk/idle animations, and Web Audio indicator clicks.
+
 
 

@@ -43,7 +43,7 @@
       </section>
       <section id="hud" aria-live="polite">
         <div id="hud-p1" style="position: absolute; left: 24px; top: 24px; z-index: 10; display: flex; flex-direction: column; gap: 8px;">
-          <div class="hud-panel compact" style="display: none;" aria-hidden="true">
+          <div class="hud-panel compact">
             <span class="label">Flashlight</span>
             <span id="battery">100%</span>
             <meter id="battery-meter" min="0" max="100" value="100"></meter>
@@ -66,7 +66,7 @@
         </div>
         
         <div id="hud-p2" style="position: absolute; right: 24px; top: 24px; z-index: 10; display: none; flex-direction: column; gap: 8px;">
-          <div class="hud-panel compact" style="display: none;" aria-hidden="true">
+          <div class="hud-panel compact">
             <span class="label">Flashlight</span>
             <span id="battery2">100%</span>
             <meter id="battery2-meter" min="0" max="100" value="100"></meter>
@@ -128,6 +128,26 @@
         <label>Display Subtitles <input id="setting-subtitles" type="checkbox" checked /></label>
         <label>Camera Shake Scale <input id="setting-cam-shake" type="range" min="0" max="1" step="0.1" value="1" /></label>
         <label>Invert Mouse Look <input id="setting-invert-mouse" type="checkbox" /></label>
+        <div style="border-top: 1px dashed rgba(88, 68, 53, 0.4); margin: 12px 0;"></div>
+        <h3 style="color: #ffc87a; font-family: monospace; font-size: 0.9rem; text-align: center; margin: 4px 0 10px;">Player Profiles</h3>
+        <label>P1 Name <input id="setting-p1-name" type="text" value="Aarav" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px; width: 140px;" /></label>
+        <label>P1 Suit Color 
+          <select id="setting-p1-color" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px;">
+            <option value="0xa87c5c">Amber Brown</option>
+            <option value="0x73d08a">Forest Green</option>
+            <option value="0x3f5b7a">Denim Blue</option>
+            <option value="0xb22822">Crimson Red</option>
+          </select>
+        </label>
+        <label>P2 Name <input id="setting-p2-name" type="text" value="Rohan" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px; width: 140px;" /></label>
+        <label>P2 Suit Color 
+          <select id="setting-p2-color" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px;">
+            <option value="0x3f5b7a">Denim Blue</option>
+            <option value="0xa87c5c">Amber Brown</option>
+            <option value="0x73d08a">Forest Green</option>
+            <option value="0xb22822">Crimson Red</option>
+          </select>
+        </label>
         <button id="close-settings" type="button">Close</button>
       </section>
       <section id="inventory-panel" class="modal-menu" role="dialog" aria-modal="true" aria-label="Case File Archive" style="width: min(560px, calc(100vw - 48px));">
@@ -169,7 +189,7 @@
       <section id="dialogue" class="dialogue" aria-live="polite">
         <p id="speaker" class="speaker"></p>
         <p id="line"></p>
-        <button id="next-line" class="next-line" type="button">Next</button>
+        <button id="next-line" class="next-line" type="button">Next [Space]</button>
       </section>
       <section id="fatal-error" class="fatal-error" hidden>
         <h2>Renderer failed to start</h2>

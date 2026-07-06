@@ -4628,6 +4628,82 @@ composer.addPass(new RenderPass(scene, camera));
 const filmPass = new ShaderPass(filmGrainShader);
 composer.addPass(filmPass);
 
+// Character Selection State
+let charSelectActive = false;
+let selectScene, selectCamera, selectRenderer, selectMesh;
+let selectedVariant = "Aarav";
+let selectedOutfitColor = "#243f5e";
+let selectedHairStyle = "short";
+
+function initCharacterSelect() {
+  const selectCanvas = document.getElementById("char-preview-canvas");
+  if (!selectCanvas) return;
+
+  selectScene = new THREE.Scene();
+  selectCamera = new THREE.PerspectiveCamera(35, selectCanvas.clientWidth / selectCanvas.clientHeight, 0.1, 10);
+  selectCamera.position.set(0, 0.8, 2.6);
+
+  selectRenderer = new THREE.WebGLRenderer({ canvas: selectCanvas, antialias: true, alpha: true });
+  selectRenderer.setSize(selectCanvas.clientWidth, selectCanvas.clientHeight, false);
+  selectRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+  const ambient = new THREE.AmbientLight(0xffecd9, 0.45);
+  selectScene.add(ambient);
+
+  const spot = new THREE.PointLight(0xfff5d9, 1.8, 10);
+  spot.position.set(0.6, 1.8, 1.2);
+  spot.castShadow = true;
+  selectScene.add(spot);
+
+  updatePreviewModel();
+}
+
+function updatePreviewModel() {
+  if (!selectScene) return;
+
+  if (selectMesh) {
+    selectScene.remove(selectMesh);
+    selectMesh = null;
+  }
+
+  selectMesh = createProceduralHumanoidSkeleton({
+    name: "previewModel",
+    position: [0, 0, 0],
+    isGhost: false,
+    identity: selectedVariant,
+    outfitColorOverride: selectedOutfitColor,
+    hairStyleOverride: selectedHairStyle
+  });
+
+  if (selectedVariant === "Sam") {
+    selectMesh.scale.set(1.08, 1.08, 1.08);
+  } else if (selectedVariant === "Priya") {
+    selectMesh.scale.set(0.92, 0.94, 0.92);
+  } else {
+    selectMesh.scale.set(1.0, 1.0, 1.0);
+  }
+
+  selectScene.add(selectMesh);
+}
+
+function animateCharacterSelect() {
+  if (!charSelectActive) return;
+  requestAnimationFrame(animateCharacterSelect);
+
+  if (selectMesh) {
+    selectMesh.rotation.y += 0.012;
+    const time = performance.now() * 0.0018;
+    const hips = selectMesh.userData.hips;
+    if (hips) {
+      hips.position.y = 0.9 + Math.sin(time) * 0.015;
+    }
+  }
+
+  if (selectRenderer && selectScene && selectCamera) {
+    selectRenderer.render(selectScene, selectCamera);
+  }
+}
+
 function setupPlayer2() {
   if (!coopMode) return;
   

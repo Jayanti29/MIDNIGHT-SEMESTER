@@ -1225,3 +1225,43 @@ body:not(.started) .quick-actions {
   color: #2e7d32;
   border-color: #2e7d32;
 }
+
+/* Swatch Modifications & Character Select Styles */
+.swatch-btn {
+  transition: all 0.15s ease;
+}
+
+.swatch-btn:hover {
+  transform: scale(1.15);
+}
+
+.swatch-btn.active {
+  box-shadow: 0 0 0 2px #b22822 !important;
+  transform: scale(1.15);
+}
+
+.hair-style-btn {
+  transition: all 0.15s ease;
+}
+
+.hair-style-btn:hover {
+  background: #ecdcc9 !important;
+}
+
+.hair-style-btn.active {
+  background: #b22822 !important;
+  color: #ffffff !important;
+  border-style: solid !important;
+  border-color: #b22822 !important;
+}
+
+.variant-tabs .paper-btn {
+  transition: all 0.15s ease;
+}
+
+.variant-tabs .paper-btn.active {
+  background: #ecdcc9 !important;
+  border-color: #b22822 !important;
+  border-style: solid !important;
+  box-shadow: inset 0 0 10px rgba(178, 40, 34, 0.12);
+}

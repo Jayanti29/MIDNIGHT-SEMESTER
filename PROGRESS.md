@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 94/500**
+Commit counter: **Commit 95/500**
 
 ## Commits Log
+- **Commit 95/500**: Implemented CSS selectors for swatches, highlight buttons, and active tabs in styles.css.
 - **Commit 94/500**: Integrated character select screen DOM structure in index.html.
 - **Commit 93/500**: Established style-guide.md visual design specifications for horror case-file UI.
 - **Commit 1/500**: Completed Phase 1 Task 1. Audited src/ and verified all broken/missing systems in NOTES.md. Initialized PROGRESS.md.

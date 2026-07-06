@@ -128,26 +128,37 @@
         <label>Display Subtitles <input id="setting-subtitles" type="checkbox" checked /></label>
         <label>Camera Shake Scale <input id="setting-cam-shake" type="range" min="0" max="1" step="0.1" value="1" /></label>
         <label>Invert Mouse Look <input id="setting-invert-mouse" type="checkbox" /></label>
+        <label>Screen Brightness <input id="setting-brightness" type="range" min="0.5" max="2.5" step="0.05" value="1.25" /></label>
+        
         <div style="border-top: 1px dashed rgba(88, 68, 53, 0.4); margin: 12px 0;"></div>
         <h3 style="color: #ffc87a; font-family: monospace; font-size: 0.9rem; text-align: center; margin: 4px 0 10px;">Player Profiles</h3>
+        
         <label>P1 Name <input id="setting-p1-name" type="text" value="Aarav" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px; width: 140px;" /></label>
-        <label>P1 Suit Color 
-          <select id="setting-p1-color" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px;">
-            <option value="0xa87c5c">Amber Brown</option>
-            <option value="0x73d08a">Forest Green</option>
-            <option value="0x3f5b7a">Denim Blue</option>
-            <option value="0xb22822">Crimson Red</option>
+        <label>P1 Character Model
+          <select id="setting-p1-model" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px;">
+            <option value="Aarav">Aarav Mehta (Student - Blue Hoodie)</option>
+            <option value="Priya">Priya Sharma (Student - Yellow Jacket, Long Hair)</option>
+            <option value="Kulkarni">Prof. Kulkarni (Professor - Grey Coat, Glasses)</option>
           </select>
         </label>
+        
         <label>P2 Name <input id="setting-p2-name" type="text" value="Rohan" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px; width: 140px;" /></label>
-        <label>P2 Suit Color 
-          <select id="setting-p2-color" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px;">
-            <option value="0x3f5b7a">Denim Blue</option>
-            <option value="0xa87c5c">Amber Brown</option>
-            <option value="0x73d08a">Forest Green</option>
-            <option value="0xb22822">Crimson Red</option>
+        <label>P2 Character Model
+          <select id="setting-p2-model" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px;">
+            <option value="Rohan">Rohan (Student - Green Windbreaker)</option>
+            <option value="Sam">Sam (Student - Leather Jacket, Cap)</option>
+            <option value="Priya">Priya Sharma (Student - Yellow Jacket, Long Hair)</option>
           </select>
         </label>
+        
+        <div id="character-dossier-preview" style="margin-top: 14px; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+          <div class="polaroid-photo" style="background: #eadecd; padding: 8px 8px 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid #d4c4b0; transform: rotate(-2deg); width: 130px; position: relative;">
+            <div id="dossier-clip" style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 28px; height: 16px; background: rgba(120, 110, 95, 0.6); border-radius: 2px;"></div>
+            <div id="polaroid-image-placeholder" style="width: 100%; height: 110px; background: #231b15; border: 1px solid #c9bda9; display: flex; align-items: center; justify-content: center; font-size: 2.2rem;">👨‍🎓</div>
+            <p id="polaroid-caption" style="margin: 8px 0 0; font-family: monospace; font-size: 0.72rem; color: #3b281b; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; font-weight: bold;">Aarav</p>
+          </div>
+        </div>
+        
         <button id="close-settings" type="button">Close</button>
       </section>
       <section id="inventory-panel" class="modal-menu" role="dialog" aria-modal="true" aria-label="Case File Archive" style="width: min(560px, calc(100vw - 48px));">

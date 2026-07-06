@@ -5362,6 +5362,16 @@ coopButton.addEventListener("click", () => {
   coopMode = true;
   startGame();
 });
+const continueButton = document.getElementById("continue-button");
+continueButton?.addEventListener("click", () => {
+  coopMode = false;
+  // Restore saved character directly from localStorage — skip the select screen
+  p1Model = localStorage.getItem("setting-p1-model") || p1Model;
+  p1OutfitColor = localStorage.getItem("setting-p1-outfit-color") || p1OutfitColor;
+  p1HairStyle = localStorage.getItem("setting-p1-hair-style") || p1HairStyle;
+  startScreen.classList.add("hidden");
+  startGame();
+});
 menuSettings.addEventListener("click", () => {
   startScreen.classList.add("hidden");
   settingsPanel.classList.add("open");

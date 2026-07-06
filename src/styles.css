@@ -850,3 +850,378 @@ body:not(.started) .quick-actions {
     padding: 10px 12px;
   }
 }
+
+/* ==========================================================================
+   CASE FILE & CORKBOARD OVERHAUL
+   ========================================================================== */
+
+/* Corkboard Background for Main Menu */
+.corkboard {
+  background: radial-gradient(circle, #553b26 0%, #2f1d10 100%);
+  background-size: cover;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  z-index: 10;
+}
+
+.corkboard-canvas {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 1200px;
+  max-height: 800px;
+  background: #473220; /* Dark cork shade */
+  border: 24px solid #1c1109; /* Wooden frame */
+  box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.9), 0 30px 90px rgba(0, 0, 0, 0.85);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  box-sizing: border-box;
+}
+
+/* Header Pin Tag */
+.header-tag {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%) rotate(-1deg);
+  background: #fdfaf2;
+  color: #1a0f0a;
+  padding: 10px 30px;
+  font-family: Georgia, serif;
+  font-size: 1.6rem;
+  font-weight: bold;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+  border: 1px solid #dcd3be;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.header-tag::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  background: #c23b22; /* Red Pushpin */
+  border-radius: 50%;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+}
+
+/* Red Restricted Stamp style */
+.restricted-stamp {
+  position: absolute;
+  top: 40px;
+  right: 50px;
+  font-family: Courier New, monospace;
+  font-weight: 900;
+  font-size: 1.8rem;
+  color: rgba(178, 40, 34, 0.85);
+  border: 5px double rgba(178, 40, 34, 0.85);
+  padding: 8px 18px;
+  transform: rotate(12deg);
+  letter-spacing: 0.15em;
+  pointer-events: none;
+}
+
+/* Manila Dossier Card */
+.dossier-card {
+  background: #ecdcc9;
+  color: #2b1f13;
+  padding: 30px;
+  border-radius: 2px;
+  box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+  max-width: 440px;
+  text-align: center;
+  border: 1px solid #d4c4b0;
+  transform: rotate(-1.5deg);
+  margin-bottom: 24px;
+}
+
+.dossier-card h1 {
+  font-family: Georgia, serif;
+  font-size: 2.1rem;
+  color: #8b2b22;
+  margin: 0 0 12px;
+}
+
+.dossier-card p.subtitle {
+  font-family: Courier New, monospace;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #4b3a2a;
+}
+
+/* Pinned Menu */
+.pinned-menu {
+  background: #ecdcc9;
+  border: 1px solid #c8b9a5;
+  padding: 24px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+  transform: rotate(2deg);
+  width: min(320px, 90vw);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+
+.menu-dossier-tab {
+  position: absolute;
+  top: -24px;
+  left: 20px;
+  background: #ecdcc9;
+  font-family: Courier New, monospace;
+  font-weight: bold;
+  font-size: 0.72rem;
+  padding: 4px 12px;
+  border: 1px solid #c8b9a5;
+  border-bottom: none;
+  border-radius: 4px 4px 0 0;
+  color: #7a6652;
+}
+
+.paper-btn {
+  background: #faf4e8 !important;
+  color: #2b1f13 !important;
+  border: 1px dashed #ad9e89 !important;
+  font-family: monospace;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.06);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.paper-btn:hover {
+  background: #8b2b22 !important;
+  color: #ffffff !important;
+  border-color: #8b2b22 !important;
+  transform: scale(1.02);
+}
+
+/* Pinned Photos on Corkboard */
+.cork-photo {
+  position: absolute;
+  pointer-events: none;
+}
+
+.photo-1 {
+  left: 60px;
+  top: 180px;
+}
+
+.photo-2 {
+  right: 60px;
+  top: 220px;
+}
+
+.polaroid {
+  background: #f5eedf;
+  padding: 10px 10px 30px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  border: 1px solid #e1d4bf;
+  width: 140px;
+  transform: rotate(-4deg);
+  position: relative;
+}
+
+.photo-2 .polaroid {
+  transform: rotate(5deg);
+}
+
+.polaroid::before {
+  content: "";
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12px;
+  height: 12px;
+  background: #8b2b22;
+  border-radius: 50%;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.3);
+}
+
+.photo-img {
+  width: 120px;
+  height: 110px;
+  background: #231b15;
+  border: 1px solid #dcd0bd;
+}
+
+.campus-shot-1 {
+  background: radial-gradient(circle, #2d261e 0%, #15110d 100%);
+}
+
+.campus-shot-2 {
+  background: radial-gradient(circle, #341e1b 0%, #0d0605 100%);
+}
+
+.photo-label {
+  font-family: Courier New, monospace;
+  font-size: 0.65rem;
+  font-weight: bold;
+  color: #4b3a2a;
+  text-align: center;
+  margin-top: 10px;
+}
+
+.string-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 5;
+}
+
+/* tabbed personnel folder panel */
+.dossier-folder {
+  background: #ecdcc9 !important;
+  color: #2b1f13 !important;
+  border: 1px solid #ad9e89 !important;
+  padding: 24px 28px 20px !important;
+  border-radius: 4px 24px 4px 4px !important;
+  box-shadow: 0 30px 90px rgba(0,0,0,0.85), inset 0 0 40px rgba(0,0,0,0.06) !important;
+}
+
+.folder-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 14px;
+  border-bottom: 2px dashed rgba(43, 31, 19, 0.18);
+  padding-bottom: 4px;
+}
+
+.folder-tab-btn {
+  background: rgba(43, 31, 19, 0.08);
+  border: 1px solid #ad9e89;
+  border-bottom: none;
+  color: #5b4632;
+  font-family: monospace;
+  font-weight: bold;
+  font-size: 0.8rem;
+  padding: 6px 16px;
+  border-radius: 4px 4px 0 0;
+  cursor: pointer;
+}
+
+.folder-tab-btn.active {
+  background: #ecdcc9;
+  border-color: #ad9e89;
+  color: #8b2b22;
+  margin-bottom: -6px;
+  padding-bottom: 11px;
+  z-index: 2;
+}
+
+.folder-content {
+  min-height: 200px;
+}
+
+.tab-panel {
+  display: none;
+}
+
+.tab-panel.active {
+  display: grid;
+  gap: 12px;
+}
+
+.section-title {
+  font-family: Courier New, monospace;
+  font-weight: bold;
+  font-size: 0.76rem;
+  color: #8b2b22;
+  margin: 0;
+  letter-spacing: 0.1em;
+}
+
+/* Redacted hover reveal */
+.redacted {
+  background: #111111;
+  color: #111111;
+  padding: 0 4px;
+  cursor: help;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+
+.redacted:hover {
+  background: transparent;
+  color: #8b2b22;
+  user-select: auto;
+}
+
+/* Subtitle Index Card style */
+.index-card {
+  background: #fdfaf4 !important;
+  color: #2b1f13 !important;
+  border: 1px solid #d4c5b0 !important;
+  box-shadow: 0 15px 30px rgba(0,0,0,0.5) !important;
+  border-radius: 2px !important;
+  padding: 24px !important;
+  bottom: 30px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: min(580px, 95vw) !important;
+}
+
+.index-card-header {
+  font-family: Courier New, monospace;
+  font-size: 0.65rem;
+  font-weight: bold;
+  color: #8a735c;
+  border-bottom: 1px dashed rgba(138, 115, 92, 0.3);
+  padding-bottom: 4px;
+  margin-bottom: 8px;
+}
+
+.index-card #speaker {
+  color: #8b2b22 !important;
+  font-family: Georgia, serif;
+}
+
+.index-card #line {
+  font-family: Courier New, monospace;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+/* Stamped status signs */
+.case-stamp {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  font-family: monospace;
+  font-weight: 900;
+  font-size: 1.6rem;
+  padding: 6px 14px;
+  border-radius: 4px;
+  border: 4px solid;
+  letter-spacing: 0.08em;
+  transform: rotate(10deg);
+  pointer-events: none;
+  z-index: 10;
+}
+
+.case-stamp.unsolved {
+  color: #b22822;
+  border-color: #b22822;
+}
+
+.case-stamp.closed {
+  color: #2e7d32;
+  border-color: #2e7d32;
+}

@@ -26,20 +26,46 @@
           <p id="loading-status">Compiling shaders... 0%</p>
         </div>
       </section>
-      <section id="start-screen" class="overlay">
-        <div class="brand">
-          <p class="kicker">Ravenswood Institute of Technology</p>
-          <h1>Midnight Semester</h1>
-          <p class="subtitle">
-            Aarav stayed back to finish his capstone. At 12:07 AM, the gate locks, backup power wakes Block A, and a voice on the intercom says his name.
-          </p>
+      <section id="start-screen" class="overlay corkboard">
+        <div class="corkboard-canvas">
+          <div class="header-tag pin-pin">Midnight Semester</div>
+          <div class="restricted-stamp">RESTRICTED</div>
+          <div class="brand dossier-card">
+            <p class="kicker">Ravenswood Institute of Technology</p>
+            <h1>Midnight Semester</h1>
+            <p class="subtitle">
+              Aarav stayed back to finish his capstone. At 12:07 AM, the gate locks, backup power wakes Block A, and a voice on the intercom says his name.
+            </p>
+          </div>
+          
+          <nav class="main-menu pinned-menu" aria-label="Main menu">
+            <div class="menu-dossier-tab">CASE FILE #2005</div>
+            <button id="start-button" type="button" class="paper-btn">Play Solo</button>
+            <button id="coop-button" type="button" class="paper-btn">Play Co-op (Split-Screen)</button>
+            <button id="menu-settings" type="button" class="paper-btn">Settings File</button>
+            <button id="menu-quit" type="button" class="paper-btn">Quit Game</button>
+          </nav>
+
+          <!-- Pinned Photos -->
+          <div class="cork-photo photo-1">
+            <div class="polaroid">
+              <div class="photo-img campus-shot-1"></div>
+              <div class="photo-label">BLOCK A WING - 2005</div>
+            </div>
+          </div>
+          
+          <div class="cork-photo photo-2">
+            <div class="polaroid">
+              <div class="photo-img campus-shot-2"></div>
+              <div class="photo-label">LAB BASEMENT</div>
+            </div>
+          </div>
+
+          <!-- Connecting string overlay -->
+          <svg class="string-overlay" xmlns="http://www.w3.org/2000/svg">
+            <line x1="20%" y1="30%" x2="80%" y2="70%" stroke="#b22822" stroke-width="2.5" stroke-dasharray="2 3"/>
+          </svg>
         </div>
-        <nav class="main-menu" aria-label="Main menu">
-          <button id="start-button" type="button">Play Solo</button>
-          <button id="coop-button" type="button">Play Co-op (Split-Screen)</button>
-          <button id="menu-settings" type="button">Settings</button>
-          <button id="menu-quit" type="button">Quit</button>
-        </nav>
       </section>
       <section id="hud" aria-live="polite">
         <div id="hud-p1" style="position: absolute; left: 24px; top: 24px; z-index: 10; display: flex; flex-direction: column; gap: 8px;">
@@ -110,58 +136,73 @@
         <p class="kicker">Task Log</p>
         <ol id="task-log-list"></ol>
       </section>
-      <section id="pause-menu" class="modal-menu" role="dialog" aria-modal="true" aria-label="Pause Menu">
+      <section id="pause-menu" class="modal-menu dossier-folder" role="dialog" aria-modal="true" aria-label="Pause Menu">
         <p class="kicker">Paused</p>
         <h2>Midnight Semester</h2>
         <button id="resume-button" type="button">Resume</button>
-        <button id="pause-settings" type="button">Settings</button>
+        <button id="pause-settings" type="button">Settings File</button>
         <button id="quit-to-menu" type="button">Quit to Menu</button>
       </section>
-      <section id="settings-panel" class="modal-menu" role="dialog" aria-modal="true" aria-label="Settings Menu">
-        <p class="kicker">Settings</p>
-        <h2>Comfort And Audio</h2>
-        <label>Master Volume <input id="setting-master-volume" type="range" min="0" max="1" step="0.01" value="0.8" /></label>
-        <label>SFX Volume <input id="setting-sfx-volume" type="range" min="0" max="1" step="0.01" value="0.8" /></label>
-        <label>Ambient Volume <input id="setting-ambient-volume" type="range" min="0" max="1" step="0.01" value="0.8" /></label>
-        <label>Mouse Sensitivity <input id="setting-mouse-sensitivity" type="range" min="0.5" max="3" step="0.1" value="1" /></label>
-        <label>Field Of View <input id="setting-fov" type="range" min="60" max="90" step="1" value="72" /></label>
-        <label>Display Subtitles <input id="setting-subtitles" type="checkbox" checked /></label>
-        <label>Camera Shake Scale <input id="setting-cam-shake" type="range" min="0" max="1" step="0.1" value="1" /></label>
-        <label>Invert Mouse Look <input id="setting-invert-mouse" type="checkbox" /></label>
-        <label>Screen Brightness <input id="setting-brightness" type="range" min="0.5" max="2.5" step="0.05" value="1.25" /></label>
-        
-        <div style="border-top: 1px dashed rgba(88, 68, 53, 0.4); margin: 12px 0;"></div>
-        <h3 style="color: #ffc87a; font-family: monospace; font-size: 0.9rem; text-align: center; margin: 4px 0 10px;">Player Profiles</h3>
-        
-        <label>P1 Name <input id="setting-p1-name" type="text" value="Aarav" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px; width: 140px;" /></label>
-        <label>P1 Character Model
-          <select id="setting-p1-model" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px;">
-            <option value="Aarav">Aarav Mehta (Student - Blue Hoodie)</option>
-            <option value="Priya">Priya Sharma (Student - Yellow Jacket, Long Hair)</option>
-            <option value="Kulkarni">Prof. Kulkarni (Professor - Grey Coat, Glasses)</option>
-          </select>
-        </label>
-        
-        <label>P2 Name <input id="setting-p2-name" type="text" value="Rohan" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px; width: 140px;" /></label>
-        <label>P2 Character Model
-          <select id="setting-p2-model" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px;">
-            <option value="Rohan">Rohan (Student - Green Windbreaker)</option>
-            <option value="Sam">Sam (Student - Leather Jacket, Cap)</option>
-            <option value="Priya">Priya Sharma (Student - Yellow Jacket, Long Hair)</option>
-          </select>
-        </label>
-        
-        <div id="character-dossier-preview" style="margin-top: 14px; display: flex; justify-content: center; align-items: center; flex-direction: column;">
-          <div class="polaroid-photo" style="background: #eadecd; padding: 8px 8px 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid #d4c4b0; transform: rotate(-2deg); width: 130px; position: relative;">
-            <div id="dossier-clip" style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 28px; height: 16px; background: rgba(120, 110, 95, 0.6); border-radius: 2px;"></div>
-            <div id="polaroid-image-placeholder" style="width: 100%; height: 110px; background: #231b15; border: 1px solid #c9bda9; display: flex; align-items: center; justify-content: center; font-size: 2.2rem;">👨‍🎓</div>
-            <p id="polaroid-caption" style="margin: 8px 0 0; font-family: monospace; font-size: 0.72rem; color: #3b281b; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; font-weight: bold;">Aarav</p>
+      <section id="settings-panel" class="modal-menu dossier-folder" role="dialog" aria-modal="true" aria-label="Settings Menu">
+        <div class="folder-tabs">
+          <button id="tab-audio" class="folder-tab-btn active" type="button">Audio</button>
+          <button id="tab-graphics" class="folder-tab-btn" type="button">Comfort</button>
+          <button id="tab-controls" class="folder-tab-btn" type="button">Identity</button>
+        </div>
+
+        <div class="folder-content">
+          <!-- Audio Settings -->
+          <div id="panel-audio" class="tab-panel active">
+            <p class="section-title">VOLUMES</p>
+            <label>Master Volume <input id="setting-master-volume" type="range" min="0" max="1" step="0.01" value="0.8" /></label>
+            <label>SFX Volume <input id="setting-sfx-volume" type="range" min="0" max="1" step="0.01" value="0.8" /></label>
+            <label>Ambient Volume <input id="setting-ambient-volume" type="range" min="0" max="1" step="0.01" value="0.8" /></label>
+          </div>
+
+          <!-- Comfort Settings -->
+          <div id="panel-graphics" class="tab-panel">
+            <p class="section-title">CALIBRATION</p>
+            <label>Field Of View <input id="setting-fov" type="range" min="60" max="90" step="1" value="72" /></label>
+            <label>Screen Brightness <input id="setting-brightness" type="range" min="0.5" max="2.5" step="0.05" value="1.25" /></label>
+            <label>Camera Shake Scale <input id="setting-cam-shake" type="range" min="0" max="1" step="0.1" value="1" /></label>
+            <label>Display Subtitles <input id="setting-subtitles" type="checkbox" checked /></label>
+            <label>Invert Mouse Look <input id="setting-invert-mouse" type="checkbox" /></label>
+          </div>
+
+          <!-- Controls/Identity Settings -->
+          <div id="panel-controls" class="tab-panel">
+            <p class="section-title">CHARACTERS</p>
+            <label>P1 Name <input id="setting-p1-name" type="text" value="Aarav" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px; width: 140px;" /></label>
+            <label>P1 Character Model
+              <select id="setting-p1-model" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px;">
+                <option value="Aarav">Aarav Mehta (Blue Hoodie)</option>
+                <option value="Priya">Priya Sharma (Yellow Jacket)</option>
+                <option value="Kulkarni">Prof. Kulkarni (Grey Coat)</option>
+              </select>
+            </label>
+            
+            <label>P2 Name <input id="setting-p2-name" type="text" value="Rohan" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px; width: 140px;" /></label>
+            <label>P2 Character Model
+              <select id="setting-p2-model" style="background: rgba(14, 11, 9, 0.95); border: 1px solid #584435; color: #e5d4bc; padding: 4px 8px; font-family: inherit; border-radius: 4px;">
+                <option value="Rohan">Rohan (Green Windbreaker)</option>
+                <option value="Sam">Sam (Leather Jacket)</option>
+                <option value="Priya">Priya Sharma (Yellow Jacket)</option>
+              </select>
+            </label>
+            
+            <div id="character-dossier-preview" style="margin-top: 14px; display: flex; justify-content: center; align-items: center; flex-direction: column;">
+              <div class="polaroid-photo" style="background: #eadecd; padding: 8px 8px 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid #d4c4b0; transform: rotate(-2deg); width: 130px; position: relative;">
+                <div id="dossier-clip" style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 28px; height: 16px; background: rgba(120, 110, 95, 0.6); border-radius: 2px;"></div>
+                <div id="polaroid-image-placeholder" style="width: 100%; height: 110px; background: #231b15; border: 1px solid #c9bda9; display: flex; align-items: center; justify-content: center; font-size: 2.2rem;">👨‍🎓</div>
+                <p id="polaroid-caption" style="margin: 8px 0 0; font-family: monospace; font-size: 0.72rem; color: #3b281b; text-align: center; text-transform: uppercase; letter-spacing: 0.05em; font-weight: bold;">Aarav</p>
+              </div>
+            </div>
           </div>
         </div>
         
-        <button id="close-settings" type="button">Close</button>
+        <button id="close-settings" type="button" style="margin-top: 10px;">Close File</button>
       </section>
-      <section id="inventory-panel" class="modal-menu" role="dialog" aria-modal="true" aria-label="Case File Archive" style="width: min(560px, calc(100vw - 48px));">
+      <section id="inventory-panel" class="modal-menu dossier-folder" role="dialog" aria-modal="true" aria-label="Case File Archive" style="width: min(560px, calc(100vw - 48px));">
         <p class="kicker">Case File Archive</p>
         <h2>Recovered Documents</h2>
         <div id="inventory-list" class="inventory-list">
@@ -173,20 +214,22 @@
         </div>
         <button id="close-inventory" type="button" style="margin-top: 14px;">Close</button>
       </section>
-      <section id="gameover-screen" class="modal-menu" role="dialog" aria-modal="true" aria-label="Heart Failure Screen">
+      <section id="gameover-screen" class="modal-menu dossier-folder" role="dialog" aria-modal="true" aria-label="Heart Failure Screen">
+        <div class="case-stamp unsolved">UNSOLVED</div>
         <p class="kicker" style="color: #b22822;">Heart Failure</p>
-        <h2>You Collapsed</h2>
-        <p id="gameover-reason" style="color: #a49b8b; font-size: 0.88rem; margin: 10px 0 16px;">The fear overcame Aarav.</p>
-        <button id="restart-button" type="button">Restart</button>
+        <h2>Aarav Mehta</h2>
+        <p id="gameover-reason" style="color: #4b3a2a; font-size: 0.88rem; margin: 10px 0 16px;">The fear overcame Aarav.</p>
+        <button id="restart-button" type="button">Reopen File</button>
       </section>
-      <section id="win-screen" class="modal-menu" role="dialog" aria-modal="true" aria-label="Escape Success Screen">
+      <section id="win-screen" class="modal-menu dossier-folder" role="dialog" aria-modal="true" aria-label="Escape Success Screen">
+        <div class="case-stamp closed">CLOSED</div>
         <p class="kicker" style="color: #ffc87a;">Case Closed</p>
-        <h2>You Escaped</h2>
-        <p id="win-detail" style="color: #a49b8b; font-size: 0.88rem; margin: 10px 0 6px;">Aarav sealed the evidence log and escaped Block A before dawn.</p>
-        <p id="win-stats" style="color: #6d8c6a; font-size: 0.78rem; margin: 0 0 16px;"></p>
-        <button id="play-again-button" type="button">Play Again</button>
+        <h2>Escape Success</h2>
+        <p id="win-detail" style="color: #4b3a2a; font-size: 0.88rem; margin: 10px 0 6px;">Aarav sealed the evidence log and escaped Block A before dawn.</p>
+        <p id="win-stats" style="color: #8b2b22; font-weight: bold; font-size: 0.78rem; margin: 0 0 16px;"></p>
+        <button id="play-again-button" type="button">Archive File</button>
       </section>
-      <section id="choice-screen" class="modal-menu" role="dialog" aria-modal="true" aria-label="Ending Choice Selection Screen" style="width: min(600px, calc(100vw - 48px));">
+      <section id="choice-screen" class="modal-menu dossier-folder" role="dialog" aria-modal="true" aria-label="Ending Choice Selection Screen" style="width: min(600px, calc(100vw - 48px));">
         <p class="kicker" style="color: #ffc87a;">Operations Terminal</p>
         <h2>Select System Protocol</h2>
         <p id="choice-prompt-text" style="color: #a49b8b; font-size: 0.88rem; margin: 10px 0 16px;">
@@ -197,7 +240,8 @@
         <button id="choice-ending-c" type="button" style="display: block; width: 100%; margin: 8px 0; text-align: left; padding: 12px 16px; font-family: inherit; font-size: 0.9rem; background: #3c2f25; color: #e5d4bc; border: 1px solid #584435; cursor: pointer;">Protocol C: Terminate Grid & Stay</button>
         <button id="choice-ending-d" type="button" style="display: block; width: 100%; margin: 8px 0; text-align: left; padding: 12px 16px; font-family: inherit; font-size: 0.9rem; background: #3c2f25; color: #e5d4bc; border: 1px solid #584435; cursor: pointer;">Protocol D: Emergency Exit</button>
       </section>
-      <section id="dialogue" class="dialogue" aria-live="polite">
+      <section id="dialogue" class="dialogue index-card" aria-live="polite">
+        <div class="index-card-header">EXHIBIT D-4: INTERCOM DIALOGUE</div>
         <p id="speaker" class="speaker"></p>
         <p id="line"></p>
         <button id="next-line" class="next-line" type="button">Next [Space]</button>

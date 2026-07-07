@@ -560,7 +560,7 @@ const PropFactory = {
     group.add(tube);
     const light = new THREE.PointLight(0xfff9e6, 1.8, 12, 1.2);
     light.position.y = -0.15;
-    light.castShadow = true;
+    light.castShadow = false;
     group.add(light);
     if (flicker) {
       flickerLights.push({ light, base: 1.8, phase: Math.random() * Math.PI * 2 });

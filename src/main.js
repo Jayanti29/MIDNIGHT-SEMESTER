@@ -5815,7 +5815,7 @@ settingAmbientVolume.addEventListener("input", (event) => {
   }
 });
 
-settingMouseSensitivity.addEventListener("input", (event) => {
+settingMouseSensitivity?.addEventListener("input", (event) => {
   mouseSensitivity = parseFloat(event.target.value);
   localStorage.setItem("setting-mouse-sensitivity", mouseSensitivity);
   caption.textContent = `Mouse Sensitivity: ${mouseSensitivity.toFixed(1)}x`;
@@ -5936,7 +5936,7 @@ choiceEndingD?.addEventListener("click", () => {
 settingMasterVolume.value = masterVolume;
 settingSfxVolume.value = sfxVolume;
 settingAmbientVolume.value = ambientVolume;
-settingMouseSensitivity.value = mouseSensitivity;
+if (settingMouseSensitivity) settingMouseSensitivity.value = mouseSensitivity;
 const savedFov = localStorage.getItem("setting-fov");
 if (savedFov) {
   camera.fov = parseInt(savedFov);

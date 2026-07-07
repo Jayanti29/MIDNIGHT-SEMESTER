@@ -2330,7 +2330,6 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   group.name = name;
   group.position.set(...position);
   group.add(hips);
-  group.bind(skeleton);
   let outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x243f5e;
   let hairColor = 0x111111;
   let hairLength = "short";

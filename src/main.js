@@ -3112,6 +3112,37 @@ function buildMetronome(position, dormGroup) {
   interactables.push(baseMesh);
 }
 
+function buildPillboxProp(position, dormGroup, indexName = "1") {
+  const group = new THREE.Group();
+  group.name = "pillbox_group_" + indexName;
+  group.position.set(...position);
+
+  // White cardboard box
+  const boxGeo = new THREE.BoxGeometry(0.12, 0.05, 0.08);
+  const boxMat = new THREE.MeshStandardMaterial({ color: 0xf5f5f5, roughness: 0.8 });
+  const boxMesh = new THREE.Mesh(boxGeo, boxMat);
+  boxMesh.castShadow = true;
+  boxMesh.receiveShadow = true;
+  group.add(boxMesh);
+
+  // Red cross indicator decoration
+  const cross1Geo = new THREE.BoxGeometry(0.04, 0.002, 0.01);
+  const cross2Geo = new THREE.BoxGeometry(0.01, 0.002, 0.04);
+  const crossMat = new THREE.MeshBasicMaterial({ color: 0xcc2929 });
+  const cross1 = new THREE.Mesh(cross1Geo, crossMat);
+  const cross2 = new THREE.Mesh(cross2Geo, crossMat);
+  cross1.position.set(0, 0.026, 0);
+  cross2.position.set(0, 0.026, 0);
+  group.add(cross1);
+  group.add(cross2);
+
+  tagInteractable(boxMesh, "pillbox", "Sanity Pills");
+  boxMesh.userData.parentPillbox = group;
+
+  dormGroup.attach(group);
+  interactables.push(boxMesh);
+}
+
 function buildDocuments() {
   const docs = [
     {

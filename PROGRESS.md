@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 109/500**
+Commit counter: **Commit 110/500**
 
 ## Commits Log
+- **Commit 110/500**: Phase 18 - Added HTML elements for P1 and P2 pills inventory counters.
 - **Commit 109/500**: Phase 18 - Added CSS styling rules for sanity panels.
 - **Commit 108/500**: Phase 18 - Added P1 and P2 Mental Sanity HUD panel elements.
 - **Commit 107/500**: Completed Phase 17. Handheld EMF Detector Gear & Proximity Detection.

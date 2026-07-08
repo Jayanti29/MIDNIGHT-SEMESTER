@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 107/500**
+Commit counter: **Commit 108/500**
 
 ## Commits Log
+- **Commit 108/500**: Phase 18 - Added P1 and P2 Mental Sanity HUD panel elements.
 - **Commit 107/500**: Completed Phase 17. Handheld EMF Detector Gear & Proximity Detection.
 - **Commit 106/500**: Completed Phase 16. Added New Game+ (Nightmare Mode) difficulty option, main menu Endings Gallery folder panel, and procedural Room 32 tape recorder.
 - **Commit 105/500**: Stamp-slam animations, folder-appear transitions, win epilogue typewriter, loading lore text DOM.

@@ -5657,6 +5657,32 @@ function resetGame() {
   emfTickTimer = 0;
   emfTickTimer2 = 0;
 
+  p1Sanity = 100;
+  p2Sanity = 100;
+  p1Pills = 0;
+  p2Pills = 0;
+  shadowSpawnTimer = 0;
+  creepyWhisperTimer = 0;
+
+  const sanity1Val = document.getElementById("sanity-p1-val");
+  const sanity1Meter = document.getElementById("sanity-p1-meter");
+  const sanity2Val = document.getElementById("sanity-p2-val");
+  const sanity2Meter = document.getElementById("sanity-p2-meter");
+  const pills1Count = document.getElementById("pills-p1-count");
+  const pills2Count = document.getElementById("pills-p2-count");
+
+  if (sanity1Val) sanity1Val.textContent = "100%";
+  if (sanity1Meter) sanity1Meter.value = 100;
+  if (sanity2Val) sanity2Val.textContent = "100%";
+  if (sanity2Meter) sanity2Meter.value = 100;
+  if (pills1Count) pills1Count.textContent = "0";
+  if (pills2Count) pills2Count.textContent = "0";
+
+  const sanity1Panel = document.getElementById("sanity-p1-panel");
+  const sanity2Panel = document.getElementById("sanity-p2-panel");
+  if (sanity1Panel) sanity1Panel.classList.remove("critical-sanity");
+  if (sanity2Panel) sanity2Panel.classList.remove("critical-sanity");
+
   if (camera2) {
     scene.remove(camera2);
     camera2 = null;

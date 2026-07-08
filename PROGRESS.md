@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 112/500**
+Commit counter: **Commit 113/500**
 
 ## Commits Log
+- **Commit 113/500**: Phase 18 - Added sanity and pills resetting logic in resetGame().
 - **Commit 112/500**: Phase 18 - Declared sanity, pills count, and hallucination state variables.
 - **Commit 111/500**: Phase 18 - Added CSS styling rules for pills counter panels.
 - **Commit 110/500**: Phase 18 - Added HTML elements for P1 and P2 pills inventory counters.

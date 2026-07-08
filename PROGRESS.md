@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 125/500**
+Commit counter: **Commit 126/500**
 
 ## Commits Log
+- **Commit 126/500**: Phase 18 - Integrated player sanity weighting in Meera's target tracking AI.
 - **Commit 125/500**: Phase 18 - Added hallucinated shadow figures and whispers audio loop.
 - **Commit 124/500**: Phase 18 - Added camera shake and tilt effects for low sanity.
 - **Commit 123/500**: Phase 18 - Added sanity depletion and safe zone recovery in main loop.

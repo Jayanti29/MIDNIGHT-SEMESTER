@@ -4144,24 +4144,31 @@ function updateState(delta) {
     const meera = scene.userData.meeraCharacter;
     
     // Choose nearest player target, checking if they are hidden
+    // Choose nearest player target, prioritizing players with lower sanity
     let targetCamera = null;
     let targetDist = Infinity;
     let targetFear = 0;
     let targetIsP2 = false;
+    let bestScore = Infinity;
 
     if (!isPlayerHidden) {
+      const dist1 = meera.position.distanceTo(camera.position);
+      const score1 = dist1 * (0.35 + 0.65 * (p1Sanity / 100));
       targetCamera = camera;
-      targetDist = meera.position.distanceTo(camera.position);
+      targetDist = dist1;
       targetFear = fear;
+      bestScore = score1;
     }
 
     if (coopMode && camera2 && !isPlayer2Hidden) {
-      const distToP2 = meera.position.distanceTo(camera2.position);
-      if (distToP2 < targetDist) {
+      const dist2 = meera.position.distanceTo(camera2.position);
+      const score2 = dist2 * (0.35 + 0.65 * (p2Sanity / 100));
+      if (score2 < bestScore) {
         targetCamera = camera2;
-        targetDist = distToP2;
+        targetDist = dist2;
         targetFear = fear2;
         targetIsP2 = true;
+        bestScore = score2;
       }
     }
     

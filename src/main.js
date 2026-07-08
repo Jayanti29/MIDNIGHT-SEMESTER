@@ -1428,6 +1428,9 @@ function initAudio() {
   const emfTickBuffer = createEmfTickBuffer(audioCtx);
   audioManager.buffers.set("emf_tick", emfTickBuffer);
 
+  const pillConsumeBuffer = createPillConsumeBuffer(audioCtx);
+  audioManager.buffers.set("pill_consume", pillConsumeBuffer);
+
   const generatorStartBuffer = createGeneratorStartBuffer(audioCtx);
   audioManager.buffers.set("generator_start", generatorStartBuffer);
 

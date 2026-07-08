@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 114/500**
+Commit counter: **Commit 115/500**
 
 ## Commits Log
+- **Commit 115/500**: Phase 18 - Registered pill_consume sound buffer in initAudio().
 - **Commit 114/500**: Phase 18 - Synthesized createPillConsumeBuffer audio swallow effect.
 - **Commit 113/500**: Phase 18 - Added sanity and pills resetting logic in resetGame().
 - **Commit 112/500**: Phase 18 - Declared sanity, pills count, and hallucination state variables.

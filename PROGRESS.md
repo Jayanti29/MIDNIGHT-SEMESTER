@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 121/500**
+Commit counter: **Commit 122/500**
 
 ## Commits Log
+- **Commit 122/500**: Phase 18 - Wired KeyC and KeyP toggles to consume sanity pills.
 - **Commit 121/500**: Phase 18 - Implemented sanity pill inventory collection logic.
 - **Commit 120/500**: Phase 18 - Added raycast label prompts for pillbox interaction.
 - **Commit 119/500**: Phase 18 - Spawned 3D pillbox props in key locations.

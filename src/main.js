@@ -3493,6 +3493,62 @@ function setEmfActive2(active) {
   if (panel) panel.style.display = active ? "flex" : "none";
 }
 
+function consumePill1() {
+  if (p1Pills <= 0) {
+    caption.textContent = "You don't have any Sanity Pills left.";
+    return;
+  }
+  p1Pills--;
+  const p1Count = document.getElementById("pills-p1-count");
+  if (p1Count) p1Count.textContent = p1Pills;
+  
+  p1Sanity = Math.min(100, p1Sanity + 35);
+  const sanity1Val = document.getElementById("sanity-p1-val");
+  const sanity1Meter = document.getElementById("sanity-p1-meter");
+  if (sanity1Val) sanity1Val.textContent = `${Math.round(p1Sanity)}%`;
+  if (sanity1Meter) sanity1Meter.value = p1Sanity;
+  
+  if (p1Sanity > 30) {
+    const sanity1Panel = document.getElementById("sanity-p1-panel");
+    if (sanity1Panel) sanity1Panel.classList.remove("critical-sanity");
+  }
+
+  caption.textContent = "You took a sanity pill. The panic begins to fade...";
+  sayLine("Aarav", "Tastes chalky... but my heartbeat is slowing down.");
+  if (audioManager) {
+    audioManager.playSound("pill_consume", { volume: 0.95 });
+  }
+  addTaskLog("Consumed Sanity Pills (+35% Sanity).");
+}
+
+function consumePill2() {
+  if (p2Pills <= 0) {
+    caption.textContent = "Player 2 has no Sanity Pills left.";
+    return;
+  }
+  p2Pills--;
+  const p2Count = document.getElementById("pills-p2-count");
+  if (p2Count) p2Count.textContent = p2Pills;
+
+  p2Sanity = Math.min(100, p2Sanity + 35);
+  const sanity2Val = document.getElementById("sanity-p2-val");
+  const sanity2Meter = document.getElementById("sanity-p2-meter");
+  if (sanity2Val) sanity2Val.textContent = `${Math.round(p2Sanity)}%`;
+  if (sanity2Meter) sanity2Meter.value = p2Sanity;
+
+  if (p2Sanity > 30) {
+    const sanity2Panel = document.getElementById("sanity-p2-panel");
+    if (sanity2Panel) sanity2Panel.classList.remove("critical-sanity");
+  }
+
+  caption.textContent = "Player 2 took a sanity pill.";
+  sayLine("Rohan", "Feeling a bit more clear-headed now.");
+  if (audioManager) {
+    audioManager.playSound("pill_consume", { volume: 0.95 });
+  }
+  addTaskLog("Player 2 consumed Sanity Pills (+35% Sanity).");
+}
+
 function updateMovement(delta) {
   if (gameState !== GameState.PLAYING || debugConsoleOpen) return;
 
@@ -6355,7 +6411,7 @@ document.addEventListener("keydown", (event) => {
 
   if (gameState !== GameState.PLAYING) return;
   
-  const p2Codes = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Period", "Slash", "ShiftRight", "KeyO"];
+  const p2Codes = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Period", "Slash", "ShiftRight", "KeyO", "KeyP"];
   if (coopMode && p2Codes.includes(event.code)) {
     player2Keys.add(event.code);
     if (event.code === "Period") {
@@ -6363,6 +6419,9 @@ document.addEventListener("keydown", (event) => {
     }
     if (event.code === "KeyO") {
       setEmfActive2(!emfActive2);
+    }
+    if (event.code === "KeyP") {
+      consumePill2();
     }
     if (event.code === "ShiftRight") {
       inspectNearest2();
@@ -6374,6 +6433,9 @@ document.addEventListener("keydown", (event) => {
     }
     if (event.code === "KeyQ") {
       setEmfActive(!emfActive);
+    }
+    if (event.code === "KeyC") {
+      consumePill1();
     }
     if (event.code === "KeyE") {
       inspectNearest();

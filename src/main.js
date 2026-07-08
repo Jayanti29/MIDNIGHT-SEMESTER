@@ -679,6 +679,7 @@ let p1Pills = 0;
 let p2Pills = 0;
 let shadowSpawnTimer = 0;
 let creepyWhisperTimer = 0;
+let shadowFigures = [];
 let meeraFinalEventPlayed = false;
 let activeApparitionWalk = false;
 let apparitionGhost = null;
@@ -5393,6 +5394,75 @@ function animate() {
   updateRain(delta);
   updateThunder(delta);
 
+  // Handle sanity creepy whispers looping audio triggers
+  if (gameState === GameState.PLAYING) {
+    if (p1Sanity < 45 || (coopMode && p2Sanity < 45)) {
+      creepyWhisperTimer -= delta;
+      if (creepyWhisperTimer <= 0) {
+        creepyWhisperTimer = 16.0 + Math.random() * 12.0;
+        if (audioManager) {
+          audioManager.playSound("creepy_whispers", { volume: 0.8 });
+        }
+      }
+    }
+
+    // Shadow figures spawn logic
+    shadowSpawnTimer -= delta;
+    if (shadowSpawnTimer <= 0) {
+      shadowSpawnTimer = 12.0 + Math.random() * 10.0;
+      const targetSanity = coopMode ? Math.min(p1Sanity, p2Sanity) : p1Sanity;
+      if (targetSanity < 45) {
+        const activeCam = (coopMode && p2Sanity < p1Sanity) ? camera2 : camera;
+        const forwardDir = new THREE.Vector3(0, 0, -1).applyQuaternion(activeCam.quaternion);
+        forwardDir.y = 0;
+        forwardDir.normalize();
+
+        const spawnPos = activeCam.position.clone()
+          .addScaledVector(forwardDir, 10.0 + Math.random() * 4.0);
+        spawnPos.y = 1.1;
+
+        const shadowGeo = new THREE.PlaneGeometry(0.75, 2.1);
+        const shadowMat = new THREE.MeshBasicMaterial({
+          color: 0x07020a,
+          transparent: true,
+          opacity: 0.85,
+          side: THREE.DoubleSide,
+          depthWrite: false
+        });
+        const shadowMesh = new THREE.Mesh(shadowGeo, shadowMat);
+        shadowMesh.position.copy(spawnPos);
+        shadowMesh.lookAt(activeCam.position.x, 1.1, activeCam.position.z);
+        scene.add(shadowMesh);
+        shadowFigures.push(shadowMesh);
+      }
+    }
+
+    // Shadow figures update logic
+    for (let i = shadowFigures.length - 1; i >= 0; i--) {
+      const figure = shadowFigures[i];
+      const dist1 = camera.position.distanceTo(figure.position);
+      const dist2 = camera2 ? camera2.position.distanceTo(figure.position) : 9999;
+      const minDist = Math.min(dist1, dist2);
+
+      if (minDist < 5.0) {
+        figure.material.opacity -= delta * 2.0;
+      }
+      
+      const relativeZ1 = figure.position.z - camera.position.z;
+      const relativeZ2 = camera2 ? (figure.position.z - camera2.position.z) : -999;
+      const isBehind = relativeZ1 > 2.0 && relativeZ2 > 2.0;
+
+      if (figure.material.opacity <= 0 || isBehind) {
+        scene.remove(figure);
+        shadowFigures.splice(i, 1);
+        if (figure.material.opacity <= 0 && minDist < 5.0) {
+          playWhisper();
+          caption.textContent = "A cold breath whispers in your ear...";
+        }
+      }
+    }
+  }
+
   // Procedural bone skeletal updates
   const time = clock.elapsedTime;
   if (scene.userData.player1Character) {
@@ -5921,6 +5991,8 @@ function resetGame() {
   p2Pills = 0;
   shadowSpawnTimer = 0;
   creepyWhisperTimer = 0;
+  shadowFigures.forEach(f => scene.remove(f));
+  shadowFigures = [];
 
   const sanity1Val = document.getElementById("sanity-p1-val");
   const sanity1Meter = document.getElementById("sanity-p1-meter");

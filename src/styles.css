@@ -1445,5 +1445,12 @@ body:not(.started) .quick-actions {
   box-shadow: 0 0 12px rgba(255, 59, 48, 0.5);
 }
 
+/* === PHASE 18: SANITY PILLS COUNTER HUD === */
+#pills-p1-panel, #pills-p2-panel {
+  border-color: #d4b537; /* golden yellow */
+  color: #d4b537;
+  transition: all 0.22s ease;
+}
+
 
 

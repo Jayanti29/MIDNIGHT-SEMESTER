@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 106/500**
+Commit counter: **Commit 107/500**
 
 ## Commits Log
+- **Commit 107/500**: Completed Phase 17. Handheld EMF Detector Gear & Proximity Detection.
 - **Commit 106/500**: Completed Phase 16. Added New Game+ (Nightmare Mode) difficulty option, main menu Endings Gallery folder panel, and procedural Room 32 tape recorder.
 - **Commit 105/500**: Stamp-slam animations, folder-appear transitions, win epilogue typewriter, loading lore text DOM.
 - **Commit 104/500**: NPC survivor updateNpcSurvivorAnimations — nervous fidget idle, hunched follow walk, panicked flee sprint.

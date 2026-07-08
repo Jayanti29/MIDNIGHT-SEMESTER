@@ -1417,4 +1417,19 @@ body:not(.started) .quick-actions {
   background: rgba(250, 244, 232, 0.9) !important;
 }
 
+/* === PHASE 17: EMF DETECTOR GEAR HUD === */
+#emf-p1-panel, #emf-p2-panel {
+  border-color: #73d08a;
+  color: #73d08a;
+  transition: all 0.22s ease;
+}
+
+#emf-p1-panel.danger-emf, #emf-p2-panel.danger-emf {
+  border-color: #ff5555;
+  color: #ff5555;
+  box-shadow: 0 0 10px rgba(255, 85, 85, 0.4);
+  animation: pulse-red 1.2s infinite;
+}
+
+
 

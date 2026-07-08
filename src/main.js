@@ -667,6 +667,12 @@ let meeraDiaryReacted = false;
 let hardcoreMode = false;
 let tapeRecorderPlaying = false;
 let tapeSoundInstance = null;
+let emfActive = false;
+let emfActive2 = false;
+let emfLevel = 1;
+let emfLevel2 = 1;
+let emfTickTimer = 0;
+let emfTickTimer2 = 0;
 let meeraFinalEventPlayed = false;
 let activeApparitionWalk = false;
 let apparitionGhost = null;
@@ -1413,6 +1419,9 @@ function initAudio() {
   const buzzBuffer = createBuzzBuffer(audioCtx);
   audioManager.buffers.set("electric_buzz", buzzBuffer);
 
+  const emfTickBuffer = createEmfTickBuffer(audioCtx);
+  audioManager.buffers.set("emf_tick", emfTickBuffer);
+
   const generatorStartBuffer = createGeneratorStartBuffer(audioCtx);
   audioManager.buffers.set("generator_start", generatorStartBuffer);
 
@@ -1645,6 +1654,23 @@ function createTapePrequelBuffer(ctx) {
     sample += (Math.random() * 2 - 1) * sweepVolume;
     
     data[i] = Math.max(-1.0, Math.min(1.0, sample));
+  }
+  return buffer;
+}
+
+function createEmfTickBuffer(ctx) {
+  const sampleRate = ctx.sampleRate;
+  const duration = 0.15; // very short click
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    // Geiger tick: short metallic decay
+    let click = Math.sin(2 * Math.PI * 3200 * t) * Math.exp(-220 * t);
+    // Add small high frequency noise pop
+    click += (Math.random() * 2 - 1) * 0.15 * Math.exp(-350 * t);
+    data[i] = click * 0.42;
   }
   return buffer;
 }
@@ -3199,6 +3225,7 @@ function addAtmosphere() {
   flashlightLight = flashlight;
   camera.userData.flashlight = flashlight;
   camera.userData.flashlightProp = buildFlashlightProp();
+  camera.userData.emfProp = buildEmfProp();
 
   const ghost = new THREE.Mesh(
     new THREE.PlaneGeometry(0.82, 2.2),
@@ -3257,6 +3284,117 @@ function buildFlashlightProp() {
   group.userData.gauge = gauge;
   camera.add(group);
   return group;
+}
+
+function buildEmfProp() {
+  const group = new THREE.Group();
+  group.name = "emf_prop";
+  
+  // Handheld position relative to camera on left side
+  group.position.set(-0.32, -0.36, -0.72);
+  group.rotation.set(-0.1, -0.22, 0.08);
+
+  // Dark gray body box
+  const bodyGeo = new THREE.BoxGeometry(0.12, 0.22, 0.06);
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x3a4045, roughness: 0.8 });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  body.castShadow = true;
+  group.add(body);
+
+  // Screen plane
+  const screenGeo = new THREE.PlaneGeometry(0.09, 0.07);
+  const screenMat = new THREE.MeshBasicMaterial({ color: 0x081708 });
+  const screen = new THREE.Mesh(screenGeo, screenMat);
+  screen.position.set(0, 0.03, 0.031);
+  group.add(screen);
+
+  // Handle cylinder
+  const handleGeo = new THREE.CylinderGeometry(0.024, 0.024, 0.16, 8);
+  const handleMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9 });
+  const handle = new THREE.Mesh(handleGeo, handleMat);
+  handle.position.set(0, -0.18, 0);
+  group.add(handle);
+
+  // 5 LEDs
+  const ledGeo = new THREE.SphereGeometry(0.01, 8, 8);
+  const leds = [];
+  const colors = [0x00ff00, 0x00ff00, 0xffff00, 0xffa500, 0xff0000]; // Green, Green, Yellow, Orange, Red
+  for (let i = 0; i < 5; i++) {
+    const ledMat = new THREE.MeshBasicMaterial({ color: colors[i], transparent: true, opacity: 0.18 });
+    const led = new THREE.Mesh(ledGeo, ledMat);
+    led.position.set(-0.04 + i * 0.02, 0.088, 0.031);
+    group.add(led);
+    leds.push(led);
+  }
+  
+  group.userData = { leds };
+  group.visible = false;
+  camera.add(group);
+  return group;
+}
+
+function buildEmfPropForP2() {
+  const group = new THREE.Group();
+  group.name = "emf_prop_p2";
+  
+  // Handheld position relative to camera2 on left side
+  group.position.set(-0.32, -0.36, -0.72);
+  group.rotation.set(-0.1, -0.22, 0.08);
+
+  const body = new THREE.Mesh(
+    new THREE.BoxGeometry(0.12, 0.22, 0.06),
+    new THREE.MeshStandardMaterial({ color: 0x3a4045, roughness: 0.8 })
+  );
+  group.add(body);
+
+  const screen = new THREE.Mesh(
+    new THREE.PlaneGeometry(0.09, 0.07),
+    new THREE.MeshBasicMaterial({ color: 0x081708 })
+  );
+  screen.position.set(0, 0.03, 0.031);
+  group.add(screen);
+
+  const handle = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.024, 0.024, 0.16, 8),
+    new THREE.MeshStandardMaterial({ color: 0x1a1a1a, roughness: 0.9 })
+  );
+  handle.position.set(0, -0.18, 0);
+  group.add(handle);
+
+  const ledGeo = new THREE.SphereGeometry(0.01, 8, 8);
+  const leds = [];
+  const colors = [0x00ff00, 0x00ff00, 0xffff00, 0xffa500, 0xff0000];
+  for (let i = 0; i < 5; i++) {
+    const ledMat = new THREE.MeshBasicMaterial({ color: colors[i], transparent: true, opacity: 0.18 });
+    const led = new THREE.Mesh(ledGeo, ledMat);
+    led.position.set(-0.04 + i * 0.02, 0.088, 0.031);
+    group.add(led);
+    leds.push(led);
+  }
+  
+  group.userData = { leds };
+  group.visible = false;
+  camera2.add(group);
+  return group;
+}
+
+function setEmfActive(active) {
+  emfActive = active;
+  if (camera.userData.emfProp) {
+    camera.userData.emfProp.visible = active;
+  }
+  const panel = document.getElementById("emf-p1-panel");
+  if (panel) panel.style.display = active ? "flex" : "none";
+  addTaskLog(active ? "Equipped EMF Detector Gear." : "Holstered EMF Detector Gear.");
+}
+
+function setEmfActive2(active) {
+  emfActive2 = active;
+  if (camera2 && camera2.userData.emfProp) {
+    camera2.userData.emfProp.visible = active;
+  }
+  const panel = document.getElementById("emf-p2-panel");
+  if (panel) panel.style.display = active ? "flex" : "none";
 }
 
 function updateMovement(delta) {
@@ -3574,6 +3712,103 @@ function updateState(delta) {
   const batteryMultiplier = hardcoreMode ? 1.6 : 1.0;
   if (flashlightOn && !infiniteBatteryActive) battery = Math.max(0, battery - delta * 1.15 * batteryMultiplier);
   if (battery <= 0 && flashlightOn) setFlashlight(false);
+
+  if (emfActive && !infiniteBatteryActive) {
+    battery = Math.max(0, battery - delta * 0.46 * batteryMultiplier);
+    if (battery <= 0) setEmfActive(false);
+  }
+
+  // Player 1 EMF Reader calculation & update
+  if (emfActive) {
+    let val = 1.0;
+    if (scene.userData.meeraCharacter && scene.userData.meeraCharacter.visible) {
+      const dist = camera.position.distanceTo(scene.userData.meeraCharacter.position);
+      if (dist <= 25) {
+        const ratio = Math.max(0, 1 - (dist - 1) / 24);
+        val = 1.0 + ratio * 4.0;
+        val += (Math.random() - 0.5) * 0.15;
+        val = THREE.MathUtils.clamp(val, 1.0, 5.0);
+      } else {
+        val = 1.0 + (Math.random() - 0.5) * 0.05;
+      }
+    } else {
+      val = 1.0 + (Math.random() - 0.5) * 0.05;
+    }
+    
+    emfLevel = Math.floor(val);
+    const p1ValEl = document.getElementById("emf-p1-val");
+    const p1MeterEl = document.getElementById("emf-p1-meter");
+    const p1PanelEl = document.getElementById("emf-p1-panel");
+    if (p1ValEl) p1ValEl.textContent = val.toFixed(1);
+    if (p1MeterEl) p1MeterEl.value = val;
+    if (p1PanelEl) {
+      if (emfLevel === 5) p1PanelEl.classList.add("danger-emf");
+      else p1PanelEl.classList.remove("danger-emf");
+    }
+
+    // Handheld LEDs update
+    if (camera.userData.emfProp && camera.userData.emfProp.userData.leds) {
+      camera.userData.emfProp.userData.leds.forEach((led, idx) => {
+        led.material.opacity = idx < emfLevel ? 1.0 : 0.18;
+      });
+    }
+
+    // Sound ticking Geiger
+    emfTickTimer -= delta;
+    if (emfTickTimer <= 0) {
+      const intervals = [1.2, 0.8, 0.5, 0.24, 0.08];
+      emfTickTimer = intervals[Math.min(emfLevel - 1, 4)];
+      if (audioManager) {
+        audioManager.playSound("emf_tick", { volume: 0.18 * (emfLevel / 5) });
+      }
+    }
+  }
+
+  // Player 2 EMF Reader calculation & update
+  if (coopMode && emfActive2) {
+    let val2 = 1.0;
+    if (scene.userData.meeraCharacter && scene.userData.meeraCharacter.visible && camera2) {
+      const dist2 = camera2.position.distanceTo(scene.userData.meeraCharacter.position);
+      if (dist2 <= 25) {
+        const ratio2 = Math.max(0, 1 - (dist2 - 1) / 24);
+        val2 = 1.0 + ratio2 * 4.0;
+        val2 += (Math.random() - 0.5) * 0.15;
+        val2 = THREE.MathUtils.clamp(val2, 1.0, 5.0);
+      } else {
+        val2 = 1.0 + (Math.random() - 0.5) * 0.05;
+      }
+    } else {
+      val2 = 1.0 + (Math.random() - 0.5) * 0.05;
+    }
+
+    emfLevel2 = Math.floor(val2);
+    const p2ValEl = document.getElementById("emf-p2-val");
+    const p2MeterEl = document.getElementById("emf-p2-meter");
+    const p2PanelEl = document.getElementById("emf-p2-panel");
+    if (p2ValEl) p2ValEl.textContent = val2.toFixed(1);
+    if (p2MeterEl) p2MeterEl.value = val2;
+    if (p2PanelEl) {
+      if (emfLevel2 === 5) p2PanelEl.classList.add("danger-emf");
+      else p2PanelEl.classList.remove("danger-emf");
+    }
+
+    // Handheld LEDs update
+    if (camera2 && camera2.userData.emfProp && camera2.userData.emfProp.userData.leds) {
+      camera2.userData.emfProp.userData.leds.forEach((led, idx) => {
+        led.material.opacity = idx < emfLevel2 ? 1.0 : 0.18;
+      });
+    }
+
+    // Sound ticking Geiger
+    emfTickTimer2 -= delta;
+    if (emfTickTimer2 <= 0) {
+      const intervals2 = [1.2, 0.8, 0.5, 0.24, 0.08];
+      emfTickTimer2 = intervals2[Math.min(emfLevel2 - 1, 4)];
+      if (audioManager) {
+        audioManager.playSound("emf_tick", { volume: 0.18 * (emfLevel2 / 5) });
+      }
+    }
+  }
   
   if (godModeActive) {
     fear = 0;
@@ -3590,6 +3825,11 @@ function updateState(delta) {
   if (coopMode && camera2 && player2Flashlight) {
     if (flashlightOn2 && !infiniteBatteryActive) battery2 = Math.max(0, battery2 - delta * 1.15 * batteryMultiplier);
     if (battery2 <= 0 && flashlightOn2) setFlashlight2(false);
+
+    if (emfActive2 && !infiniteBatteryActive) {
+      battery2 = Math.max(0, battery2 - delta * 0.46 * batteryMultiplier);
+      if (battery2 <= 0) setEmfActive2(false);
+    }
 
     if (godModeActive) {
       fear2 = 0;
@@ -3756,7 +3996,14 @@ function updateState(delta) {
         const targetFlashlightOn = targetCamera ? (targetIsP2 ? flashlightOn2 : flashlightOn) : false;
         const targetWantsSprint = targetCamera ? (targetIsP2 ? player2Keys.has("ShiftRight") : keys.has("ShiftLeft")) : false;
         const targetSprintExhausted = targetCamera ? (targetIsP2 ? sprintExhausted2 : sprintExhausted) : false;
-        const playerDetected = targetCamera && ((targetFlashlightOn && targetDist < 15) || (targetDist < 7) || (targetSprintExhausted === false && targetWantsSprint && targetDist < 11));
+        const targetEmfActive = targetCamera ? (targetIsP2 ? emfActive2 : emfActive) : false;
+        const detectionMultiplier = targetEmfActive ? 1.5 : 1.0;
+        const playerDetected = targetCamera && (
+          (targetFlashlightOn && targetDist < 15 * detectionMultiplier) || 
+          (targetDist < 7 * detectionMultiplier) || 
+          (targetSprintExhausted === false && targetWantsSprint && targetDist < 11 * detectionMultiplier) ||
+          (targetEmfActive && targetDist < 16)
+        );
         
         if (playerDetected && meeraState === AiState.PATROL) {
           meeraState = AiState.CHASE;
@@ -5089,6 +5336,7 @@ function setupPlayer2() {
   
   camera2.layers.enable(0);
   camera2.layers.enable(2);
+  camera2.userData.emfProp = buildEmfPropForP2();
 
   player2Character = createCharacter({ name: p2Name, position: [0.8, 0, 8], color: 0xffffff, identity: p2Model });
   player2Character.layers.set(1);
@@ -5395,6 +5643,13 @@ function resetGame() {
     tapeSoundInstance = null;
   }
   tapeRecorderPlaying = false;
+
+  if (emfActive) setEmfActive(false);
+  if (emfActive2) setEmfActive2(false);
+  emfLevel = 1;
+  emfLevel2 = 1;
+  emfTickTimer = 0;
+  emfTickTimer2 = 0;
 
   if (camera2) {
     scene.remove(camera2);
@@ -5945,11 +6200,14 @@ document.addEventListener("keydown", (event) => {
 
   if (gameState !== GameState.PLAYING) return;
   
-  const p2Codes = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Period", "Slash", "ShiftRight"];
+  const p2Codes = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Period", "Slash", "ShiftRight", "KeyO"];
   if (coopMode && p2Codes.includes(event.code)) {
     player2Keys.add(event.code);
     if (event.code === "Period") {
       toggleFlashlight2();
+    }
+    if (event.code === "KeyO") {
+      setEmfActive2(!emfActive2);
     }
     if (event.code === "ShiftRight") {
       inspectNearest2();
@@ -5958,6 +6216,9 @@ document.addEventListener("keydown", (event) => {
     keys.add(event.code);
     if (event.code === "KeyF") {
       toggleFlashlight();
+    }
+    if (event.code === "KeyQ") {
+      setEmfActive(!emfActive);
     }
     if (event.code === "KeyE") {
       inspectNearest();

@@ -1431,6 +1431,9 @@ function initAudio() {
   const pillConsumeBuffer = createPillConsumeBuffer(audioCtx);
   audioManager.buffers.set("pill_consume", pillConsumeBuffer);
 
+  const whispersBuffer = createCreepyWhisperBuffer(audioCtx);
+  audioManager.buffers.set("creepy_whispers", whispersBuffer);
+
   const generatorStartBuffer = createGeneratorStartBuffer(audioCtx);
   audioManager.buffers.set("generator_start", generatorStartBuffer);
 

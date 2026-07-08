@@ -4412,6 +4412,19 @@ function updateState(delta) {
     samFlashlight.target.position.copy(samFlashlight.position).add(dir);
   }
 
+  if (p1Sanity < 50) {
+    const sanityIntensity = (50 - p1Sanity) / 50;
+    shakeOffset.x += (Math.random() - 0.5) * 0.03 * sanityIntensity * camShakeMultiplier;
+    shakeOffset.y += (Math.random() - 0.5) * 0.03 * sanityIntensity * camShakeMultiplier;
+    camera.rotation.z += Math.sin(clock.elapsedTime * 6) * 0.02 * sanityIntensity * camShakeMultiplier;
+  }
+  if (coopMode && camera2 && p2Sanity < 50) {
+    const sanityIntensity2 = (50 - p2Sanity) / 50;
+    camera2.position.x += (Math.random() - 0.5) * 0.02 * sanityIntensity2 * camShakeMultiplier;
+    camera2.position.y += (Math.random() - 0.5) * 0.02 * sanityIntensity2 * camShakeMultiplier;
+    camera2.rotation.z += Math.sin(clock.elapsedTime * 6) * 0.02 * sanityIntensity2 * camShakeMultiplier;
+  }
+
   updateInteractionPrompt();
   camera.position.add(shakeOffset);
 }

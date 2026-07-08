@@ -2746,6 +2746,12 @@ function buildCorridor() {
   scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [2.6, 0, -34.5], color: 0xc9d5cf, ghostly: true, identity: "Meera" });
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 
+  // Spawn a pillbox in the main corridor lobby
+  const p1PillboxGroup = new THREE.Group();
+  p1PillboxGroup.name = "corridor_pillbox";
+  level1Group.add(p1PillboxGroup);
+  buildPillboxProp([0.8, 0.78, -25.0], p1PillboxGroup, "corridor");
+
   basementGateGroup = new THREE.Group();
   basementGateGroup.name = "basement gate group";
   basementGateGroup.position.set(0, 0, -48);
@@ -2942,6 +2948,13 @@ function buildLevel2() {
   
   buildConfessionTapeMesh([6.8, 1.12, -18.2]);
 
+  // Spawn pillbox in Level 2 generator room
+  const pillboxGroupL2 = new THREE.Group();
+  pillboxGroupL2.name = "basement_pillbox_group";
+  pillboxGroupL2.position.set(6.0, 1.1, -19.0);
+  buildPillboxProp([0, 0, 0], pillboxGroupL2, "basement");
+  addToActiveLevel(pillboxGroupL2);
+
   const chamberGroup = new THREE.Group();
   chamberGroup.name = "sensory chamber";
   chamberGroup.position.set(-2.0, 0, -22.0);
@@ -3042,6 +3055,9 @@ function buildDormRoom() {
 
   // Spawn tape recorder prop
   buildTapeRecorder([0.6, 1.11, roomZ - 4.4], dormGroup);
+
+  // Spawn pillbox on Room 32 desk
+  buildPillboxProp([0.0, 1.11, roomZ - 4.25], dormGroup, "dorm");
 
   addToActiveLevel(dormGroup);
 }

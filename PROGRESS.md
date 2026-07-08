@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 120/500**
+Commit counter: **Commit 121/500**
 
 ## Commits Log
+- **Commit 121/500**: Phase 18 - Implemented sanity pill inventory collection logic.
 - **Commit 120/500**: Phase 18 - Added raycast label prompts for pillbox interaction.
 - **Commit 119/500**: Phase 18 - Spawned 3D pillbox props in key locations.
 - **Commit 118/500**: Phase 18 - Implemented 3D mesh builder function buildPillboxProp.

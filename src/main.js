@@ -4670,6 +4670,35 @@ function inspectObject(hit, isPlayer2 = false) {
     return;
   }
 
+  if (type === "pillbox") {
+    const parent = hit.object.userData.parentPillbox;
+    if (parent) {
+      if (isPlayer2) {
+        p2Pills++;
+        const p2Count = document.getElementById("pills-p2-count");
+        if (p2Count) p2Count.textContent = p2Pills;
+      } else {
+        p1Pills++;
+        const p1Count = document.getElementById("pills-p1-count");
+        if (p1Count) p1Count.textContent = p1Pills;
+      }
+      parent.visible = false;
+
+      const idx = interactables.indexOf(hit.object);
+      if (idx !== -1) {
+        interactables.splice(idx, 1);
+      }
+
+      caption.textContent = `Picked up Sanity Pills. Press [C] (P1) or [P] (P2) to consume.`;
+      sayLine(playerName, "Sanity pills... this will calm my nerves.");
+      if (audioManager) {
+        audioManager.playSound("ui_select", { volume: 0.3 });
+      }
+      addTaskLog("Picked up sanity pills box.");
+    }
+    return;
+  }
+
   if (type === "battery") {
     const parent = hit.object.userData.parentBattery;
     if (parent) {

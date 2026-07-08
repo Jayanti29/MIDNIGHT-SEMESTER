@@ -1700,6 +1700,27 @@ function createPillConsumeBuffer(ctx) {
   return buffer;
 }
 
+function createCreepyWhisperBuffer(ctx) {
+  const sampleRate = ctx.sampleRate;
+  const duration = 6.0; // 6-second loop
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const breath = 0.5 + 0.5 * Math.sin(2 * Math.PI * 0.3 * t);
+    let hiss = (Math.random() * 2 - 1) * 0.05 * breath;
+    if (t > 1.0 && t < 2.5) {
+      hiss += Math.sin(2 * Math.PI * 440 * t) * (Math.random() * 0.03) * Math.sin(Math.PI * (t - 1.0) / 1.5);
+    }
+    if (t > 3.5 && t < 5.0) {
+      hiss += Math.sin(2 * Math.PI * 220 * t) * (Math.random() * 0.04) * Math.sin(Math.PI * (t - 3.5) / 1.5);
+    }
+    data[i] = Math.max(-1.0, Math.min(1.0, hiss));
+  }
+  return buffer;
+}
+
 function createJumpscareStingerBuffer(ctx) {
   const duration = 2.4;
   const sampleRate = ctx.sampleRate;

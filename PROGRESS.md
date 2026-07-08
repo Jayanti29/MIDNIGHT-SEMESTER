@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 111/500**
+Commit counter: **Commit 112/500**
 
 ## Commits Log
+- **Commit 112/500**: Phase 18 - Declared sanity, pills count, and hallucination state variables.
 - **Commit 111/500**: Phase 18 - Added CSS styling rules for pills counter panels.
 - **Commit 110/500**: Phase 18 - Added HTML elements for P1 and P2 pills inventory counters.
 - **Commit 109/500**: Phase 18 - Added CSS styling rules for sanity panels.

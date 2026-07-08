@@ -4343,6 +4343,8 @@ function updateInteractionPrompt() {
     } else if (type === "evidence") {
       const label = hit.object.userData.interactionLabel || "Evidence";
       interactionPrompt.textContent = `[E] Inspect ${label}`;
+    } else if (type === "pillbox") {
+      interactionPrompt.textContent = "[E] Collect Sanity Pills";
     } else {
       interactionPrompt.textContent = `[E] ${hit.object.userData.interactionLabel || "Interact"}`;
     }
@@ -4373,6 +4375,8 @@ function updateInteractionPrompt() {
         } else if (type === "evidence") {
           const label = hit2.object.userData.interactionLabel || "Evidence";
           interactionPromptP2.textContent = `[ShiftRight] Inspect ${label}`;
+        } else if (type === "pillbox") {
+          interactionPromptP2.textContent = "[ShiftRight] Collect Sanity Pills";
         } else {
           interactionPromptP2.textContent = `[ShiftRight] ${hit2.object.userData.interactionLabel || "Interact"}`;
         }

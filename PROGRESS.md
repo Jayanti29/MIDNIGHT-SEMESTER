@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 105/500**
+Commit counter: **Commit 106/500**
 
 ## Commits Log
+- **Commit 106/500**: Completed Phase 16. Added New Game+ (Nightmare Mode) difficulty option, main menu Endings Gallery folder panel, and procedural Room 32 tape recorder.
 - **Commit 105/500**: Stamp-slam animations, folder-appear transitions, win epilogue typewriter, loading lore text DOM.
 - **Commit 104/500**: NPC survivor updateNpcSurvivorAnimations — nervous fidget idle, hunched follow walk, panicked flee sprint.
 - **Commit 103/500**: Diegetic HUD — hidden flat meters, ink-dot crosshair with 'x' on interactable, adaptive fear-scaled heartbeat.

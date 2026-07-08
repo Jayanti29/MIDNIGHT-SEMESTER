@@ -98,6 +98,12 @@ const choiceEndingB = document.querySelector("#choice-ending-b");
 const choiceEndingC = document.querySelector("#choice-ending-c");
 const choiceEndingD = document.querySelector("#choice-ending-d");
 
+const startPlusButton = document.querySelector("#start-plus-button");
+const menuEndingsButton = document.querySelector("#menu-endings");
+const endingsGallery = document.querySelector("#endings-gallery");
+const endingsCloseBtn = document.querySelector("#endings-close-btn");
+const hardcoreBadge = document.querySelector("#hardcore-badge");
+
 const loadingManager = new THREE.LoadingManager();
 
 loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
@@ -658,6 +664,9 @@ let kulkarniCallPlayed = false;
 let meeraSecondEventPlayed = false;
 let activeCountdownFlicker = false;
 let meeraDiaryReacted = false;
+let hardcoreMode = false;
+let tapeRecorderPlaying = false;
+let tapeSoundInstance = null;
 let meeraFinalEventPlayed = false;
 let activeApparitionWalk = false;
 let apparitionGhost = null;
@@ -1407,6 +1416,9 @@ function initAudio() {
   const generatorStartBuffer = createGeneratorStartBuffer(audioCtx);
   audioManager.buffers.set("generator_start", generatorStartBuffer);
 
+  const tapeBuffer = createTapePrequelBuffer(audioCtx);
+  audioManager.buffers.set("tape_prequel", tapeBuffer);
+
   // Play spatial buzzing hum on a couple of the corridor lights
   flickerLights.forEach((lightObj, index) => {
     if (index % 2 === 0) {
@@ -1571,6 +1583,68 @@ function createTickingBuffer(ctx) {
       click = Math.sin(2 * Math.PI * 1200 * t) * Math.exp(-120 * t);
     }
     data[i] = click * 0.18;
+  }
+  return buffer;
+}
+
+function createTapePrequelBuffer(ctx) {
+  const sampleRate = ctx.sampleRate;
+  const duration = 12.0; // 12 seconds
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+
+  // Generate base static hum + metronome clicks + code frequency beeps
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    
+    // 12Hz deep carrier hum (Dr. Verma's neural grid)
+    let sample = Math.sin(2 * Math.PI * 12 * t) * 0.15;
+    
+    // Metronome tick every 1.2 seconds
+    const tickPeriod = 1.2;
+    const tInPeriod = t % tickPeriod;
+    if (tInPeriod < 0.05) {
+      // Wood creak click
+      sample += Math.sin(2 * Math.PI * 800 * tInPeriod) * Math.exp(-150 * tInPeriod) * 0.4;
+    }
+    
+    // Voice/beeps at key timings representing the numbers
+    // 42 at t = 2.2 - 3.2
+    if (t >= 2.2 && t < 3.2) {
+      const dt = t - 2.2;
+      const freq = 300 + Math.sin(2 * Math.PI * 8 * dt) * 50;
+      sample += Math.sin(2 * Math.PI * freq * dt) * Math.exp(-3 * dt) * 0.25;
+    }
+    // 18 at t = 4.2 - 5.2
+    if (t >= 4.2 && t < 5.2) {
+      const dt = t - 4.2;
+      const freq = 200 + Math.sin(2 * Math.PI * 6 * dt) * 30;
+      sample += Math.sin(2 * Math.PI * freq * dt) * Math.exp(-3 * dt) * 0.25;
+    }
+    // 5 at t = 6.2 - 7.2
+    if (t >= 6.2 && t < 7.2) {
+      const dt = t - 6.2;
+      const freq = 120 + Math.sin(2 * Math.PI * 4 * dt) * 20;
+      sample += Math.sin(2 * Math.PI * freq * dt) * Math.exp(-3 * dt) * 0.25;
+    }
+    // 0 at t = 8.2 - 9.2
+    if (t >= 8.2 && t < 9.2) {
+      const dt = t - 8.2;
+      const freq = 60 + Math.sin(2 * Math.PI * 2 * dt) * 10;
+      sample += Math.sin(2 * Math.PI * freq * dt) * Math.exp(-3 * dt) * 0.25;
+    }
+    
+    // Glitches and tape static (random pops)
+    if (Math.random() < 0.00015) {
+      sample += (Math.random() * 2 - 1) * 0.6;
+    }
+    
+    // Faint creepy white noise background sweep
+    const sweepVolume = 0.04 + Math.sin(t * 1.5) * 0.03;
+    sample += (Math.random() * 2 - 1) * sweepVolume;
+    
+    data[i] = Math.max(-1.0, Math.min(1.0, sample));
   }
   return buffer;
 }
@@ -2891,7 +2965,48 @@ function buildDormRoom() {
   // Task 68: Add metronome prop on desk
   buildMetronome([-0.6, 1.11, roomZ - 4.4], dormGroup);
 
+  // Spawn tape recorder prop
+  buildTapeRecorder([0.6, 1.11, roomZ - 4.4], dormGroup);
+
   addToActiveLevel(dormGroup);
+}
+
+function buildTapeRecorder(position, dormGroup) {
+  const group = new THREE.Group();
+  group.name = "tape_recorder_group";
+  group.position.set(...position);
+
+  // Recorder body
+  const bodyGeo = new THREE.BoxGeometry(0.26, 0.14, 0.18);
+  const bodyMesh = new THREE.Mesh(bodyGeo, materials.darkWood);
+  bodyMesh.castShadow = true;
+  bodyMesh.receiveShadow = true;
+  group.add(bodyMesh);
+
+  // Left Reel
+  const reelGeo = new THREE.CylinderGeometry(0.045, 0.045, 0.02, 12);
+  const reelL = new THREE.Mesh(reelGeo, materials.brass);
+  reelL.position.set(-0.06, 0.08, 0);
+  reelL.castShadow = true;
+  group.add(reelL);
+
+  // Right Reel
+  const reelR = new THREE.Mesh(reelGeo, materials.brass);
+  reelR.position.set(0.06, 0.08, 0);
+  reelR.castShadow = true;
+  group.add(reelR);
+
+  // Small speaker grille
+  const grilleGeo = new THREE.BoxGeometry(0.08, 0.01, 0.08);
+  const grille = new THREE.Mesh(grilleGeo, materials.darkWood);
+  grille.position.set(0, 0.075, 0);
+  group.add(grille);
+
+  tagInteractable(bodyMesh, "tape_recorder", "Audio Recorder");
+  bodyMesh.userData.parentRecorder = group;
+
+  dormGroup.attach(group);
+  interactables.push(bodyMesh);
 }
 
 function buildMetronome(position, dormGroup) {
@@ -3456,7 +3571,8 @@ function updateState(delta) {
     }
   }
 
-  if (flashlightOn && !infiniteBatteryActive) battery = Math.max(0, battery - delta * 1.15);
+  const batteryMultiplier = hardcoreMode ? 1.6 : 1.0;
+  if (flashlightOn && !infiniteBatteryActive) battery = Math.max(0, battery - delta * 1.15 * batteryMultiplier);
   if (battery <= 0 && flashlightOn) setFlashlight(false);
   
   if (godModeActive) {
@@ -3472,7 +3588,7 @@ function updateState(delta) {
 
   // Player 2 Flashlight, Battery, and Fear updates
   if (coopMode && camera2 && player2Flashlight) {
-    if (flashlightOn2 && !infiniteBatteryActive) battery2 = Math.max(0, battery2 - delta * 1.15);
+    if (flashlightOn2 && !infiniteBatteryActive) battery2 = Math.max(0, battery2 - delta * 1.15 * batteryMultiplier);
     if (battery2 <= 0 && flashlightOn2) setFlashlight2(false);
 
     if (godModeActive) {
@@ -3592,7 +3708,7 @@ function updateState(delta) {
     
     if (meeraState === AiState.INACTIVE) {
       if (currentLevel === 1) {
-        if (camera.position.z < -16 || fear > 28 || (coopMode && (camera2.position.z < -16 || fear2 > 28))) {
+        if (hardcoreMode || camera.position.z < -16 || fear > 28 || (coopMode && (camera2.position.z < -16 || fear2 > 28))) {
           meeraState = AiState.PATROL;
           meera.position.set(0, 0, -35);
           meera.visible = true;
@@ -4254,6 +4370,42 @@ function inspectObject(hit, isPlayer2 = false) {
         audioManager.playSound("ui_select", { volume: 0.25 });
       }
       addTaskLog("Checkpoint reached: System logs saved.");
+    }
+    return;
+  }
+
+  if (type === "tape_recorder") {
+    if (!hardcoreMode) {
+      caption.textContent = "A heavy magnetic tape recorder from 2004. The reels are stuck. The label reads: 'Applied Cognition Lab - Trial 8'.";
+      sayLine(playerName, "This must have belonged to the lab researchers. I wonder if there's a way to play it...");
+      addTaskLog("Inspected the locked tape recorder.");
+    } else {
+      if (tapeRecorderPlaying) {
+        tapeRecorderPlaying = false;
+        caption.textContent = "You stopped the tape recorder.";
+        if (tapeSoundInstance) {
+          try {
+            tapeSoundInstance.stop();
+          } catch (e) {}
+          tapeSoundInstance = null;
+        }
+        addTaskLog("Stopped the tape recorder playback.");
+      } else {
+        tapeRecorderPlaying = true;
+        caption.textContent = "[Audio Log]: Subject M... 42... 18... 5... 0... [static]... help me...";
+        sayLine(playerName, "The reels are spinning! This is Meera's voice... she's reciting the sequence!");
+        addTaskLog("Played the historical prequel recording.");
+        if (audioManager) {
+          tapeSoundInstance = audioManager.playSound("tape_prequel", { volume: 0.8 });
+          if (tapeSoundInstance) {
+            tapeSoundInstance.onEnded = () => {
+              tapeRecorderPlaying = false;
+              tapeSoundInstance = null;
+              addTaskLog("Tape recorder playback completed.");
+            };
+          }
+        }
+      }
     }
     return;
   }
@@ -4992,6 +5144,28 @@ function startGame({ lockPointer = true } = {}) {
   statTimesHidden = 0;
   statCansThrown = 0;
   statFearPeak = 0;
+  
+  if (hardcoreMode) {
+    meeraSpeedMultiplier = 1.4;
+    const hardcoreNotes = [
+      { title: "Maintenance Fuse Notice", body: "Block A backup grid rerouted to Laboratory Room 2A. Do not adjust fuses. — Chief Warden, 2019." },
+      { title: "Torn Lab Page", body: "Subject M has stopped eating. She says something counts on the walls at night. We continue." },
+      { title: "Meera's Wall Scrawl", body: "The metronome doesn't need power. It never did. — M.I." },
+      { title: "Burned Safety Notice", body: "All Applied Cognition experiments suspended pending ethics review. Files to be sealed until 2025. Access revoked. — Dean's Office, 2005." },
+      { title: "Dean's Secret Memo", body: "Kulkarni, the Ministry is questioning the volunteer registry. We cannot account for Meera Iyer's academic status. Erase all records from the Block A local server immediately." },
+      { title: "Dr. Verma's Confession Tape", body: "Verification of Subject M's isolation timeline reveals multiple breaches in the trial logs. Verma confessed to forging data parameters. The patient's state is persistent." },
+      { title: "Meera's Diary Page", body: "October 12, 2004. The noise in the walls isn't random. It's a sequence. 42, 18, 5, 0... If I stop counting, the doors stay locked. If I sleep, they change the sequence." },
+      { title: "Capstone Project Report", body: "Ravenswood Capstone 2026 - Aarav Mehta. Topic: Neural Synchronization via Low-Frequency Audio Stimuli. Notes: The backup grid in Block A still hums at 12Hz, exactly matching the target frequency from the 2004 experiments." }
+    ];
+    hardcoreNotes.forEach(n => {
+      readLoreNotes.add(n.title);
+      collectedDocuments.set(n.title, n.body);
+    });
+    if (hardcoreBadge) hardcoreBadge.style.display = "flex";
+  } else {
+    meeraSpeedMultiplier = 1.0;
+    if (hardcoreBadge) hardcoreBadge.style.display = "none";
+  }
 
   // Spawn solo player character (always, even outside coop mode)
   if (!scene.userData.player1Character) {
@@ -5123,6 +5297,12 @@ function triggerEnding(endingId) {
   setGameState(GameState.WIN);
   document.exitPointerLock?.();
   
+  let unlocked = JSON.parse(localStorage.getItem("ms_unlocked_endings") || "[]");
+  if (!unlocked.includes(endingId)) {
+    unlocked.push(endingId);
+    localStorage.setItem("ms_unlocked_endings", JSON.stringify(unlocked));
+  }
+  
   if (audioManager) {
     audioManager.fadeAmbientOut(3.0);
   }
@@ -5185,8 +5365,12 @@ function triggerEnding(endingId) {
   }
 
   if (winStats) {
+    const runBadge = hardcoreMode 
+      ? `<div style="color: #ff3b30; font-weight: bold; text-align: center; border: 1px solid #ff3b30; padding: 6px; border-radius: 4px; margin-bottom: 8px; font-size: 0.8rem; background: rgba(255, 59, 48, 0.15); animation: pulse-red 2s infinite; box-sizing: border-box;">NIGHTMARE RUN SUCCESSFUL</div>`
+      : "";
     winStats.innerHTML = `
 <div style="text-align: left; background: rgba(14, 11, 9, 0.95); padding: 16px; border: 1px solid #584435; border-radius: 6px; display: flex; flex-direction: column; gap: 8px; font-family: monospace; color: #d8c39f; font-size: 0.82rem; width: 100%; box-sizing: border-box; margin-top: 14px; box-shadow: 0 4px 16px rgba(0,0,0,0.8);">
+  ${runBadge}
   <div style="color: #ffc87a; font-weight: bold; font-size: 0.9rem; text-align: center; border-bottom: 1px solid #584435; padding-bottom: 6px; margin-bottom: 6px;">RUN SCOREBOARD</div>
   <div style="display: flex; justify-content: space-between;"><span>ESCAPE TIME:</span><span style="color: #73d08a;">${speedrunDuration}s</span></div>
   <div style="display: flex; justify-content: space-between;"><span>LORE COLLECTED:</span><span style="color: #73d08a;">${docsCollected}/8</span></div>
@@ -5204,6 +5388,14 @@ function triggerEnding(endingId) {
 }
 
 function resetGame() {
+  if (tapeSoundInstance) {
+    try {
+      tapeSoundInstance.stop();
+    } catch (e) {}
+    tapeSoundInstance = null;
+  }
+  tapeRecorderPlaying = false;
+
   if (camera2) {
     scene.remove(camera2);
     camera2 = null;
@@ -5571,6 +5763,16 @@ btnCharConfirm?.addEventListener("click", () => {
 });
 
 startButton.addEventListener("click", () => {
+  hardcoreMode = false;
+  coopMode = false;
+  startScreen.classList.add("hidden");
+  if (charSelectScreen) charSelectScreen.style.display = "block";
+  charSelectActive = true;
+  initCharacterSelect();
+  animateCharacterSelect();
+});
+startPlusButton?.addEventListener("click", () => {
+  hardcoreMode = true;
   coopMode = false;
   startScreen.classList.add("hidden");
   if (charSelectScreen) charSelectScreen.style.display = "block";
@@ -5579,6 +5781,7 @@ startButton.addEventListener("click", () => {
   animateCharacterSelect();
 });
 coopButton.addEventListener("click", () => {
+  hardcoreMode = false;
   coopMode = true;
   startGame();
 });
@@ -5972,6 +6175,81 @@ if (settingBrightness) {
   renderer.toneMappingExposure = screenBrightness;
 }
 updateDossierPreview();
+
+// Phase 16: Initial menu and archive checking
+const unlockedEndings = JSON.parse(localStorage.getItem("ms_unlocked_endings") || "[]");
+if (unlockedEndings.length > 0 && startPlusButton) {
+  startPlusButton.style.display = "block";
+}
+
+menuEndingsButton?.addEventListener("click", openEndingsGallery);
+endingsCloseBtn?.addEventListener("click", () => {
+  endingsGallery.style.display = "none";
+  startScreen.classList.remove("hidden");
+});
+
+function openEndingsGallery() {
+  const unlocked = JSON.parse(localStorage.getItem("ms_unlocked_endings") || "[]");
+  if (document.getElementById("endings-progress-count")) {
+    document.getElementById("endings-progress-count").textContent = `${unlocked.length}/4`;
+  }
+  
+  const endingsData = {
+    "A": {
+      title: "PROTOCOL A: PUBLIC BROADCAST (THE TRUTH RELEASED)",
+      body: "Aarav initiated a public broadcast of the 2004 sensory isolation data, exposing Ravenswood's illegal cognitive experiments. Meera's story is finally known. The facility was permanently closed following a federal probe."
+    },
+    "B": {
+      title: "PROTOCOL B: HANDOVER TO KULKARNI (THE FILES SEALED)",
+      body: "Aarav securely transferred all data directly to Professor Kulkarni. Within hours, the server was wiped and the basement staircase was walled over with fresh concrete. Aarav received his degree, and the silence remains."
+    },
+    "C": {
+      title: "PROTOCOL C: TERMINATE GRID & STAY (LOST IN THE HUM)",
+      body: "Aarav manually cut all power grids and stayed in the dark with Meera, matching the metronome's ticking. No one ever found him, but the backup grid still hums at 12Hz..."
+    },
+    "D": {
+      title: "PROTOCOL D: EMERGENCY EXIT (SURVIVAL)",
+      body: "Aarav triggered the emergency release hatch and escaped into the cold morning air, leaving the data behind. He survived, but the weight of what he left behind will follow him forever."
+    }
+  };
+
+  ["A", "B", "C", "D"].forEach(id => {
+    const card = document.getElementById(`card-ending-${id.toLowerCase()}`);
+    if (!card) return;
+    const status = card.querySelector(".ending-status");
+    const desc = card.querySelector(".ending-desc");
+    if (unlocked.includes(id)) {
+      card.style.background = "#faf4e8";
+      card.style.borderColor = "#ad9e89";
+      if (status) {
+        status.textContent = "[UNLOCKED]";
+        status.style.color = "#73d08a";
+      }
+      if (desc) {
+        desc.innerHTML = `<strong>Result:</strong> ${endingsData[id].body}`;
+      }
+    } else {
+      card.style.background = "rgba(250, 244, 232, 0.4)";
+      card.style.borderColor = "#c8b9a5";
+      if (status) {
+        status.textContent = "[LOCKED]";
+        status.style.color = "#b22822";
+      }
+      if (desc) {
+        desc.textContent = id === "A" 
+          ? "Expose Ravenswood's cognitive experiments. (Requires 5 Lore Notes + collect Dr. Verma's Confession Tape)."
+          : id === "B"
+            ? "Trust the faculty liaison. Relinquish all data findings."
+            : id === "C"
+              ? "Sever the campus backup grid and stay behind with the presence."
+              : "Escape immediately through the maintenance generator door without collecting the logs.";
+      }
+    }
+  });
+
+  startScreen.classList.add("hidden");
+  endingsGallery.style.display = "block";
+}
 
 window.addEventListener("resize", () => {
   const aspect = window.innerWidth / window.innerHeight;

@@ -3964,6 +3964,7 @@ function updateState(delta) {
   
   if (godModeActive) {
     fear = 0;
+    p1Sanity = 100;
   } else {
     const depthFear = THREE.MathUtils.clamp((-camera.position.z - 6) * 1.7, 0, 58);
     const darknessFear = flashlightOn ? 0 : 24;
@@ -3971,6 +3972,38 @@ function updateState(delta) {
     if (fear >= 100 && gameState === GameState.PLAYING) {
       triggerGameOver("Aarav's heart could not take the terror. The dark claimed him.");
     }
+
+    let sanityDrain = 0;
+    if (!flashlightOn) {
+      sanityDrain += 1.5;
+    }
+    if (scene.userData.meeraCharacter && scene.userData.meeraCharacter.visible) {
+      const distToMeera = camera.position.distanceTo(scene.userData.meeraCharacter.position);
+      if (distToMeera < 12.0) {
+        sanityDrain += 4.5 * (1.0 - (distToMeera / 12.0));
+      }
+    }
+    if (hardcoreMode) {
+      sanityDrain *= 1.45;
+    }
+
+    if (sanityDrain > 0) {
+      p1Sanity = Math.max(0, p1Sanity - delta * sanityDrain);
+    } else {
+      if (currentLevel === 1 && camera.position.z > -12) {
+        p1Sanity = Math.min(100, p1Sanity + delta * 2.0);
+      }
+    }
+  }
+
+  const sanity1Val = document.getElementById("sanity-p1-val");
+  const sanity1Meter = document.getElementById("sanity-p1-meter");
+  const sanity1Panel = document.getElementById("sanity-p1-panel");
+  if (sanity1Val) sanity1Val.textContent = `${Math.round(p1Sanity)}%`;
+  if (sanity1Meter) sanity1Meter.value = p1Sanity;
+  if (sanity1Panel) {
+    if (p1Sanity <= 30) sanity1Panel.classList.add("critical-sanity");
+    else sanity1Panel.classList.remove("critical-sanity");
   }
 
   // Player 2 Flashlight, Battery, and Fear updates
@@ -3985,6 +4018,7 @@ function updateState(delta) {
 
     if (godModeActive) {
       fear2 = 0;
+      p2Sanity = 100;
     } else {
       const depthFear2 = THREE.MathUtils.clamp((-camera2.position.z - 6) * 1.7, 0, 58);
       const darknessFear2 = flashlightOn2 ? 0 : 24;
@@ -3992,6 +4026,38 @@ function updateState(delta) {
       if (fear2 >= 100 && gameState === GameState.PLAYING) {
         triggerGameOver("Rohan's heart could not take the terror. The dark claimed him.");
       }
+
+      let sanityDrain2 = 0;
+      if (!flashlightOn2) {
+        sanityDrain2 += 1.5;
+      }
+      if (scene.userData.meeraCharacter && scene.userData.meeraCharacter.visible) {
+        const distToMeera2 = camera2.position.distanceTo(scene.userData.meeraCharacter.position);
+        if (distToMeera2 < 12.0) {
+          sanityDrain2 += 4.5 * (1.0 - (distToMeera2 / 12.0));
+        }
+      }
+      if (hardcoreMode) {
+        sanityDrain2 *= 1.45;
+      }
+
+      if (sanityDrain2 > 0) {
+        p2Sanity = Math.max(0, p2Sanity - delta * sanityDrain2);
+      } else {
+        if (currentLevel === 1 && camera2.position.z > -12) {
+          p2Sanity = Math.min(100, p2Sanity + delta * 2.0);
+        }
+      }
+    }
+
+    const sanity2Val = document.getElementById("sanity-p2-val");
+    const sanity2Meter = document.getElementById("sanity-p2-meter");
+    const sanity2Panel = document.getElementById("sanity-p2-panel");
+    if (sanity2Val) sanity2Val.textContent = `${Math.round(p2Sanity)}%`;
+    if (sanity2Meter) sanity2Meter.value = p2Sanity;
+    if (sanity2Panel) {
+      if (p2Sanity <= 30) sanity2Panel.classList.add("critical-sanity");
+      else sanity2Panel.classList.remove("critical-sanity");
     }
 
     if (flashlightOn2 && player2Flashlight.parent !== camera2) {

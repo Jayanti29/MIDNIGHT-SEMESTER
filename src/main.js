@@ -1681,6 +1681,22 @@ function createEmfTickBuffer(ctx) {
   return buffer;
 }
 
+function createPillConsumeBuffer(ctx) {
+  const sampleRate = ctx.sampleRate;
+  const duration = 0.45; // 450ms gulp
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const freq = 120 * Math.exp(-6 * t) + 80;
+    const amp = Math.sin(2 * Math.PI * freq * t) * Math.sin(Math.PI * (t / duration));
+    const noise = (Math.random() * 2 - 1) * 0.12 * Math.exp(-12 * t);
+    data[i] = (amp + noise) * 0.5;
+  }
+  return buffer;
+}
+
 function createJumpscareStingerBuffer(ctx) {
   const duration = 2.4;
   const sampleRate = ctx.sampleRate;

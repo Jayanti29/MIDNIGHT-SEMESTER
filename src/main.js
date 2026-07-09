@@ -1699,6 +1699,28 @@ function createEmfTickBuffer(ctx) {
   return buffer;
 }
 
+function createHeartBeatSlowBuffer(ctx) {
+  const sampleRate = ctx.sampleRate;
+  const duration = 1.0;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    let val = 0;
+    if (t >= 0.05 && t < 0.25) {
+      const dt = t - 0.05;
+      val += Math.sin(2 * Math.PI * 55 * dt) * Math.exp(-22 * dt) * 0.7;
+    }
+    if (t >= 0.25 && t < 0.45) {
+      const dt = t - 0.25;
+      val += Math.sin(2 * Math.PI * 75 * dt) * Math.exp(-25 * dt) * 0.55;
+    }
+    data[i] = val;
+  }
+  return buffer;
+}
+
 function createPillConsumeBuffer(ctx) {
   const sampleRate = ctx.sampleRate;
   const duration = 0.45; // 450ms gulp

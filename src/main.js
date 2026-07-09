@@ -5058,6 +5058,11 @@ function inspectObject(hit, isPlayer2 = false) {
     return;
   }
 
+  if (type === "ecg_sensors") {
+    // Collection logic to be implemented in Commit 144
+    return;
+  }
+
   if (type === "battery") {
     const parent = hit.object.userData.parentBattery;
     if (parent) {

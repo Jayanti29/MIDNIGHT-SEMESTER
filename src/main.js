@@ -4254,6 +4254,21 @@ function updateState(delta) {
     p1LockerMinigameProgress = Math.max(-50, p1LockerMinigameProgress - delta * 4);
     const progressMeter = document.getElementById("breath-progress-meter-p1");
     if (progressMeter) progressMeter.value = p1LockerMinigameProgress;
+
+    if (p1LockerMinigameProgress <= -50) {
+      p1LockerMinigameActive = false;
+      fear = 100;
+      caption.textContent = "You panicked! The ghost heard your hyperventilation!";
+      if (audioManager) {
+        audioManager.playSound("creepy_whisper", { volume: 0.85 });
+      }
+      activeNoiseEventZ = camera.position.z;
+      noiseInvestigateTimer = 10.0;
+      if (scene.userData.meeraCharacter) {
+        meeraState = AiState.CHASE;
+        lockerAlertState = true;
+      }
+    }
   }
 
   // Player 2 Flashlight, Battery, and Fear updates
@@ -4390,6 +4405,21 @@ function updateState(delta) {
       p2LockerMinigameProgress = Math.max(-50, p2LockerMinigameProgress - delta * 4);
       const progressMeter2 = document.getElementById("breath-progress-meter-p2");
       if (progressMeter2) progressMeter2.value = p2LockerMinigameProgress;
+
+      if (p2LockerMinigameProgress <= -50) {
+        p2LockerMinigameActive = false;
+        fear2 = 100;
+        caption.textContent = "Player 2 panicked! The ghost heard hyperventilation!";
+        if (audioManager) {
+          audioManager.playSound("creepy_whisper", { volume: 0.85 });
+        }
+        activeNoiseEventZ = camera2.position.z;
+        noiseInvestigateTimer = 10.0;
+        if (scene.userData.meeraCharacter) {
+          meeraState = AiState.CHASE;
+          lockerAlertState = true;
+        }
+      }
     }
 
     if (flashlightOn2 && player2Flashlight.parent !== camera2) {
@@ -7372,10 +7402,44 @@ renderer.setAnimationLoop(() => {
 });
 
 function checkBreathingMinigameHitP1() {
-  // Placeholder to be fully implemented in Commit 159/160
+  if (!p1LockerMinigameActive) return;
+
+  const cycleSpeed = 2.4 + (p1HeartRate - 70) * 0.02;
+  const breathTime = clock.getElapsedTime() * cycleSpeed;
+  const indicatorPos = 50 + Math.sin(breathTime) * 45;
+
+  if (indicatorPos >= 40 && indicatorPos <= 60) {
+    // Reward placeholder for Commit 160
+  } else {
+    p1LockerMinigameProgress = Math.max(-50, p1LockerMinigameProgress - 25);
+    fear = Math.min(100, fear + 20);
+    caption.textContent = "Missed rhythm! Heavy panting alerts the ghost.";
+    if (audioManager) {
+      audioManager.playSound("ui_select", { volume: 0.15 });
+    }
+    activeNoiseEventZ = camera.position.z;
+    noiseInvestigateTimer = 6.0;
+  }
 }
 
 function checkBreathingMinigameHitP2() {
-  // Placeholder to be fully implemented in Commit 159/160
+  if (!p2LockerMinigameActive) return;
+
+  const cycleSpeed2 = 2.4 + (p2HeartRate - 70) * 0.02;
+  const breathTime2 = clock.getElapsedTime() * cycleSpeed2;
+  const indicatorPos2 = 50 + Math.sin(breathTime2) * 45;
+
+  if (indicatorPos2 >= 40 && indicatorPos2 <= 60) {
+    // Reward placeholder for Commit 160
+  } else {
+    p2LockerMinigameProgress = Math.max(-50, p2LockerMinigameProgress - 25);
+    fear2 = Math.min(100, fear2 + 20);
+    caption.textContent = "Player 2 missed rhythm! Noise generated.";
+    if (audioManager) {
+      audioManager.playSound("ui_select", { volume: 0.15 });
+    }
+    activeNoiseEventZ = camera2.position.z;
+    noiseInvestigateTimer = 6.0;
+  }
 }
 

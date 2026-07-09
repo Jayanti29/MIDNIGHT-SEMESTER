@@ -242,6 +242,34 @@
         <!-- Panic Blur Overlays -->
         <div id="panic-overlay-p1" class="panic-overlay"></div>
         <div id="panic-overlay-p2" class="panic-overlay"></div>
+
+        <!-- P1 Locker Breathing Minigame Panel -->
+        <div id="breath-minigame-p1" class="minigame-panel" style="display: none;">
+          <div class="minigame-title">Heart Rate Stabilization</div>
+          <div class="minigame-subtitle">Synchronize Breath: Press [SPACE] inside the green zone</div>
+          <div class="minigame-track">
+            <div id="breath-target-p1" class="minigame-target"></div>
+            <div id="breath-indicator-p1" class="minigame-indicator"></div>
+          </div>
+          <div class="minigame-progress-container">
+            <span class="label">Calmness</span>
+            <meter id="breath-progress-meter-p1" min="0" max="100" value="30"></meter>
+          </div>
+        </div>
+
+        <!-- P2 Locker Breathing Minigame Panel -->
+        <div id="breath-minigame-p2" class="minigame-panel" style="display: none;">
+          <div class="minigame-title">Heart Rate Stabilization (P2)</div>
+          <div class="minigame-subtitle">Synchronize Breath: Press [Period] inside the green zone</div>
+          <div class="minigame-track">
+            <div id="breath-target-p2" class="minigame-target"></div>
+            <div id="breath-indicator-p2" class="minigame-indicator"></div>
+          </div>
+          <div class="minigame-progress-container">
+            <span class="label">Calmness</span>
+            <meter id="breath-progress-meter-p2" min="0" max="100" value="30"></meter>
+          </div>
+        </div>
         <!-- In-World Journal / Notebook Prop for Objectives -->
         <div id="journal-notebook" class="notebook-prop">
           <div class="notebook-header">Aarav's Journal</div>

@@ -1609,5 +1609,161 @@ body:not(.coop-active) #breath-minigame-p1 {
   height: 8px;
 }
 
+/* Decryptor Terminal Styles */
+.terminal-overlay {
+  background: #020804 !important; /* Retro dark green CRT screen background */
+  border: 4px solid #1a331e !important;
+  color: #39ff14 !important; /* Neon green text */
+  box-shadow: 0 0 30px rgba(57, 255, 20, 0.4), inset 0 0 20px rgba(57, 255, 20, 0.2) !important;
+  font-family: 'Courier New', Courier, monospace !important;
+  padding: 20px !important;
+  width: min(480px, calc(100vw - 32px)) !important;
+  border-radius: 4px !important;
+}
+
+.terminal-screen {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.terminal-scanlines {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+  background-size: 100% 4px, 6px 100%;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.terminal-header {
+  border-bottom: 2px solid #39ff14;
+  padding-bottom: 8px;
+  font-weight: bold;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  text-shadow: 0 0 4px #39ff14;
+}
+
+.terminal-body {
+  margin: 15px 0;
+  flex: 1;
+}
+
+.matrix-text {
+  margin: 6px 0;
+  font-size: 0.85rem;
+  text-shadow: 0 0 3px #39ff14;
+}
+
+.matrix-text.text-small {
+  font-size: 0.72rem;
+}
+
+.status-msg {
+  text-align: center;
+  font-weight: bold;
+  font-size: 0.9rem;
+  margin: 15px 0 10px;
+  animation: terminal-blink 1.5s infinite;
+}
+
+.frequency-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+.frequency-bar {
+  flex: 1;
+  height: 20px;
+  background: #051408;
+  border: 1px solid #39ff14;
+  position: relative;
+  overflow: hidden;
+}
+
+.frequency-target {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: rgba(57, 255, 20, 0.3);
+  border-left: 2px dashed #39ff14;
+  border-right: 2px dashed #39ff14;
+}
+
+.frequency-indicator {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: #39ff14;
+  box-shadow: 0 0 8px #39ff14;
+  transform: translateX(-50%);
+}
+
+.terminal-btn {
+  background: #051408;
+  color: #39ff14;
+  border: 1px solid #39ff14;
+  padding: 8px 16px;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-shadow: 0 0 2px #39ff14;
+}
+
+.terminal-btn:hover {
+  background: #39ff14;
+  color: #020804;
+  box-shadow: 0 0 12px #39ff14;
+}
+
+.terminal-btn:active {
+  transform: scale(0.98);
+}
+
+.terminal-btn.close-btn {
+  border-color: #ff3939;
+  color: #ff3939;
+  text-shadow: 0 0 2px #ff3939;
+}
+
+.terminal-btn.close-btn:hover {
+  background: #ff3939;
+  color: #020804;
+  box-shadow: 0 0 12px #ff3939;
+}
+
+.progress-container {
+  margin-top: 15px;
+}
+
+.progress-container meter {
+  width: 100%;
+  height: 12px;
+  border: 1px solid #39ff14;
+  background: #051408;
+}
+
+.progress-container meter::-webkit-meter-bar {
+  background: #051408;
+}
+
+.progress-container meter::-webkit-meter-value {
+  background: #39ff14;
+  box-shadow: 0 0 6px #39ff14;
+}
+
+@keyframes terminal-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
 
 

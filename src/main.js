@@ -734,6 +734,7 @@ let p2DebrisCount = 0;
 let activeNoiseEventZ = null;
 let noiseInvestigateTimer = 0;
 let libraryFoldersCollected = new Set();
+let searchedCabinets = new Set();
 let decryptedLogsCount = 0;
 let p1LockerPeeking = false;
 let p2LockerPeeking = false;
@@ -5664,6 +5665,33 @@ function inspectObject(hit, isPlayer2 = false) {
       caption.textContent = "Accessing Main Operations Terminal. Select system protocol.";
       addTaskLog("Accessed exit operations terminal.");
     }
+    return;
+  }
+
+  if (type === "filing_cabinet") {
+    const cabinetId = hit.object.id;
+    if (searchedCabinets.has(cabinetId)) {
+      caption.textContent = "The cabinet drawers are empty.";
+      sayLine(playerName, "Nothing else inside this cabinet.");
+      if (audioManager) audioManager.playSound("door_latch", { volume: 0.35 });
+    } else {
+      searchedCabinets.add(cabinetId);
+      libraryFoldersCollected.add(cabinetId);
+      caption.textContent = "You found an Encrypted Research Folder inside the cabinet drawer.";
+      sayLine(playerName, "An encrypted research log. I should take this to the decryptor terminal in the center.");
+      if (audioManager) {
+        audioManager.playSound("drawer_slide", { volume: 0.6 });
+        audioManager.playSound("ui_select", { volume: 0.4 });
+      }
+      addTaskLog("Recovered encrypted research log folder.");
+    }
+    return;
+  }
+
+  if (type === "bookshelf") {
+    caption.textContent = "Rows of old textbooks, university circulars, and disused binders.";
+    sayLine(playerName, "Nothing useful here. Just dust and old academic documents.");
+    if (audioManager) audioManager.playSound("ui_hover", { volume: 0.2 });
     return;
   }
 }

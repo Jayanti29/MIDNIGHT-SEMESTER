@@ -688,6 +688,10 @@ let p2LockerMinigameProgress = 0;
 let p1BreathState = "hold";
 let p2BreathState = "hold";
 let ecgSensorsCollected = false;
+let p1HeartbeatSlowNode = null;
+let p1HeartbeatFastNode = null;
+let p2HeartbeatSlowNode = null;
+let p2HeartbeatFastNode = null;
 let shadowSpawnTimer = 0;
 let creepyWhisperTimer = 0;
 let shadowFigures = [];
@@ -4069,6 +4073,39 @@ function updateState(delta) {
     ecgPath1.style.animationDuration = `${60 / p1HeartRate}s`;
   }
 
+  if (gameState === GameState.PLAYING && audioCtx && audioManager && audioManager.buffers.has("heart_beat_slow")) {
+    if (!p1HeartbeatSlowNode) {
+      p1HeartbeatSlowNode = new THREE.Audio(audioManager.listener);
+      p1HeartbeatSlowNode.setBuffer(audioManager.buffers.get("heart_beat_slow"));
+      p1HeartbeatSlowNode.setLoop(true);
+      p1HeartbeatSlowNode.setVolume(0);
+      p1HeartbeatSlowNode.play();
+    }
+    if (!p1HeartbeatFastNode) {
+      p1HeartbeatFastNode = new THREE.Audio(audioManager.listener);
+      p1HeartbeatFastNode.setBuffer(audioManager.buffers.get("heart_beat_fast"));
+      p1HeartbeatFastNode.setLoop(true);
+      p1HeartbeatFastNode.setVolume(0);
+      p1HeartbeatFastNode.play();
+    }
+
+    const sfxVolFactor = sfxVolume;
+    if (p1HeartRate > 95) {
+      const fastVol = Math.min(1.0, (p1HeartRate - 95) / 45) * 0.9 * sfxVolFactor;
+      p1HeartbeatFastNode.setVolume(fastVol);
+      p1HeartbeatSlowNode.setVolume(0);
+      p1HeartbeatFastNode.setPlaybackRate(p1HeartRate / 120);
+    } else {
+      const slowVol = Math.max(0.0, (p1HeartRate - 65) / 30) * 0.5 * sfxVolFactor;
+      p1HeartbeatSlowNode.setVolume(slowVol);
+      p1HeartbeatFastNode.setVolume(0);
+      p1HeartbeatSlowNode.setPlaybackRate(p1HeartRate / 70);
+    }
+  } else {
+    if (p1HeartbeatSlowNode) p1HeartbeatSlowNode.setVolume(0);
+    if (p1HeartbeatFastNode) p1HeartbeatFastNode.setVolume(0);
+  }
+
   const sanity1Val = document.getElementById("sanity-p1-val");
   const sanity1Meter = document.getElementById("sanity-p1-meter");
   const sanity1Panel = document.getElementById("sanity-p1-panel");
@@ -4132,6 +4169,39 @@ function updateState(delta) {
     const ecgPath2 = document.querySelector("#ecg-p2-svg .ecg-path");
     if (ecgPath2) {
       ecgPath2.style.animationDuration = `${60 / p2HeartRate}s`;
+    }
+
+    if (gameState === GameState.PLAYING && audioCtx && audioManager && audioManager.buffers.has("heart_beat_slow")) {
+      if (!p2HeartbeatSlowNode) {
+        p2HeartbeatSlowNode = new THREE.Audio(audioManager.listener);
+        p2HeartbeatSlowNode.setBuffer(audioManager.buffers.get("heart_beat_slow"));
+        p2HeartbeatSlowNode.setLoop(true);
+        p2HeartbeatSlowNode.setVolume(0);
+        p2HeartbeatSlowNode.play();
+      }
+      if (!p2HeartbeatFastNode) {
+        p2HeartbeatFastNode = new THREE.Audio(audioManager.listener);
+        p2HeartbeatFastNode.setBuffer(audioManager.buffers.get("heart_beat_fast"));
+        p2HeartbeatFastNode.setLoop(true);
+        p2HeartbeatFastNode.setVolume(0);
+        p2HeartbeatFastNode.play();
+      }
+
+      const sfxVolFactor = sfxVolume;
+      if (p2HeartRate > 95) {
+        const fastVol2 = Math.min(1.0, (p2HeartRate - 95) / 45) * 0.9 * sfxVolFactor;
+        p2HeartbeatFastNode.setVolume(fastVol2);
+        p2HeartbeatSlowNode.setVolume(0);
+        p2HeartbeatFastNode.setPlaybackRate(p2HeartRate / 120);
+      } else {
+        const slowVol2 = Math.max(0.0, (p2HeartRate - 65) / 30) * 0.5 * sfxVolFactor;
+        p2HeartbeatSlowNode.setVolume(slowVol2);
+        p2HeartbeatFastNode.setVolume(0);
+        p2HeartbeatSlowNode.setPlaybackRate(p2HeartRate / 70);
+      }
+    } else {
+      if (p2HeartbeatSlowNode) p2HeartbeatSlowNode.setVolume(0);
+      if (p2HeartbeatFastNode) p2HeartbeatFastNode.setVolume(0);
     }
 
     const sanity2Val = document.getElementById("sanity-p2-val");

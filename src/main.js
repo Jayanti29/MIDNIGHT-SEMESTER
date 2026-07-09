@@ -5970,6 +5970,14 @@ function animate() {
     renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
     if (filmPass) {
       filmPass.uniforms.time.value = clock.elapsedTime * 60.0;
+      if (p1HeartRate > 90) {
+        const shift = Math.min(1.0, (p1HeartRate - 90) / 80);
+        filmPass.uniforms.redShiftAmount.value = shift * 0.5;
+        filmPass.uniforms.desaturationAmount.value = shift * 0.65;
+      } else {
+        filmPass.uniforms.redShiftAmount.value = 0.0;
+        filmPass.uniforms.desaturationAmount.value = 0.0;
+      }
     }
     composer.render();
   }
@@ -5984,7 +5992,9 @@ const filmGrainShader = {
     grainAmount: { value: 0.09 },
     vignetteAmount: { value: 0.55 },
     aberrationAmount: { value: 0.0018 },
-    scanlineAmount: { value: 0.04 }
+    scanlineAmount: { value: 0.04 },
+    redShiftAmount: { value: 0.0 },
+    desaturationAmount: { value: 0.0 }
   },
   vertexShader: /* glsl */`
     varying vec2 vUv;
@@ -6000,6 +6010,8 @@ const filmGrainShader = {
     uniform float vignetteAmount;
     uniform float aberrationAmount;
     uniform float scanlineAmount;
+    uniform float redShiftAmount;
+    uniform float desaturationAmount;
     varying vec2 vUv;
 
     float rand(vec2 co) {
@@ -6029,9 +6041,12 @@ const filmGrainShader = {
       float vignette = 1.0 - smoothstep(0.12, 0.72, dist * 2.0 * vignetteAmount);
       color.rgb *= vignette;
 
-      // Slight desaturation for horror tone
+      // Dynamic desaturation for horror tone
       float luma = dot(color.rgb, vec3(0.299, 0.587, 0.114));
-      color.rgb = mix(color.rgb, vec3(luma), 0.18);
+      color.rgb = mix(color.rgb, vec3(luma), 0.18 + desaturationAmount * 0.6);
+
+      // Red shift for panic
+      color.rgb = mix(color.rgb, vec3(color.r * 1.25, color.g * 0.7, color.b * 0.7), redShiftAmount);
 
       gl_FragColor = color;
     }

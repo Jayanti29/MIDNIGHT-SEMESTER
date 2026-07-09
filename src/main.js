@@ -1455,6 +1455,9 @@ function initAudio() {
   const heartbeatSlowBuffer = createHeartBeatSlowBuffer(audioCtx);
   audioManager.buffers.set("heart_beat_slow", heartbeatSlowBuffer);
 
+  const heartbeatFastBuffer = createHeartBeatFastBuffer(audioCtx);
+  audioManager.buffers.set("heart_beat_fast", heartbeatFastBuffer);
+
   // Play spatial buzzing hum on a couple of the corridor lights
   flickerLights.forEach((lightObj, index) => {
     if (index % 2 === 0) {

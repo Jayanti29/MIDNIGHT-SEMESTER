@@ -4052,6 +4052,8 @@ function updateState(delta) {
     if (hardcoreMode) {
       sanityDrain *= 1.45;
     }
+    const p1HrMultiplier = 1.0 + Math.max(0.0, (p1HeartRate - 70) / 100) * 1.5;
+    sanityDrain *= p1HrMultiplier;
 
     if (sanityDrain > 0) {
       p1Sanity = Math.max(0, p1Sanity - delta * sanityDrain);
@@ -4150,6 +4152,8 @@ function updateState(delta) {
       if (hardcoreMode) {
         sanityDrain2 *= 1.45;
       }
+      const p2HrMultiplier = 1.0 + Math.max(0.0, (p2HeartRate - 70) / 100) * 1.5;
+      sanityDrain2 *= p2HrMultiplier;
 
       if (sanityDrain2 > 0) {
         p2Sanity = Math.max(0, p2Sanity - delta * sanityDrain2);

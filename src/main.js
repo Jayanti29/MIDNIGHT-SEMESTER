@@ -6233,6 +6233,19 @@ function resetGame() {
   p2Sanity = 100;
   p1Pills = 0;
   p2Pills = 0;
+  p1HeartRate = 72;
+  p2HeartRate = 72;
+  p1LockerMinigameActive = false;
+  p2LockerMinigameActive = false;
+  p1LockerMinigameProgress = 0;
+  p2LockerMinigameProgress = 0;
+  ecgSensorsCollected = false;
+
+  if (p1HeartbeatSlowNode) { try { p1HeartbeatSlowNode.stop(); } catch(e) {} p1HeartbeatSlowNode = null; }
+  if (p1HeartbeatFastNode) { try { p1HeartbeatFastNode.stop(); } catch(e) {} p1HeartbeatFastNode = null; }
+  if (p2HeartbeatSlowNode) { try { p2HeartbeatSlowNode.stop(); } catch(e) {} p2HeartbeatSlowNode = null; }
+  if (p2HeartbeatFastNode) { try { p2HeartbeatFastNode.stop(); } catch(e) {} p2HeartbeatFastNode = null; }
+
   shadowSpawnTimer = 0;
   creepyWhisperTimer = 0;
   shadowFigures.forEach(f => scene.remove(f));

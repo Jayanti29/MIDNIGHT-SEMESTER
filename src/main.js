@@ -5493,6 +5493,7 @@ function executeCommand(cmdStr) {
       addConsoleLog("  /ghostspeed <mult> - Multiply ghost movement speed (e.g. /ghostspeed 0.5)");
       addConsoleLog("  /loadlevel <1|2> - Jump to level 1 or level 2");
       addConsoleLog("  /heartrate <bpm> [p1|p2] - Override player heart rate manually");
+      addConsoleLog("  /skipminigame - Skip and win active locker breathing minigames");
       break;
 
     case "heartrate": {
@@ -5511,6 +5512,29 @@ function executeCommand(cmdStr) {
       }
       break;
     }
+
+    case "skipminigame":
+    case "sm":
+      if (p1LockerMinigameActive) {
+        p1LockerMinigameProgress = 100;
+        p1LockerMinigameActive = false;
+        fear = 0;
+        p1Sanity = Math.min(100, p1Sanity + 20);
+        caption.textContent = "Breathing minigame skipped (Win).";
+        addConsoleLog("Skipped Player 1 breathing minigame.");
+      }
+      if (p2LockerMinigameActive) {
+        p2LockerMinigameProgress = 100;
+        p2LockerMinigameActive = false;
+        fear2 = 0;
+        p2Sanity = Math.min(100, p2Sanity + 20);
+        caption.textContent = "Player 2 breathing minigame skipped (Win).";
+        addConsoleLog("Skipped Player 2 breathing minigame.");
+      }
+      if (!p1LockerMinigameActive && !p2LockerMinigameActive) {
+        addConsoleLog("No active breathing minigames to skip.");
+      }
+      break;
       
     case "god":
       godModeActive = !godModeActive;

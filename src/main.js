@@ -4661,11 +4661,23 @@ function updateState(delta) {
     shakeOffset.y += (Math.random() - 0.5) * 0.03 * sanityIntensity * camShakeMultiplier;
     camera.rotation.z += Math.sin(clock.elapsedTime * 6) * 0.02 * sanityIntensity * camShakeMultiplier;
   }
+  if (p1HeartRate > 90) {
+    const hrIntensity = (p1HeartRate - 90) / 80;
+    const pulseSpeed = (p1HeartRate / 60) * Math.PI * 2;
+    camera.rotation.z += Math.sin(clock.elapsedTime * pulseSpeed) * 0.03 * hrIntensity * camShakeMultiplier;
+    camera.rotation.y += Math.cos(clock.elapsedTime * pulseSpeed * 0.5) * 0.005 * hrIntensity * camShakeMultiplier;
+  }
   if (coopMode && camera2 && p2Sanity < 50) {
     const sanityIntensity2 = (50 - p2Sanity) / 50;
     camera2.position.x += (Math.random() - 0.5) * 0.02 * sanityIntensity2 * camShakeMultiplier;
     camera2.position.y += (Math.random() - 0.5) * 0.02 * sanityIntensity2 * camShakeMultiplier;
     camera2.rotation.z += Math.sin(clock.elapsedTime * 6) * 0.02 * sanityIntensity2 * camShakeMultiplier;
+  }
+  if (coopMode && camera2 && p2HeartRate > 90) {
+    const hrIntensity2 = (p2HeartRate - 90) / 80;
+    const pulseSpeed2 = (p2HeartRate / 60) * Math.PI * 2;
+    camera2.rotation.z += Math.sin(clock.elapsedTime * pulseSpeed2) * 0.03 * hrIntensity2 * camShakeMultiplier;
+    camera2.rotation.y += Math.cos(clock.elapsedTime * pulseSpeed2 * 0.5) * 0.005 * hrIntensity2 * camShakeMultiplier;
   }
 
   updateInteractionPrompt();

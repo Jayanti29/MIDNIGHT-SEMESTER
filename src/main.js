@@ -3236,6 +3236,99 @@ function buildEcgSensorsProp(position, dormGroup) {
   interactables.push(bodyMesh);
 }
 
+function buildBookshelfProp(position, parentGroup) {
+  const group = new THREE.Group();
+  group.name = "bookshelf_prop";
+  group.position.set(...position);
+
+  // Main wooden frame
+  const frameGeo = new THREE.BoxGeometry(1.2, 2.2, 0.38);
+  const frameMesh = new THREE.Mesh(frameGeo, materials.darkWood);
+  frameMesh.castShadow = true;
+  frameMesh.receiveShadow = true;
+  group.add(frameMesh);
+
+  // Decorative shelves indent panels
+  const indentMat = new THREE.MeshStandardMaterial({ color: 0x1d140e, roughness: 0.9 });
+  const frontIndent = new THREE.Mesh(new THREE.BoxGeometry(1.1, 2.1, 0.05), indentMat);
+  frontIndent.position.set(0, 0, 0.17);
+  group.add(frontIndent);
+
+  // Add 4 horizontal shelf boards
+  const shelfBoardMat = materials.darkWood;
+  for (let i = 0; i < 4; i++) {
+    const board = new THREE.Mesh(new THREE.BoxGeometry(1.1, 0.04, 0.34), shelfBoardMat);
+    board.position.set(0, -0.8 + i * 0.5, 0.16);
+    group.add(board);
+  }
+
+  // Populate bookshelves with random book stacks/rows
+  const bookColors = [0x5c1d1d, 0x1d3d5c, 0x1d5c34, 0x5c541d, 0x474747];
+  for (let shelf = 0; shelf < 4; shelf++) {
+    const yPos = -0.8 + shelf * 0.5 + 0.02;
+    // Row of books
+    const numBooks = 6 + Math.floor(Math.random() * 8);
+    for (let b = 0; b < numBooks; b++) {
+      const bookH = 0.22 + Math.random() * 0.1;
+      const bookW = 0.03 + Math.random() * 0.02;
+      const bookD = 0.24 + Math.random() * 0.06;
+      const bookMat = new THREE.MeshStandardMaterial({
+        color: bookColors[Math.floor(Math.random() * bookColors.length)],
+        roughness: 0.7
+      });
+      const book = new THREE.Mesh(new THREE.BoxGeometry(bookW, bookH, bookD), bookMat);
+      // Align books next to each other
+      const xOffset = -0.45 + (b / numBooks) * 0.9;
+      // Slight rotation yaw for realistic organic shelf feel
+      book.rotation.y = (Math.random() - 0.5) * 0.15;
+      book.position.set(xOffset, yPos + bookH / 2, 0.16);
+      group.add(book);
+    }
+  }
+
+  parentGroup.attach(group);
+}
+
+function buildFilingCabinetProp(position, parentGroup) {
+  const group = new THREE.Group();
+  group.name = "filing_cabinet_prop";
+  group.position.set(...position);
+
+  // Cabinet outer steel body
+  const bodyGeo = new THREE.BoxGeometry(0.8, 1.4, 0.62);
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x4f545a, metalness: 0.6, roughness: 0.4 });
+  const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+  bodyMesh.castShadow = true;
+  bodyMesh.receiveShadow = true;
+  group.add(bodyMesh);
+
+  // Add 4 steel drawers with handles
+  const drawerFaceGeo = new THREE.BoxGeometry(0.72, 0.28, 0.02);
+  const drawerFaceMat = new THREE.MeshStandardMaterial({ color: 0x3d4145, metalness: 0.6, roughness: 0.4 });
+  const handleGeo = new THREE.CylinderGeometry(0.01, 0.01, 0.18, 8);
+  const handleMat = new THREE.MeshStandardMaterial({ color: 0xdddddd, metalness: 0.9, roughness: 0.1 });
+
+  for (let i = 0; i < 4; i++) {
+    const yOffset = 0.45 - i * 0.3;
+    const drawerFace = new THREE.Mesh(drawerFaceGeo, drawerFaceMat);
+    drawerFace.position.set(0, yOffset, 0.3);
+    group.add(drawerFace);
+
+    // Brass/chrome handle bar on the front of the drawer
+    const handle = new THREE.Mesh(handleGeo, handleMat);
+    handle.rotation.z = Math.PI / 2;
+    handle.position.set(0, yOffset, 0.325);
+    group.add(handle);
+  }
+
+  // Tag body mesh as interactable filing cabinet
+  tagInteractable(bodyMesh, "filing_cabinet", "Filing Cabinet");
+  bodyMesh.userData.parentCabinet = group;
+
+  parentGroup.attach(group);
+  interactables.push(bodyMesh);
+}
+
 function buildTapeRecorder(position, dormGroup) {
   const group = new THREE.Group();
   group.name = "tape_recorder_group";

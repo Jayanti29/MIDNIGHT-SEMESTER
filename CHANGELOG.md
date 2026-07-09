@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.2.2-advanced] — 2026-07-09
+
+### Added
+- Procedurally generated low-frequency heartbeat dual-tone loops (heart_beat_slow below 95 BPM, heart_beat_fast above 95 BPM) mapped to real-time player fear and exhaustion states.
+- Diegetic Heart Rate / ECG visual panel HUD widgets featuring vector SVG animated waves that redraw matching player BPM rates.
+- Hiding locker breathing stabilization minigame triggered upon entry (if ECG sensors are collected), requiring SPACE (P1) or Period (P2) key calibration alignment inside green target zones.
+- Interactive ECG electrode sensor collectibles placed on Room 32's desk.
+- Real-time camera tilt and roll sway adjustments matching elevated heart rates.
+- Dynamic screen red-shift vignette color grading and blur overlays at critical heart rates (above 115 BPM).
+- Developer cheat commands /heartrate and /skipminigame.
+
 ## [0.2.1-advanced] — 2026-07-06
 
 ### Added

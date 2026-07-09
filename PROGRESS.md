@@ -1,8 +1,47 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 127/500**
+Commit counter: **Commit 166/500**
 
 ## Commits Log
+- **Commit 166/500**: Phase 19 - Perform code formatting, remove redundant heartbeat variables, and align styles.
+- **Commit 165/500**: Phase 19 - Add developer console cheats command verification checks.
+- **Commit 164/500**: Phase 19 - Implement dynamic post-processing color grading (e.g. desaturation/red shift) on high heart rate.
+- **Commit 163/500**: Wire personnel folder dropdown configurations for P1 and P2 heartbeat sounds.
+- **Commit 162/500**: Phase 19 - Add cheat console command support /skipminigame to auto-win the breathing minigame.
+- **Commit 161/500**: Phase 19 - Add cheat console command support /heartrate to set player heart rate.
+- **Commit 160/500**: Phase 19 - Add reward mechanics: perfect breathing alignment recovers sanity and reduces fear.
+- **Commit 159/500**: Phase 19 - Add penalty mechanics: failing the minigame spikes fear and alerts the ghost.
+- **Commit 158/500**: Phase 19 - Program breath sound triggers matching the minigame cycle.
+- **Commit 157/500**: Phase 19 - Registered breath_in and breath_out sound buffers in initAudio().
+- **Commit 156/500**: Phase 19 - Synthesize breath_in and breath_out sound buffers in src/main.js.
+- **Commit 155/500**: Phase 19 - Program keyboard input listeners (SPACE for P1, Period for P2) to align breathing rhythm.
+- **Commit 154/500**: Phase 19 - Update the locker minigame UI visibility when hiding inside lockers.
+- **Commit 153/500**: Phase 19 - Add styling rules for locker minigame panels in src/styles.css.
+- **Commit 152/500**: Phase 19 - Add locker minigame HUD elements (breathing rhythm bar and target zone) in index.html.
+- **Commit 151/500**: Phase 19 - Implement a locker-hiding breathing synchronization minigame state.
+- **Commit 150/500**: Phase 19 - Add camera tilt / roll sway adjustments driven by elevated heart rate.
+- **Commit 149/500**: Phase 19 - Toggle the panic blur CSS class dynamically in the game loop based on critical state.
+- **Commit 148/500**: Phase 19 - Add CSS class .panic-blur and transitions in src/styles.css.
+- **Commit 147/500**: Phase 19 - Implement P1 and P2 panic screen blur effects triggered at critical heart rate levels.
+- **Commit 146/500**: Phase 19 - Reset ECG sensors collection state on game restart/reset.
+- **Commit 145/500**: Phase 19 - Save ECG sensors collection state in Emergency Terminal checkpoints.
+- **Commit 144/500**: Phase 19 - Implement collection logic and task log messages for ECG sensors.
+- **Commit 143/500**: Phase 19 - Add raycast label prompts for ECG electrode sensor interaction.
+- **Commit 142/500**: Phase 19 - Implement a 3D mesh builder function buildEcgSensorsProp() in src/main.js.
+- **Commit 141/500**: Phase 19 - Spawned a new environment interactive item: ECG electrode sensors in Room 32.
+- **Commit 140/500**: Phase 19 - Integrate heart rate weight into player sanity depletion rate.
+- **Commit 139/500**: Phase 19 - Play spatialized heartbeat audio looping with frequency and volume scaling based on fear.
+- **Commit 138/500**: Phase 19 - Implement dynamic scaling of ECG animations based on heart rate value.
+- **Commit 137/500**: Phase 19 - Update P1 and P2 heart rate text indicators dynamically in the HUD.
+- **Commit 136/500**: Phase 19 - Add heart rate calculation logic inside the game loop in src/main.js.
+- **Commit 135/500**: Phase 19 - Registered heart_beat_fast sound buffer in initAudio().
+- **Commit 134/500**: Phase 19 - Synthesized heart_beat_fast audio buffer in src/main.js.
+- **Commit 133/500**: Phase 19 - Registered heart_beat_slow sound buffer in initAudio().
+- **Commit 132/500**: Phase 19 - Synthesized heart_beat_slow audio buffer in src/main.js.
+- **Commit 131/500**: Phase 19 - Implement CSS SVG path heartbeat animation keyframes in src/styles.css.
+- **Commit 130/500**: Phase 19 - Added CSS styling rules for Heart Rate / ECG panels in src/styles.css.
+- **Commit 129/500**: Phase 19 - Added HTML elements for P1 and P2 Heart Rate / ECG panels in index.html.
+- **Commit 128/500**: Phase 19 - Declared global state variables for player heart rate and breathing minigame.
 - **Commit 127/500**: Phase 18 - Completed final verification and updated implementation walkthrough.
 - **Commit 126/500**: Phase 18 - Integrated player sanity weighting in Meera's target tracking AI.
 - **Commit 125/500**: Phase 18 - Added hallucinated shadow figures and whispers audio loop.

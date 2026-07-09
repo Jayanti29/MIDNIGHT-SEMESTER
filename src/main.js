@@ -5492,7 +5492,25 @@ function executeCommand(cmdStr) {
       addConsoleLog("  /skip - Teleport straight to exit operations console");
       addConsoleLog("  /ghostspeed <mult> - Multiply ghost movement speed (e.g. /ghostspeed 0.5)");
       addConsoleLog("  /loadlevel <1|2> - Jump to level 1 or level 2");
+      addConsoleLog("  /heartrate <bpm> [p1|p2] - Override player heart rate manually");
       break;
+
+    case "heartrate": {
+      const val = parseFloat(args[0]);
+      if (isNaN(val) || val < 40 || val > 220) {
+        addConsoleLog("Usage: /heartrate <bpm> [p1|p2] (BPM between 40 and 220)");
+      } else {
+        const target = args[1] ? args[1].toLowerCase() : "both";
+        if (target === "p1" || target === "p1" || target === "both") {
+          p1HeartRate = val;
+        }
+        if (target === "p2" || target === "p2" || target === "both") {
+          p2HeartRate = val;
+        }
+        addConsoleLog(`Heart rate set to ${val} BPM for target: ${target}`);
+      }
+      break;
+    }
       
     case "god":
       godModeActive = !godModeActive;

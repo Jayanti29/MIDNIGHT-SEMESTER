@@ -4135,6 +4135,15 @@ function updateState(delta) {
     ecgPath1.style.animationDuration = `${60 / p1HeartRate}s`;
   }
 
+  const panicOverlay1 = document.getElementById("panic-overlay-p1");
+  if (panicOverlay1) {
+    if (p1HeartRate > 115) {
+      panicOverlay1.classList.add("panic-active");
+    } else {
+      panicOverlay1.classList.remove("panic-active");
+    }
+  }
+
   if (gameState === GameState.PLAYING && audioCtx && audioManager && audioManager.buffers.has("heart_beat_slow")) {
     if (!p1HeartbeatSlowNode) {
       p1HeartbeatSlowNode = new THREE.Audio(audioManager.listener);
@@ -4233,6 +4242,15 @@ function updateState(delta) {
     const ecgPath2 = document.querySelector("#ecg-p2-svg .ecg-path");
     if (ecgPath2) {
       ecgPath2.style.animationDuration = `${60 / p2HeartRate}s`;
+    }
+
+    const panicOverlay2 = document.getElementById("panic-overlay-p2");
+    if (panicOverlay2) {
+      if (p2HeartRate > 115) {
+        panicOverlay2.classList.add("panic-active");
+      } else {
+        panicOverlay2.classList.remove("panic-active");
+      }
     }
 
     if (gameState === GameState.PLAYING && audioCtx && audioManager && audioManager.buffers.has("heart_beat_slow")) {
@@ -5963,6 +5981,7 @@ function setupPlayer2() {
 function startGame({ lockPointer = true } = {}) {
   initAudio();
   setupPlayer2();
+  document.body.classList.toggle("coop-active", coopMode);
   setupUiSounds();
   buildRainSystem();
   runStartTime = Date.now();

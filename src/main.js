@@ -3084,6 +3084,38 @@ function buildLevel2() {
   buildCheckpointConsole([-2.0, 0, -10.0], "Applied Cognition Terminal");
   buildExitTerminalMesh([0, 0, -38.5]);
 
+  // Spawn Library Archive Room on the left side of the basement
+  box("library floor", [6, 0.18, 12], [-6.0, -0.1, -10.0], materials.floor, false, true);
+  box("library ceiling", [6, 0.24, 12], [-6.0, 3.0, -10.0], materials.wall, false, true);
+  box("library left wall", [0.24, 3.0, 12], [-9.02, 1.41, -10.0], materials.wall, true, true, true);
+  box("library back wall", [6, 3.0, 0.24], [-6.0, 1.41, -16.02], materials.wall, true, true, true);
+  box("library front wall", [6, 3.0, 0.24], [-6.0, 1.41, -3.98], materials.wall, true, true, true);
+
+  const libraryGroup = new THREE.Group();
+  libraryGroup.name = "library_group";
+  libraryGroup.position.set(-6.0, 0, -10.0);
+
+  // Bookshelves along the back and left walls
+  buildBookshelfProp([-2.0, 0, -5.2], libraryGroup);
+  buildBookshelfProp([0.0, 0, -5.2], libraryGroup);
+  buildBookshelfProp([2.0, 0, -5.2], libraryGroup);
+  
+  const shelfLeft = new THREE.Group();
+  buildBookshelfProp([0, 0, 0], shelfLeft);
+  shelfLeft.position.set(-2.6, 0, 0);
+  shelfLeft.rotation.y = Math.PI / 2;
+  libraryGroup.add(shelfLeft);
+
+  // Filing cabinets along the front wall
+  buildFilingCabinetProp([-2.0, 0, 5.0], libraryGroup);
+  buildFilingCabinetProp([0.0, 0, 5.0], libraryGroup);
+  buildFilingCabinetProp([2.0, 0, 5.0], libraryGroup);
+
+  // Decryptor Terminal in the center
+  buildDecryptorTerminalProp([0, 0, -2.0], libraryGroup);
+
+  addToActiveLevel(libraryGroup);
+
   for (let z = 5; z > -36; z -= 12) {
     const lamp = new THREE.PointLight(0x73d08a, 1.8, 14, 1.5);
     lamp.position.set(0, 2.65, z);

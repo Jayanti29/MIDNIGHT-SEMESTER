@@ -1724,6 +1724,28 @@ function createHeartBeatSlowBuffer(ctx) {
   return buffer;
 }
 
+function createHeartBeatFastBuffer(ctx) {
+  const sampleRate = ctx.sampleRate;
+  const duration = 0.5;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    let val = 0;
+    if (t >= 0.02 && t < 0.18) {
+      const dt = t - 0.02;
+      val += Math.sin(2 * Math.PI * 68 * dt) * Math.exp(-32 * dt) * 0.85;
+    }
+    if (t >= 0.16 && t < 0.32) {
+      const dt = t - 0.16;
+      val += Math.sin(2 * Math.PI * 90 * dt) * Math.exp(-35 * dt) * 0.7;
+    }
+    data[i] = val;
+  }
+  return buffer;
+}
+
 function createPillConsumeBuffer(ctx) {
   const sampleRate = ctx.sampleRate;
   const duration = 0.45; // 450ms gulp

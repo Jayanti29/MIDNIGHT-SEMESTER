@@ -3125,7 +3125,14 @@ function buildDormRoom() {
   // Spawn pillbox on Room 32 desk
   buildPillboxProp([0.0, 1.11, roomZ - 4.25], dormGroup, "dorm");
 
+  // Spawn ECG electrode sensors on Room 32 desk
+  buildEcgSensorsProp([-0.3, 1.11, roomZ - 4.25], dormGroup);
+
   addToActiveLevel(dormGroup);
+}
+
+function buildEcgSensorsProp(position, dormGroup) {
+  // Placeholder to be fully implemented in Commit 142
 }
 
 function buildTapeRecorder(position, dormGroup) {

@@ -4058,6 +4058,10 @@ function updateState(delta) {
     }
   }
 
+  // Heart rate calculation P1
+  const targetHR1 = 70 + (fear / 100) * 70 + ((100 - stamina) / 100) * 30;
+  p1HeartRate = THREE.MathUtils.lerp(p1HeartRate, targetHR1 + Math.sin(clock.getElapsedTime() * 3) * 1.5, delta * 2.0);
+
   const sanity1Val = document.getElementById("sanity-p1-val");
   const sanity1Meter = document.getElementById("sanity-p1-meter");
   const sanity1Panel = document.getElementById("sanity-p1-panel");
@@ -4111,6 +4115,10 @@ function updateState(delta) {
         }
       }
     }
+
+    // Heart rate calculation P2
+    const targetHR2 = 70 + (fear2 / 100) * 70 + ((100 - stamina2) / 100) * 30;
+    p2HeartRate = THREE.MathUtils.lerp(p2HeartRate, targetHR2 + Math.sin(clock.getElapsedTime() * 3) * 1.5, delta * 2.0);
 
     const sanity2Val = document.getElementById("sanity-p2-val");
     const sanity2Meter = document.getElementById("sanity-p2-meter");

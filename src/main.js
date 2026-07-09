@@ -3132,7 +3132,59 @@ function buildDormRoom() {
 }
 
 function buildEcgSensorsProp(position, dormGroup) {
-  // Placeholder to be fully implemented in Commit 142
+  const group = new THREE.Group();
+  group.name = "ecg_sensors_group";
+  group.position.set(...position);
+
+  const bodyGeo = new THREE.BoxGeometry(0.12, 0.03, 0.08);
+  const bodyMat = new THREE.MeshStandardMaterial({ color: 0x2b2b2b, roughness: 0.5 });
+  const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+  bodyMesh.castShadow = true;
+  bodyMesh.receiveShadow = true;
+  group.add(bodyMesh);
+
+  const ledGeo = new THREE.SphereGeometry(0.008, 8, 8);
+  const ledMat = new THREE.MeshBasicMaterial({ color: 0x39ff14 });
+  const ledMesh = new THREE.Mesh(ledGeo, ledMat);
+  ledMesh.position.set(0.04, 0.016, 0.02);
+  group.add(ledMesh);
+
+  const padGeo = new THREE.CylinderGeometry(0.02, 0.02, 0.005, 8);
+  const padMat = new THREE.MeshStandardMaterial({ color: 0x8e8e8e, metalness: 0.8, roughness: 0.2 });
+  
+  const pad1 = new THREE.Mesh(padGeo, padMat);
+  pad1.position.set(-0.06, -0.01, -0.05);
+  group.add(pad1);
+
+  const pad2 = new THREE.Mesh(padGeo, padMat);
+  pad2.position.set(0.06, -0.01, 0.05);
+  group.add(pad2);
+
+  const wireMat = new THREE.LineBasicMaterial({ color: 0x111111 });
+  
+  const wire1Points = [
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(-0.03, -0.01, -0.025),
+    new THREE.Vector3(-0.06, -0.01, -0.05)
+  ];
+  const wire1Geo = new THREE.BufferGeometry().setFromPoints(wire1Points);
+  const wire1 = new THREE.Line(wire1Geo, wireMat);
+  group.add(wire1);
+
+  const wire2Points = [
+    new THREE.Vector3(0, 0, 0),
+    new THREE.Vector3(0.03, -0.01, 0.025),
+    new THREE.Vector3(0.06, -0.01, 0.05)
+  ];
+  const wire2Geo = new THREE.BufferGeometry().setFromPoints(wire2Points);
+  const wire2 = new THREE.Line(wire2Geo, wireMat);
+  group.add(wire2);
+
+  tagInteractable(bodyMesh, "ecg_sensors", "ECG Sensors");
+  bodyMesh.userData.parentEcgSensors = group;
+
+  dormGroup.attach(group);
+  interactables.push(bodyMesh);
 }
 
 function buildTapeRecorder(position, dormGroup) {

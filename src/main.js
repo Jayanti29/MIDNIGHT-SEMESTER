@@ -4890,6 +4890,11 @@ function inspectObject(hit, isPlayer2 = false) {
         caption.textContent = "You are hidden inside the locker. Press [E] to step out.";
         addTaskLog("Entered hiding spot.");
         setFlashlight(false);
+        if (ecgSensorsCollected) {
+          p1LockerMinigameActive = true;
+          p1LockerMinigameProgress = 30;
+          p1BreathState = "hold";
+        }
 
         if (scene.userData.meeraCharacter && meeraState === AiState.CHASE) {
           const distToMeera = camera.position.distanceTo(scene.userData.meeraCharacter.position);
@@ -4904,6 +4909,7 @@ function inspectObject(hit, isPlayer2 = false) {
         camera.position.copy(player1PreLockerPos || new THREE.Vector3(camera.position.x, 1.7, camera.position.z + 0.6));
         caption.textContent = "You stepped out of the locker.";
         addTaskLog("Exited hiding spot.");
+        p1LockerMinigameActive = false;
       }
     } else {
       if (!isPlayer2Hidden) {
@@ -4914,6 +4920,11 @@ function inspectObject(hit, isPlayer2 = false) {
         caption.textContent = "Player 2 is hidden inside the locker. Press [ShiftRight] to step out.";
         addTaskLog("Player 2 entered hiding spot.");
         setFlashlight2(false);
+        if (ecgSensorsCollected) {
+          p2LockerMinigameActive = true;
+          p2LockerMinigameProgress = 30;
+          p2BreathState = "hold";
+        }
 
         if (scene.userData.meeraCharacter && meeraState === AiState.CHASE) {
           const distToMeera2 = camera2.position.distanceTo(scene.userData.meeraCharacter.position);
@@ -4928,6 +4939,7 @@ function inspectObject(hit, isPlayer2 = false) {
         camera2.position.copy(player2PreLockerPos || new THREE.Vector3(camera2.position.x, 1.7, camera2.position.z + 0.6));
         caption.textContent = "Player 2 stepped out of the locker.";
         addTaskLog("Player 2 exited hiding spot.");
+        p2LockerMinigameActive = false;
       }
     }
     if (audioManager) audioManager.playSound("door_creak", { volume: 0.4 });

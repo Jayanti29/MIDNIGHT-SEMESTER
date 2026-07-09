@@ -4062,6 +4062,9 @@ function updateState(delta) {
   const targetHR1 = 70 + (fear / 100) * 70 + ((100 - stamina) / 100) * 30;
   p1HeartRate = THREE.MathUtils.lerp(p1HeartRate, targetHR1 + Math.sin(clock.getElapsedTime() * 3) * 1.5, delta * 2.0);
 
+  const heart1ValEl = document.getElementById("heart-p1-val");
+  if (heart1ValEl) heart1ValEl.textContent = `${Math.round(p1HeartRate)} BPM`;
+
   const sanity1Val = document.getElementById("sanity-p1-val");
   const sanity1Meter = document.getElementById("sanity-p1-meter");
   const sanity1Panel = document.getElementById("sanity-p1-panel");
@@ -4119,6 +4122,9 @@ function updateState(delta) {
     // Heart rate calculation P2
     const targetHR2 = 70 + (fear2 / 100) * 70 + ((100 - stamina2) / 100) * 30;
     p2HeartRate = THREE.MathUtils.lerp(p2HeartRate, targetHR2 + Math.sin(clock.getElapsedTime() * 3) * 1.5, delta * 2.0);
+
+    const heart2ValEl = document.getElementById("heart-p2-val");
+    if (heart2ValEl) heart2ValEl.textContent = `${Math.round(p2HeartRate)} BPM`;
 
     const sanity2Val = document.getElementById("sanity-p2-val");
     const sanity2Meter = document.getElementById("sanity-p2-meter");

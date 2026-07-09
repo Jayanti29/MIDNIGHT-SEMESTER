@@ -687,6 +687,8 @@ let p1LockerMinigameProgress = 0;
 let p2LockerMinigameProgress = 0;
 let p1BreathState = "hold";
 let p2BreathState = "hold";
+let p1PrevBreathDir = 1;
+let p2PrevBreathDir = 1;
 let ecgSensorsCollected = false;
 let p1HeartbeatSlowNode = null;
 let p1HeartbeatFastNode = null;
@@ -4232,6 +4234,28 @@ function updateState(delta) {
     minigamePanel1.style.display = p1LockerMinigameActive ? "flex" : "none";
   }
 
+  if (p1LockerMinigameActive) {
+    const cycleSpeed = 2.4 + (p1HeartRate - 70) * 0.02;
+    const breathTime = clock.getElapsedTime() * cycleSpeed;
+    const indicatorPos = 50 + Math.sin(breathTime) * 45;
+    
+    const indicatorEl = document.getElementById("breath-indicator-p1");
+    if (indicatorEl) indicatorEl.style.left = `${indicatorPos}%`;
+
+    const dir = Math.cos(breathTime) >= 0 ? 1 : -1;
+    if (dir !== p1PrevBreathDir) {
+      p1PrevBreathDir = dir;
+      p1BreathState = dir === 1 ? "in" : "out";
+      if (audioManager && gameState === GameState.PLAYING) {
+        audioManager.playSound(dir === 1 ? "breath_in" : "breath_out", { volume: 0.35 * sfxVolume });
+      }
+    }
+
+    p1LockerMinigameProgress = Math.max(-50, p1LockerMinigameProgress - delta * 4);
+    const progressMeter = document.getElementById("breath-progress-meter-p1");
+    if (progressMeter) progressMeter.value = p1LockerMinigameProgress;
+  }
+
   // Player 2 Flashlight, Battery, and Fear updates
   if (coopMode && camera2 && player2Flashlight) {
     if (flashlightOn2 && !infiniteBatteryActive) battery2 = Math.max(0, battery2 - delta * 1.15 * batteryMultiplier);
@@ -4344,6 +4368,28 @@ function updateState(delta) {
     const minigamePanel2 = document.getElementById("breath-minigame-p2");
     if (minigamePanel2) {
       minigamePanel2.style.display = p2LockerMinigameActive ? "flex" : "none";
+    }
+
+    if (p2LockerMinigameActive) {
+      const cycleSpeed2 = 2.4 + (p2HeartRate - 70) * 0.02;
+      const breathTime2 = clock.getElapsedTime() * cycleSpeed2;
+      const indicatorPos2 = 50 + Math.sin(breathTime2) * 45;
+      
+      const indicatorEl2 = document.getElementById("breath-indicator-p2");
+      if (indicatorEl2) indicatorEl2.style.left = `${indicatorPos2}%`;
+
+      const dir2 = Math.cos(breathTime2) >= 0 ? 1 : -1;
+      if (dir2 !== p2PrevBreathDir) {
+        p2PrevBreathDir = dir2;
+        p2BreathState = dir2 === 1 ? "in" : "out";
+        if (audioManager && gameState === GameState.PLAYING) {
+          audioManager.playSound(dir2 === 1 ? "breath_in" : "breath_out", { volume: 0.35 * sfxVolume });
+        }
+      }
+
+      p2LockerMinigameProgress = Math.max(-50, p2LockerMinigameProgress - delta * 4);
+      const progressMeter2 = document.getElementById("breath-progress-meter-p2");
+      if (progressMeter2) progressMeter2.value = p2LockerMinigameProgress;
     }
 
     if (flashlightOn2 && player2Flashlight.parent !== camera2) {

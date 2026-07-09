@@ -1472,5 +1472,17 @@ body:not(.started) .quick-actions {
   fill: none;
 }
 
+.ecg-path {
+  stroke-dasharray: 200;
+  stroke-dashoffset: 200;
+  animation: ecg-draw 1.5s linear infinite;
+}
+
+@keyframes ecg-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
 
 

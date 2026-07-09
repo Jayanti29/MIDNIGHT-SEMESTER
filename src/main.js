@@ -1452,6 +1452,9 @@ function initAudio() {
   const tapeBuffer = createTapePrequelBuffer(audioCtx);
   audioManager.buffers.set("tape_prequel", tapeBuffer);
 
+  const heartbeatSlowBuffer = createHeartBeatSlowBuffer(audioCtx);
+  audioManager.buffers.set("heart_beat_slow", heartbeatSlowBuffer);
+
   // Play spatial buzzing hum on a couple of the corridor lights
   flickerLights.forEach((lightObj, index) => {
     if (index % 2 === 0) {

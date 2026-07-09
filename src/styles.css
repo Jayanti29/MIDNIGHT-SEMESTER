@@ -1452,5 +1452,25 @@ body:not(.started) .quick-actions {
   transition: all 0.22s ease;
 }
 
+/* === PHASE 19: HEART RATE / ECG HUD === */
+#heart-p1-panel, #heart-p2-panel {
+  border-color: #ff3b30; /* crimson red */
+  color: #ff3b30;
+  transition: all 0.22s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+#heart-p1-panel.danger-hr, #heart-p2-panel.danger-hr {
+  box-shadow: 0 0 15px rgba(255, 59, 48, 0.7);
+}
+
+.ecg-wave {
+  stroke: #ff3b30;
+  stroke-width: 2;
+  fill: none;
+}
+
 
 

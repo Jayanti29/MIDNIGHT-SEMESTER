@@ -3318,6 +3318,10 @@ function buildBookshelfProp(position, parentGroup) {
     }
   }
 
+  tagInteractable(frameMesh, "bookshelf", "Bookshelf");
+  frameMesh.userData.parentBookshelf = group;
+  interactables.push(frameMesh);
+
   parentGroup.attach(group);
 }
 

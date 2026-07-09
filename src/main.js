@@ -7409,7 +7409,20 @@ function checkBreathingMinigameHitP1() {
   const indicatorPos = 50 + Math.sin(breathTime) * 45;
 
   if (indicatorPos >= 40 && indicatorPos <= 60) {
-    // Reward placeholder for Commit 160
+    p1LockerMinigameProgress = Math.min(100, p1LockerMinigameProgress + 18);
+    fear = Math.max(0, fear - 15);
+    p1Sanity = Math.min(100, p1Sanity + 4);
+    caption.textContent = "Perfect sync! Heart rate stabilizing.";
+    if (audioManager) {
+      audioManager.playSound("ui_select", { volume: 0.25 });
+    }
+    if (p1LockerMinigameProgress >= 100) {
+      p1LockerMinigameActive = false;
+      fear = 0;
+      p1Sanity = Math.min(100, p1Sanity + 20);
+      caption.textContent = "Calibration success. Heart rate stabilized, sanity restored.";
+      addTaskLog("Successfully calibrated breathing in locker.");
+    }
   } else {
     p1LockerMinigameProgress = Math.max(-50, p1LockerMinigameProgress - 25);
     fear = Math.min(100, fear + 20);
@@ -7430,7 +7443,20 @@ function checkBreathingMinigameHitP2() {
   const indicatorPos2 = 50 + Math.sin(breathTime2) * 45;
 
   if (indicatorPos2 >= 40 && indicatorPos2 <= 60) {
-    // Reward placeholder for Commit 160
+    p2LockerMinigameProgress = Math.min(100, p2LockerMinigameProgress + 18);
+    fear2 = Math.max(0, fear2 - 15);
+    p2Sanity = Math.min(100, p2Sanity + 4);
+    caption.textContent = "Player 2 perfect sync! Heart rate stabilizing.";
+    if (audioManager) {
+      audioManager.playSound("ui_select", { volume: 0.25 });
+    }
+    if (p2LockerMinigameProgress >= 100) {
+      p2LockerMinigameActive = false;
+      fear2 = 0;
+      p2Sanity = Math.min(100, p2Sanity + 20);
+      caption.textContent = "Player 2 breathing stabilized, sanity restored.";
+      addTaskLog("Player 2 calibrated breathing in locker.");
+    }
   } else {
     p2LockerMinigameProgress = Math.max(-50, p2LockerMinigameProgress - 25);
     fear2 = Math.min(100, fear2 + 20);

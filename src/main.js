@@ -3329,6 +3329,71 @@ function buildFilingCabinetProp(position, parentGroup) {
   interactables.push(bodyMesh);
 }
 
+function buildDecryptorTerminalProp(position, parentGroup) {
+  const group = new THREE.Group();
+  group.name = "decryptor_terminal_prop";
+  group.position.set(...position);
+
+  // Server/desk base cabinet
+  const baseGeo = new THREE.BoxGeometry(0.9, 0.9, 0.75);
+  const baseMat = new THREE.MeshStandardMaterial({ color: 0x242729, metalness: 0.6, roughness: 0.5 });
+  const baseMesh = new THREE.Mesh(baseGeo, baseMat);
+  baseMesh.castShadow = true;
+  baseMesh.receiveShadow = true;
+  group.add(baseMesh);
+
+  // Keyboard console shelf
+  const kbShelfGeo = new THREE.BoxGeometry(0.8, 0.08, 0.38);
+  const kbShelf = new THREE.Mesh(kbShelfGeo, baseMat);
+  kbShelf.position.set(0, 0.45, 0.22);
+  group.add(kbShelf);
+
+  // Keyboard keys block
+  const keysGeo = new THREE.BoxGeometry(0.65, 0.02, 0.22);
+  const keysMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.8 });
+  const keys = new THREE.Mesh(keysGeo, keysMat);
+  keys.position.set(0, 0.49, 0.25);
+  group.add(keys);
+
+  // CRT Monitor Housing
+  const crtGeo = new THREE.BoxGeometry(0.68, 0.55, 0.55);
+  const crtMat = new THREE.MeshStandardMaterial({ color: 0x3d4145, roughness: 0.4 });
+  const crtMesh = new THREE.Mesh(crtGeo, crtMat);
+  crtMesh.position.set(0, 0.72, 0.05);
+  group.add(crtMesh);
+
+  // CRT Screen Bezel
+  const bezelGeo = new THREE.BoxGeometry(0.58, 0.45, 0.02);
+  const bezelMat = new THREE.MeshStandardMaterial({ color: 0x1e2022, roughness: 0.5 });
+  const bezel = new THREE.Mesh(bezelGeo, bezelMat);
+  bezel.position.set(0, 0.72, 0.325);
+  group.add(bezel);
+
+  // Glowing Green Phosphor Screen
+  const screenGeo = new THREE.BoxGeometry(0.48, 0.35, 0.01);
+  const screenMat = new THREE.MeshBasicMaterial({ color: 0x39ff14 });
+  const screenMesh = new THREE.Mesh(screenGeo, screenMat);
+  screenMesh.position.set(0, 0.72, 0.332);
+  group.add(screenMesh);
+
+  // Side vent grills
+  const ventMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+  const vent1 = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.3, 0.4), ventMat);
+  vent1.position.set(-0.345, 0.72, 0.05);
+  group.add(vent1);
+
+  const vent2 = new THREE.Mesh(new THREE.BoxGeometry(0.01, 0.3, 0.4), ventMat);
+  vent2.position.set(0.345, 0.72, 0.05);
+  group.add(vent2);
+
+  // Tag screen as interactable decryption terminal
+  tagInteractable(screenMesh, "decryptor_terminal", "Decryptor Terminal");
+  screenMesh.userData.parentTerminal = group;
+
+  parentGroup.attach(group);
+  interactables.push(screenMesh);
+}
+
 function buildTapeRecorder(position, dormGroup) {
   const group = new THREE.Group();
   group.name = "tape_recorder_group";

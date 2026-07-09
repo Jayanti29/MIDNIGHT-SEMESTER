@@ -3132,6 +3132,7 @@ function buildDormRoom() {
 }
 
 function buildEcgSensorsProp(position, dormGroup) {
+  if (ecgSensorsCollected) return;
   const group = new THREE.Group();
   group.name = "ecg_sensors_group";
   group.position.set(...position);
@@ -5116,7 +5117,8 @@ function inspectObject(hit, isPlayer2 = false) {
         readLoreNotes: Array.from(readLoreNotes),
         inspected: inspected,
         blackoutTriggered: blackoutTriggered,
-        level: currentLevel
+        level: currentLevel,
+        ecgSensorsCollected: ecgSensorsCollected
       };
       caption.textContent = "Progress checkpoint saved.";
       sayLine(playerName, "A backup power console. The terminal says security log saved.");
@@ -6309,6 +6311,7 @@ function resetGame() {
     if (activeCheckpoint.readLoreNotes) {
       activeCheckpoint.readLoreNotes.forEach(n => readLoreNotes.add(n));
     }
+    ecgSensorsCollected = activeCheckpoint.ecgSensorsCollected || false;
     
     currentLevel = activeCheckpoint.level || 1;
     activeLevelGroup = currentLevel === 1 ? level1Group : level2Group;

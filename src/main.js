@@ -4187,6 +4187,11 @@ function updateState(delta) {
     else sanity1Panel.classList.remove("critical-sanity");
   }
 
+  const minigamePanel1 = document.getElementById("breath-minigame-p1");
+  if (minigamePanel1) {
+    minigamePanel1.style.display = p1LockerMinigameActive ? "flex" : "none";
+  }
+
   // Player 2 Flashlight, Battery, and Fear updates
   if (coopMode && camera2 && player2Flashlight) {
     if (flashlightOn2 && !infiniteBatteryActive) battery2 = Math.max(0, battery2 - delta * 1.15 * batteryMultiplier);
@@ -4294,6 +4299,11 @@ function updateState(delta) {
     if (sanity2Panel) {
       if (p2Sanity <= 30) sanity2Panel.classList.add("critical-sanity");
       else sanity2Panel.classList.remove("critical-sanity");
+    }
+
+    const minigamePanel2 = document.getElementById("breath-minigame-p2");
+    if (minigamePanel2) {
+      minigamePanel2.style.display = p2LockerMinigameActive ? "flex" : "none";
     }
 
     if (flashlightOn2 && player2Flashlight.parent !== camera2) {

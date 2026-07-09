@@ -5059,7 +5059,21 @@ function inspectObject(hit, isPlayer2 = false) {
   }
 
   if (type === "ecg_sensors") {
-    // Collection logic to be implemented in Commit 144
+    const parent = hit.object.userData.parentEcgSensors;
+    if (parent) {
+      ecgSensorsCollected = true;
+      parent.visible = false;
+      const idx = interactables.indexOf(hit.object);
+      if (idx !== -1) {
+        interactables.splice(idx, 1);
+      }
+      caption.textContent = "Picked up ECG Electrode Sensors. Bio-feed monitoring active.";
+      sayLine(playerName, "This looks like an old ECG biosensor kit. It still works.");
+      if (audioManager) {
+        audioManager.playSound("ui_select", { volume: 0.3 });
+      }
+      addTaskLog("Collected ECG Electrode Sensors.");
+    }
     return;
   }
 

@@ -4064,6 +4064,10 @@ function updateState(delta) {
 
   const heart1ValEl = document.getElementById("heart-p1-val");
   if (heart1ValEl) heart1ValEl.textContent = `${Math.round(p1HeartRate)} BPM`;
+  const ecgPath1 = document.querySelector("#ecg-p1-svg .ecg-path");
+  if (ecgPath1) {
+    ecgPath1.style.animationDuration = `${60 / p1HeartRate}s`;
+  }
 
   const sanity1Val = document.getElementById("sanity-p1-val");
   const sanity1Meter = document.getElementById("sanity-p1-meter");
@@ -4125,6 +4129,10 @@ function updateState(delta) {
 
     const heart2ValEl = document.getElementById("heart-p2-val");
     if (heart2ValEl) heart2ValEl.textContent = `${Math.round(p2HeartRate)} BPM`;
+    const ecgPath2 = document.querySelector("#ecg-p2-svg .ecg-path");
+    if (ecgPath2) {
+      ecgPath2.style.animationDuration = `${60 / p2HeartRate}s`;
+    }
 
     const sanity2Val = document.getElementById("sanity-p2-val");
     const sanity2Meter = document.getElementById("sanity-p2-meter");

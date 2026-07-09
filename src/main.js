@@ -1753,6 +1753,40 @@ function createHeartBeatFastBuffer(ctx) {
   return buffer;
 }
 
+function createBreathInBuffer(ctx) {
+  const sampleRate = ctx.sampleRate;
+  const duration = 1.2;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  let lastVal = 0;
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const noise = Math.random() * 2 - 1;
+    lastVal = lastVal * 0.94 + noise * 0.06;
+    const env = Math.sin((t / duration) * Math.PI * 0.5);
+    data[i] = lastVal * env * 0.35;
+  }
+  return buffer;
+}
+
+function createBreathOutBuffer(ctx) {
+  const sampleRate = ctx.sampleRate;
+  const duration = 1.5;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  let lastVal = 0;
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const noise = Math.random() * 2 - 1;
+    lastVal = lastVal * 0.96 + noise * 0.04;
+    const env = Math.cos((t / duration) * Math.PI * 0.5);
+    data[i] = lastVal * env * 0.28;
+  }
+  return buffer;
+}
+
 function createPillConsumeBuffer(ctx) {
   const sampleRate = ctx.sampleRate;
   const duration = 0.45; // 450ms gulp

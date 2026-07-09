@@ -4202,17 +4202,21 @@ function updateState(delta) {
       p1HeartbeatFastNode.play();
     }
 
+    let p1HeartRateMult = 1.0;
+    if (p1Model === "Kulkarni") p1HeartRateMult = 0.82;
+    else if (p1Model === "Priya") p1HeartRateMult = 1.15;
+
     const sfxVolFactor = sfxVolume;
     if (p1HeartRate > 95) {
       const fastVol = Math.min(1.0, (p1HeartRate - 95) / 45) * 0.9 * sfxVolFactor;
       p1HeartbeatFastNode.setVolume(fastVol);
       p1HeartbeatSlowNode.setVolume(0);
-      p1HeartbeatFastNode.setPlaybackRate(p1HeartRate / 120);
+      p1HeartbeatFastNode.setPlaybackRate((p1HeartRate / 120) * p1HeartRateMult);
     } else {
       const slowVol = Math.max(0.0, (p1HeartRate - 65) / 30) * 0.5 * sfxVolFactor;
       p1HeartbeatSlowNode.setVolume(slowVol);
       p1HeartbeatFastNode.setVolume(0);
-      p1HeartbeatSlowNode.setPlaybackRate(p1HeartRate / 70);
+      p1HeartbeatSlowNode.setPlaybackRate((p1HeartRate / 70) * p1HeartRateMult);
     }
   } else {
     if (p1HeartbeatSlowNode) p1HeartbeatSlowNode.setVolume(0);
@@ -4353,17 +4357,21 @@ function updateState(delta) {
         p2HeartbeatFastNode.play();
       }
 
+      let p2HeartRateMult = 1.0;
+      if (p2Model === "Kulkarni") p2HeartRateMult = 0.82;
+      else if (p2Model === "Priya" || p2Model === "Priya Sharma") p2HeartRateMult = 1.15;
+
       const sfxVolFactor = sfxVolume;
       if (p2HeartRate > 95) {
         const fastVol2 = Math.min(1.0, (p2HeartRate - 95) / 45) * 0.9 * sfxVolFactor;
         p2HeartbeatFastNode.setVolume(fastVol2);
         p2HeartbeatSlowNode.setVolume(0);
-        p2HeartbeatFastNode.setPlaybackRate(p2HeartRate / 120);
+        p2HeartbeatFastNode.setPlaybackRate((p2HeartRate / 120) * p2HeartRateMult);
       } else {
         const slowVol2 = Math.max(0.0, (p2HeartRate - 65) / 30) * 0.5 * sfxVolFactor;
         p2HeartbeatSlowNode.setVolume(slowVol2);
         p2HeartbeatFastNode.setVolume(0);
-        p2HeartbeatSlowNode.setPlaybackRate(p2HeartRate / 70);
+        p2HeartbeatSlowNode.setPlaybackRate((p2HeartRate / 70) * p2HeartRateMult);
       }
     } else {
       if (p2HeartbeatSlowNode) p2HeartbeatSlowNode.setVolume(0);

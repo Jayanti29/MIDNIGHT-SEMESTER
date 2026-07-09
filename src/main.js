@@ -6771,6 +6771,17 @@ document.addEventListener("mousemove", (event) => {
 });
 
 document.addEventListener("keydown", (event) => {
+  if (event.code === "Space" && p1LockerMinigameActive) {
+    event.preventDefault();
+    checkBreathingMinigameHitP1();
+    return;
+  }
+  if (event.code === "Period" && p2LockerMinigameActive) {
+    event.preventDefault();
+    checkBreathingMinigameHitP2();
+    return;
+  }
+
   // SUBTITLE DIALOGUE KEYBOARD PROGRESSION (while locked)
   if (dialogue.classList.contains("open")) {
     if (event.code === "Space" || event.code === "Enter") {
@@ -7273,4 +7284,12 @@ renderer.setAnimationLoop(() => {
   if (gameState === GameState.PLAYING) pollGamepad();
   _rawAnimate();
 });
+
+function checkBreathingMinigameHitP1() {
+  // Placeholder to be fully implemented in Commit 159/160
+}
+
+function checkBreathingMinigameHitP2() {
+  // Placeholder to be fully implemented in Commit 159/160
+}
 

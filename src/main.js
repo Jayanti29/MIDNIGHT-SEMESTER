@@ -7484,6 +7484,12 @@ document.addEventListener("keydown", (event) => {
     checkBreathingMinigameHitP1();
     return;
   }
+  if (event.code === "Period" && p2DecryptingActive) {
+    event.preventDefault();
+    checkDecryptionAlignment();
+    p2DecryptingActive = false;
+    return;
+  }
   if (event.code === "Period" && p2LockerMinigameActive) {
     event.preventDefault();
     checkBreathingMinigameHitP2();

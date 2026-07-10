@@ -6124,6 +6124,11 @@ function executeCommand(cmdStr) {
       }
       break;
 
+    case "unlockall":
+      academicDoorUnlocked = true;
+      addConsoleLog("Cheat: All security doors unlocked.");
+      break;
+
     case "heartrate": {
       if (args.length === 0) {
         addConsoleLog("Error: Missing BPM value. Usage: /heartrate <bpm> [p1|p2]");

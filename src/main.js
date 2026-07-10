@@ -5947,6 +5947,16 @@ function inspectObject(hit, isPlayer2 = false) {
     return;
   }
 
+  if (type === "security_terminal") {
+    document.exitPointerLock?.();
+    const modal = document.getElementById("security-terminal-modal");
+    if (modal) modal.style.display = "block";
+    setGameState(GameState.PAUSED);
+    if (audioManager) audioManager.playSound("terminal_beep", { volume: 0.5 });
+    caption.textContent = "Security override gateway accessed.";
+    return;
+  }
+
   if (type === "blueprint_map") {
     document.exitPointerLock?.();
     const mapModal = document.getElementById("map-overlay");

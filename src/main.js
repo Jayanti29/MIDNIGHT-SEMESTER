@@ -1512,6 +1512,9 @@ function initAudio() {
   const lockerShakeBuffer = createLockerShakeBuffer(audioCtx);
   audioManager.buffers.set("locker_shake", lockerShakeBuffer);
 
+  const drawerSlideBuffer = createDrawerSlideBuffer(audioCtx);
+  audioManager.buffers.set("drawer_slide", drawerSlideBuffer);
+
   const decryptSuccessBuffer = createDecryptSuccessBuffer(audioCtx);
   audioManager.buffers.set("decrypt_success", decryptSuccessBuffer);
 

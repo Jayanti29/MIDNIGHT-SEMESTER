@@ -788,7 +788,8 @@ const GameState = Object.freeze({
   PAUSED: "paused",
   GAMEOVER: "gameover",
   WIN: "win",
-  CHOICE: "choice"
+  CHOICE: "choice",
+  DECRYPTING: "decrypting"
 });
 let gameState = GameState.MENU;
 
@@ -837,6 +838,15 @@ class GameStateManager {
       }
     }
 
+    const decryptorModal = document.getElementById("decryptor-terminal-modal");
+    if (decryptorModal) {
+      if (nextState === GameState.DECRYPTING) {
+        decryptorModal.style.display = "block";
+      } else {
+        decryptorModal.style.display = "none";
+      }
+    }
+
     if (winScreen) {
       if (nextState === GameState.WIN) {
         winScreen.classList.add("open");
@@ -871,7 +881,7 @@ class GameStateManager {
   onStateChange(nextState, prevState) {
     if (nextState === GameState.PLAYING) {
       if (!clock.running) clock.start();
-    } else if (nextState === GameState.PAUSED || nextState === GameState.MENU || nextState === GameState.GAMEOVER || nextState === GameState.WIN || nextState === GameState.CHOICE) {
+    } else if (nextState === GameState.PAUSED || nextState === GameState.MENU || nextState === GameState.GAMEOVER || nextState === GameState.WIN || nextState === GameState.CHOICE || nextState === GameState.DECRYPTING) {
       clock.stop();
       keys.clear();
     }

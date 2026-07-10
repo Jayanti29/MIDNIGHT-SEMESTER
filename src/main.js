@@ -7321,6 +7321,14 @@ function checkDecryptionAlignment() {
   }
 }
 
+function triggerKulkarniLibraryDialogue() {
+  queueStory([
+    ["Professor Kulkarni", "Aarav, is that the library annex? Be careful in those files."],
+    ["Aarav", "Professor, the filing cabinets contain research folders from 2004. They are encrypted."],
+    ["Professor Kulkarni", "The decryption terminal is still wired. Do not upload them to the mainframe. Hand them over to me... for security reasons."]
+  ]);
+}
+
 function handleDecryptionSuccess() {
   setGameState(GameState.PLAYING);
   document.exitPointerLock?.();

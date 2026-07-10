@@ -7285,7 +7285,39 @@ document.addEventListener("mousemove", (event) => {
   camera.rotation.set(pitch, yaw, 0, "YXZ");
 });
 
+function checkDecryptionAlignment() {
+  if (gameState !== GameState.DECRYPTING) return;
+  const diff = Math.abs(decryptIndicatorPos - decryptTargetPos);
+  if (diff <= 10) {
+    decryptProgress = Math.min(100, decryptProgress + 25);
+    const progressMeter = document.getElementById("decrypt-progress");
+    if (progressMeter) progressMeter.value = decryptProgress;
+    const statusText = document.getElementById("decrypt-status-text");
+    if (statusText) statusText.textContent = `ALIGNMENT OK. SIGNAL SYNCED: ${decryptProgress}%`;
+    if (audioManager) audioManager.playSound("terminal_beep", { volume: 0.6 });
+    decryptTargetPos = 15 + Math.random() * 70;
+    decryptSpeedMultiplier = 1.0 + (decryptProgress / 100) * 0.5;
+    if (decryptProgress >= 100) {
+      handleDecryptionSuccess();
+    }
+  }
+}
+
+function handleDecryptionSuccess() {
+  setGameState(GameState.PLAYING);
+  document.exitPointerLock?.();
+  if (audioManager) audioManager.playSound("decrypt_success", { volume: 0.7 });
+  decryptedLogsCount++;
+  const modal = document.getElementById("decryptor-terminal-modal");
+  if (modal) modal.style.display = "none";
+}
+
 document.addEventListener("keydown", (event) => {
+  if (event.code === "Space" && gameState === GameState.DECRYPTING) {
+    event.preventDefault();
+    checkDecryptionAlignment();
+    return;
+  }
   if (event.code === "Space" && p1LockerMinigameActive) {
     event.preventDefault();
     checkBreathingMinigameHitP1();

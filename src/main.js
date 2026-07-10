@@ -1510,6 +1510,9 @@ function initAudio() {
   const terminalBeepBuffer = createTerminalBeepBuffer(audioCtx);
   audioManager.buffers.set("terminal_beep", terminalBeepBuffer);
 
+  const buttonClickBuffer = createButtonClickBuffer(audioCtx);
+  audioManager.buffers.set("button_click", buttonClickBuffer);
+
   const lockerShakeBuffer = createLockerShakeBuffer(audioCtx);
   audioManager.buffers.set("locker_shake", lockerShakeBuffer);
 

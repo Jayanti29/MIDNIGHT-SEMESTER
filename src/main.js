@@ -7705,7 +7705,7 @@ function handleSecurityOverrideSuccess() {
   caption.textContent = "PASSCODE ACCEPTED. ACADEMIC ANCHOR BYPASS ONLINE.";
   if (audioManager) {
     audioManager.playSound("decrypt_success", { volume: 0.6 });
-    audioManager.playSound("door_unlock_beep", { volume: 0.5 });
+    audioManager.playSound("door_unlock_beep", { volume: 0.5 }); // Play unlock beep
   }
   const display = document.getElementById("keypad-display");
   if (display) display.value = "OPEN";

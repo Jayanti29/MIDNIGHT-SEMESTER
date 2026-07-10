@@ -5320,7 +5320,8 @@ function showNextStoryLine() {
     return;
   }
 
-  sayLine(next[0], next[1], 12000);
+  const delay = Math.min(15000, Math.max(5000, 3000 + next[1].length * 60));
+  sayLine(next[0], next[1], delay);
 }
 
 function playIntroDialogue() {

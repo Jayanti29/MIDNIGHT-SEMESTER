@@ -4661,6 +4661,16 @@ function updateState(delta) {
     minigamePanel1.style.display = p1LockerMinigameActive ? "flex" : "none";
   }
 
+  const feedNoise = document.getElementById("cctv-feed-noise");
+  if (feedNoise && document.getElementById("security-terminal-modal")?.style.display === "block") {
+    const distToGhost = camera.position.distanceTo(meera.position);
+    if (distToGhost < 8.0) {
+      feedNoise.style.background = `rgba(0, 255, 51, ${0.08 + Math.random() * 0.15})`;
+    } else {
+      feedNoise.style.background = "rgba(0, 255, 51, 0.08)";
+    }
+  }
+
   if (document.getElementById("map-overlay")?.style.display === "block") {
     updateMapMarkers();
     if (keys.has("ShiftLeft") || keys.has("ShiftRight")) {

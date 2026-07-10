@@ -1956,6 +1956,21 @@ function createLockerShakeBuffer(ctx) {
   return buffer;
 }
 
+function createDrawerSlideBuffer(ctx) {
+  const duration = 0.8;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.sin(Math.PI * (t / duration));
+    const scrape = (Math.random() * 2 - 1) * 0.25 * Math.sin(2 * Math.PI * 180 * t);
+    data[i] = scrape * envelope;
+  }
+  return buffer;
+}
+
 function createDecryptFailureBuffer(ctx) {
   const duration = 0.45;
   const sampleRate = ctx.sampleRate;

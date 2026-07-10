@@ -7300,6 +7300,13 @@ function checkDecryptionAlignment() {
     if (decryptProgress >= 100) {
       handleDecryptionSuccess();
     }
+  } else {
+    decryptProgress = Math.max(0, decryptProgress - 15);
+    const progressMeter = document.getElementById("decrypt-progress");
+    if (progressMeter) progressMeter.value = decryptProgress;
+    const statusText = document.getElementById("decrypt-status-text");
+    if (statusText) statusText.textContent = `SYNC ERROR! DEVIATION DETECTED.`;
+    if (audioManager) audioManager.playSound("decrypt_failure", { volume: 0.5 });
   }
 }
 

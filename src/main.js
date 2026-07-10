@@ -948,7 +948,11 @@ function updateObjectivesSystem() {
         objective.textContent = "Valves primed. Pull the Generator Starter Lever in the side engine room.";
       }
     } else {
-      objective.textContent = "Generator active! Reach the Operations Terminal at the end of the hall.";
+      if (libraryFoldersCollected.size > 0 && decryptedLogsCount < 2) {
+        objective.textContent = `Library archive folders collected. Decrypt them at the center Decryptor Terminal (${decryptedLogsCount}/2).`;
+      } else {
+        objective.textContent = "Generator active! Reach the Operations Terminal at the end of the hall.";
+      }
     }
   }
 }

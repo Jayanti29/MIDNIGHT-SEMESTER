@@ -7239,6 +7239,8 @@ function resetGame() {
     readLoreNotes.clear();
     libraryFoldersCollected.clear();
     searchedCabinets.clear();
+    academicDoorUnlocked = false;
+    keypadInput = "";
     decryptedLogsCount = 0;
     activeEndingPath = null;
     

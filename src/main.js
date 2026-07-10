@@ -5861,6 +5861,8 @@ function executeCommand(cmdStr) {
       addConsoleLog("  /ghostspeed <mult> - Multiply ghost movement speed (e.g. /ghostspeed 0.5)");
       addConsoleLog("  /loadlevel <1|2> - Jump to level 1 or level 2");
       addConsoleLog("  /heartrate <bpm> [p1|p2] - Override player heart rate manually");
+      addConsoleLog("  /skipdecryption - Bypass active decryption puzzles");
+      addConsoleLog("  /triggerending <A|B|C|D> - Jump to specific game endings");
       addConsoleLog("  /skipminigame - Skip and win active locker breathing minigames");
       break;
 

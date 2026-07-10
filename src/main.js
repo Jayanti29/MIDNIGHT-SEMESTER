@@ -1941,6 +1941,21 @@ function createDecryptSuccessBuffer(ctx) {
   return buffer;
 }
 
+function createLockerShakeBuffer(ctx) {
+  const duration = 0.6;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-5.0 * t);
+    const rattle = Math.sin(2 * Math.PI * (80 + Math.random() * 40) * t);
+    data[i] = rattle * envelope * 0.35;
+  }
+  return buffer;
+}
+
 function createDecryptFailureBuffer(ctx) {
   const duration = 0.45;
   const sampleRate = ctx.sampleRate;

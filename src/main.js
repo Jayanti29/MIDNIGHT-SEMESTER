@@ -1515,6 +1515,9 @@ function initAudio() {
   const terminalBeepBuffer = createTerminalBeepBuffer(audioCtx);
   audioManager.buffers.set("terminal_beep", terminalBeepBuffer);
 
+  const radioStaticBuffer = createRadioStaticBuffer(audioCtx);
+  audioManager.buffers.set("radio_static", radioStaticBuffer);
+
   const paperRustleBuffer = createPaperRustleBuffer(audioCtx);
   audioManager.buffers.set("paper_rustle", paperRustleBuffer);
 

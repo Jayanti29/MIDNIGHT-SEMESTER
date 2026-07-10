@@ -1888,6 +1888,21 @@ function createTerminalBeepBuffer(ctx) {
   return buffer;
 }
 
+function createDecryptSuccessBuffer(ctx) {
+  const duration = 0.5;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-6.0 * t);
+    const freq = t < 0.15 ? 523.25 : (t < 0.3 ? 659.25 : 783.99); // C5 -> E5 -> G5
+    data[i] = Math.sin(2 * Math.PI * freq * t) * envelope * 0.25;
+  }
+  return buffer;
+}
+
 function playJumpscareStinger() {
   if (audioManager) {
     audioManager.playSound("jumpscare_stinger", { volume: 1.0 });

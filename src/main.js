@@ -1509,6 +1509,9 @@ function initAudio() {
   const terminalBeepBuffer = createTerminalBeepBuffer(audioCtx);
   audioManager.buffers.set("terminal_beep", terminalBeepBuffer);
 
+  const lockerShakeBuffer = createLockerShakeBuffer(audioCtx);
+  audioManager.buffers.set("locker_shake", lockerShakeBuffer);
+
   const decryptSuccessBuffer = createDecryptSuccessBuffer(audioCtx);
   audioManager.buffers.set("decrypt_success", decryptSuccessBuffer);
 

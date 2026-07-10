@@ -700,6 +700,12 @@ let creepyWhisperTimer = 0;
 let shadowFigures = [];
 let meeraFinalEventPlayed = false;
 let kulkarniLibraryEventPlayed = false;
+let currentCctvCam = 1;
+const cctvCameras = [
+  { id: 1, label: "CAM_01: MAIN LOBBY" },
+  { id: 2, label: "CAM_02: BASEMENT ENGINE" },
+  { id: 3, label: "CAM_03: LIBRARY ANNEX" }
+];
 let academicDoorUnlocked = false;
 let activeApparitionWalk = false;
 let apparitionGhost = null;
@@ -7805,6 +7811,21 @@ document.querySelectorAll(".paper-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     if (audioManager) audioManager.playSound("button_click", { volume: 0.4 });
   });
+});
+
+const switchBtn = document.getElementById("cctv-switch-btn");
+switchBtn?.addEventListener("click", () => {
+  currentCctvCam = currentCctvCam === 3 ? 1 : currentCctvCam + 1;
+  const label = document.getElementById("cctv-label");
+  if (label) label.textContent = cctvCameras[currentCctvCam - 1].label;
+  if (audioManager) audioManager.playSound("camera_switch", { volume: 0.4 });
+});
+const closeSecurityBtn = document.getElementById("close-security");
+closeSecurityBtn?.addEventListener("click", () => {
+  const modal = document.getElementById("security-terminal-modal");
+  if (modal) modal.style.display = "none";
+  setGameState(GameState.PLAYING);
+  requestPointerLock();
 });
 
 const closeMapBtn = document.getElementById("close-map-btn");

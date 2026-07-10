@@ -243,6 +243,21 @@
         <div id="locker-slat-peek-p1" class="locker-slat-overlay"></div>
         <div id="locker-slat-peek-p2" class="locker-slat-overlay"></div>
 
+        <!-- Interactive Blueprint Map Overlay -->
+        <div id="map-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 400px; background: rgba(10, 25, 47, 0.95); border: 2px solid #58c0ff; border-radius: 8px; z-index: 1000; display: none; padding: 20px; box-sizing: border-box; font-family: monospace; color: #58c0ff; box-shadow: 0 0 30px rgba(88, 192, 255, 0.4);">
+          <h3 style="margin-top: 0; border-bottom: 1px solid #58c0ff; padding-bottom: 8px; text-shadow: 0 0 5px #58c0ff;">FACILITY MAP BLUEPRINT - BLOCK A</h3>
+          <div style="position: relative; width: 100%; height: 280px; border: 1px dashed #58c0ff; background: rgba(0, 50, 100, 0.15); border-radius: 4px; overflow: hidden; margin-bottom: 12px;">
+            <div style="position: absolute; left: 10%; top: 40%; width: 80%; height: 20%; border: 1px solid #58c0ff; background: rgba(88, 192, 255, 0.1); text-align: center; line-height: 56px;">CORRIDOR</div>
+            <div style="position: absolute; left: 15%; top: 10%; width: 20%; height: 25%; border: 1px solid #58c0ff; background: rgba(88, 192, 255, 0.05); font-size: 0.7rem; padding: 4px;">ROOM 32L</div>
+            <div style="position: absolute; left: 45%; top: 10%; width: 20%; height: 25%; border: 1px solid #58c0ff; background: rgba(88, 192, 255, 0.05); font-size: 0.7rem; padding: 4px;">ROOM 29R</div>
+            <div style="position: absolute; left: 15%; top: 65%; width: 25%; height: 25%; border: 1px solid #58c0ff; background: rgba(88, 192, 255, 0.05); font-size: 0.7rem; padding: 4px;">LIBRARY ANNEX</div>
+            <div style="position: absolute; left: 55%; top: 65%; width: 25%; height: 25%; border: 1px solid #58c0ff; background: rgba(88, 192, 255, 0.05); font-size: 0.7rem; padding: 4px;">ENGINE ROOM</div>
+            <div id="map-player-marker" style="position: absolute; width: 10px; height: 10px; background: red; border-radius: 50%; box-shadow: 0 0 10px red; display: none;"></div>
+            <div id="map-player2-marker" style="position: absolute; width: 10px; height: 10px; background: yellow; border-radius: 50%; box-shadow: 0 0 10px yellow; display: none;"></div>
+          </div>
+          <button id="close-map-btn" style="float: right; background: transparent; border: 1px solid #58c0ff; color: #58c0ff; padding: 4px 12px; cursor: pointer;">Close Map</button>
+        </div>
+
         <!-- Panic Blur Overlays -->
         <div id="panic-overlay-p1" class="panic-overlay"></div>
         <div id="panic-overlay-p2" class="panic-overlay"></div>

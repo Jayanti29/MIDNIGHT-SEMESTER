@@ -4936,6 +4936,11 @@ function updateState(delta) {
               activeNoiseEventZ = null;
             }
           } else {
+            if (currentLevel === 2 && Math.abs(meera.position.z - (-10)) < 1.0 && Math.random() < 0.01) {
+              meera.position.x = -3.0; // patrols library
+            } else {
+              meera.position.x = 0; // return to hallway
+            }
             meera.position.z += meeraPatrolDir * meeraSpeed * delta;
             const zMin = currentLevel === 1 ? -45 : -35;
             const zMax = currentLevel === 1 ? -16 : 8;

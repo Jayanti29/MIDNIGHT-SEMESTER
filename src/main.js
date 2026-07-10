@@ -6744,6 +6744,7 @@ function triggerWin() {
 }
 
 function triggerEnding(endingId) {
+  activeEndingPath = endingId;
   setGameState(GameState.WIN);
   document.exitPointerLock?.();
   

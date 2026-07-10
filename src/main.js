@@ -4508,6 +4508,21 @@ function updateState(delta) {
     minigamePanel1.style.display = p1LockerMinigameActive ? "flex" : "none";
   }
 
+  if (gameState === GameState.DECRYPTING) {
+    decryptIndicatorPos += decryptOscillationDir * delta * 80 * decryptSpeedMultiplier;
+    if (decryptIndicatorPos >= 95) {
+      decryptIndicatorPos = 95;
+      decryptOscillationDir = -1;
+    } else if (decryptIndicatorPos <= 5) {
+      decryptIndicatorPos = 5;
+      decryptOscillationDir = 1;
+    }
+    const indicatorEl = document.getElementById("decrypt-indicator");
+    if (indicatorEl) indicatorEl.style.left = `${decryptIndicatorPos}%`;
+    const targetEl = document.getElementById("decrypt-target");
+    if (targetEl) targetEl.style.left = `${decryptTargetPos - 10}%`;
+  }
+
   if (p1LockerMinigameActive) {
     const cycleSpeed = 2.4 + (p1HeartRate - 70) * 0.02;
     const breathTime = clock.getElapsedTime() * cycleSpeed;

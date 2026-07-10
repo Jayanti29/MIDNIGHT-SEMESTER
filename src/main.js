@@ -4877,6 +4877,10 @@ function updateState(delta) {
         meera.position.addScaledVector(toLocker, meeraSpeed * delta);
         
         if (distToLocker < 1.45 && gameState === GameState.PLAYING && !godModeActive) {
+          // Rattles locker door!
+          if (audioManager) {
+            audioManager.playSound("creepy_whisper", { volume: 0.8 });
+          }
           lockerAlertState = false;
           lockerTargetToInspect = null;
           if (audioManager) audioManager.playSound("jumpscare_stinger", { volume: 1.0 });

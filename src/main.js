@@ -2998,6 +2998,10 @@ function buildCorridor() {
   scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [2.6, 0, -34.5], color: 0xc9d5cf, ghostly: true, identity: "Meera" });
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 
+  // Spawn a blueprint map paper on the starting desk
+  const blueprintPaper = box("blueprint_map", [0.45, 0.01, 0.35], [0.8, 0.8, -24.8], materials.brass, false, true);
+  tagInteractable(blueprintPaper, "blueprint_map", "Read blueprint map");
+
   // Spawn a pillbox in the main corridor lobby
   const p1PillboxGroup = new THREE.Group();
   p1PillboxGroup.name = "corridor_pillbox";

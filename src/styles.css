@@ -1863,5 +1863,10 @@ body:not(.coop-active) #breath-minigame-p1 {
   text-shadow: 0 0 3px rgba(115, 208, 138, 0.8);
 }
 
+#settings-panel {
+  border: 3px double #7a6652 !important;
+  box-shadow: 0 0 15px rgba(0,0,0,0.85) !important;
+}
+
 
 

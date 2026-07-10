@@ -1874,6 +1874,20 @@ function createJumpscareStingerBuffer(ctx) {
   return buffer;
 }
 
+function createTerminalBeepBuffer(ctx) {
+  const duration = 0.08;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.sin(Math.PI * (t / duration));
+    data[i] = Math.sin(2 * Math.PI * 1400 * t) * envelope * 0.15;
+  }
+  return buffer;
+}
+
 function playJumpscareStinger() {
   if (audioManager) {
     audioManager.playSound("jumpscare_stinger", { volume: 1.0 });

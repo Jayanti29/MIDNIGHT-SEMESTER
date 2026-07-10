@@ -7475,6 +7475,27 @@ function checkDecryptionAlignment() { // Sync minigame status
   }
 }
 
+function updateMapMarkers() {
+  const p1Marker = document.getElementById("map-player-marker");
+  if (p1Marker) {
+    p1Marker.style.display = "block";
+    const zPct = ((camera.position.z - (-48)) / 60) * 100;
+    const xPct = ((camera.position.x - (-3)) / 6) * 100;
+    p1Marker.style.top = `${100 - zPct}%`;
+    p1Marker.style.left = `${xPct}%`;
+  }
+  const p2Marker = document.getElementById("map-player2-marker");
+  if (p2Marker && coopMode && camera2) {
+    p2Marker.style.display = "block";
+    const zPct2 = ((camera2.position.z - (-48)) / 60) * 100;
+    const xPct2 = ((camera2.position.x - (-3)) / 6) * 100;
+    p2Marker.style.top = `${100 - zPct2}%`;
+    p2Marker.style.left = `${xPct2}%`;
+  } else if (p2Marker) {
+    p2Marker.style.display = "none";
+  }
+}
+
 function triggerKulkarniLibraryDialogue() {
   queueStory([
     ["Professor Kulkarni", "Aarav, is that the library annex? Be careful in those files."],

@@ -1989,6 +1989,18 @@ function createDrawerSlideBuffer(ctx) {
   return buffer;
 }
 
+function createRadioStaticBuffer(ctx) {
+  const duration = 1.2;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    data[i] = (Math.random() * 2 - 1) * 0.12;
+  }
+  return buffer;
+}
+
 function createButtonClickBuffer(ctx) {
   const duration = 0.12;
   const sampleRate = ctx.sampleRate;

@@ -7723,7 +7723,7 @@ document.querySelectorAll(".paper-btn").forEach((btn) => {
 });
 
 const closeMapBtn = document.getElementById("close-map-btn");
-closeMapBtn?.addEventListener("click", () => {
+closeMapBtn?.addEventListener("click", () => { // Register closeMapBtn
   const mapModal = document.getElementById("map-overlay");
   if (mapModal) mapModal.style.display = "none";
   setGameState(GameState.PLAYING);

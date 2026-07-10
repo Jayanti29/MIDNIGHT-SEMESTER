@@ -696,6 +696,7 @@ let shadowSpawnTimer = 0;
 let creepyWhisperTimer = 0;
 let shadowFigures = [];
 let meeraFinalEventPlayed = false;
+let kulkarniLibraryEventPlayed = false;
 let activeApparitionWalk = false;
 let apparitionGhost = null;
 let apparitionFadeTimer = 0;
@@ -4850,6 +4851,12 @@ function updateState(delta) {
       }
     }
     
+    // Kulkarni Library Radio Trigger Check
+    if (currentLevel === 2 && !kulkarniLibraryEventPlayed && camera.position.x < -3.5 && camera.position.z < -6.0 && camera.position.z > -14.0) {
+      kulkarniLibraryEventPlayed = true;
+      triggerKulkarniLibraryDialogue();
+    }
+
     if (meeraState !== AiState.INACTIVE) {
       if (lockerAlertState && lockerTargetToInspect) {
         meeraSpeed = 1.65 * meeraSpeedMultiplier;

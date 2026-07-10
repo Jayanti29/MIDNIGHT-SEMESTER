@@ -1480,6 +1480,9 @@ function initAudio() {
   const terminalBeepBuffer = createTerminalBeepBuffer(audioCtx);
   audioManager.buffers.set("terminal_beep", terminalBeepBuffer);
 
+  const decryptSuccessBuffer = createDecryptSuccessBuffer(audioCtx);
+  audioManager.buffers.set("decrypt_success", decryptSuccessBuffer);
+
   // Play spatial buzzing hum on a couple of the corridor lights
   flickerLights.forEach((lightObj, index) => {
     if (index % 2 === 0) {

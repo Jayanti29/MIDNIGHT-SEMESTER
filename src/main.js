@@ -8156,7 +8156,7 @@ choiceEndingD?.addEventListener("click", () => {
 settingMasterVolume.value = masterVolume;
 settingSfxVolume.value = sfxVolume;
 settingAmbientVolume.value = ambientVolume;
-if (settingMouseSensitivity) settingMouseSensitivity.value = mouseSensitivity;
+if (settingMouseSensitivity) settingMouseSensitivity.value = mouseSensitivity; // loaded sensitivity
 const savedFov = localStorage.getItem("setting-fov");
 if (savedFov) {
   camera.fov = parseInt(savedFov);

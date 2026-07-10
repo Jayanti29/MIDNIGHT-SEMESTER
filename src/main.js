@@ -4684,6 +4684,11 @@ function updateState(delta) {
     minigamePanel1.style.display = p1LockerMinigameActive ? "flex" : "none";
   }
 
+  // Strobe sound hum effect
+  if (audioManager && Math.random() < 0.05) {
+    audioManager.playSound("strobe_buzz", { volume: 0.15 });
+  }
+
   const feedNoise = document.getElementById("cctv-feed-noise");
   if (feedNoise && document.getElementById("security-terminal-modal")?.style.display === "block") {
     const distToGhost = camera.position.distanceTo(meera.position);

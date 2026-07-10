@@ -328,6 +328,7 @@ let yaw = 0;
 let pitch = 0;
 let mouseSensitivity = parseFloat(localStorage.getItem("setting-mouse-sensitivity") || "1.0");
 let vignetteScale = 1.0;
+let screenContrast = 1.0;
 let masterVolume = parseFloat(localStorage.getItem("setting-master-volume") || "0.8");
 let sfxVolume = parseFloat(localStorage.getItem("setting-sfx-volume") || "0.8");
 let ambientVolume = parseFloat(localStorage.getItem("setting-ambient-volume") || "0.8");
@@ -8010,6 +8011,12 @@ settingAmbientVolume.addEventListener("input", (event) => {
     vignetteScale = parseFloat(event.target.value);
     const vignetteEl = document.getElementById("vignette");
     if (vignetteEl) vignetteEl.style.boxShadow = `inset 0 0 ${200 * vignetteScale}px rgba(0,0,0,0.95)`;
+  });
+
+  const settingContrast = document.getElementById("setting-contrast");
+  settingContrast?.addEventListener("input", (event) => {
+    screenContrast = parseFloat(event.target.value);
+    canvas.style.filter = `contrast(${screenContrast})`;
   });
 
 settingMouseSensitivity?.addEventListener("input", (event) => {

@@ -331,6 +331,7 @@ let masterVolume = parseFloat(localStorage.getItem("setting-master-volume") || "
 let sfxVolume = parseFloat(localStorage.getItem("setting-sfx-volume") || "0.8");
 let ambientVolume = parseFloat(localStorage.getItem("setting-ambient-volume") || "0.8");
 let battery = 100;
+// Sanity & Fear metrics
 let fear = 0;
 let flashlightOn = true;
 let inspected = 0;

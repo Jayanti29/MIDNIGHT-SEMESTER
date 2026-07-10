@@ -1158,6 +1158,9 @@ body:not(.started) .quick-actions {
 }
 
 /* tabbed personnel folder panel */
+.dossier-folder h2 {
+  font-weight: 700;
+}
 .dossier-folder {
   background: #ecdcc9 !important;
   color: #2b1f13 !important;

@@ -1483,6 +1483,9 @@ function initAudio() {
   const decryptSuccessBuffer = createDecryptSuccessBuffer(audioCtx);
   audioManager.buffers.set("decrypt_success", decryptSuccessBuffer);
 
+  const decryptFailureBuffer = createDecryptFailureBuffer(audioCtx);
+  audioManager.buffers.set("decrypt_failure", decryptFailureBuffer);
+
   // Play spatial buzzing hum on a couple of the corridor lights
   flickerLights.forEach((lightObj, index) => {
     if (index % 2 === 0) {

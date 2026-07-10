@@ -1814,6 +1814,12 @@ body:not(.coop-active) #breath-minigame-p1 {
   50% { opacity: 0.5; }
 }
 
+.blueprint-map-grid {
+  background-image: linear-gradient(rgba(88, 192, 255, 0.05) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(88, 192, 255, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
 #debug-input {
   caret-color: #73d08a;
   text-shadow: 0 0 3px rgba(115, 208, 138, 0.8);

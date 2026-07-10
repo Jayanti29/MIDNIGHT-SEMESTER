@@ -1524,6 +1524,9 @@ function initAudio() {
   const terminalBeepBuffer = createTerminalBeepBuffer(audioCtx);
   audioManager.buffers.set("terminal_beep", terminalBeepBuffer);
 
+  const doorUnlockBeepBuffer = createDoorUnlockBeepBuffer(audioCtx);
+  audioManager.buffers.set("door_unlock_beep", doorUnlockBeepBuffer);
+
   const strobeBuzzBuffer = createStrobeBuzzBuffer(audioCtx);
   audioManager.buffers.set("strobe_buzz", strobeBuzzBuffer);
 

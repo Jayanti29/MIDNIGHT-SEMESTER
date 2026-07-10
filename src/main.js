@@ -1903,6 +1903,22 @@ function createDecryptSuccessBuffer(ctx) {
   return buffer;
 }
 
+function createDecryptFailureBuffer(ctx) {
+  const duration = 0.45;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-4.5 * t);
+    const buzz = Math.sin(2 * Math.PI * 130 * t) + Math.sin(2 * Math.PI * 260 * t) * 0.5;
+    const noise = Math.random() * 2 - 1;
+    data[i] = (buzz * 0.6 + noise * 0.4) * envelope * 0.25;
+  }
+  return buffer;
+}
+
 function playJumpscareStinger() {
   if (audioManager) {
     audioManager.playSound("jumpscare_stinger", { volume: 1.0 });

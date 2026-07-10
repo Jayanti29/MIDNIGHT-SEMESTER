@@ -7631,6 +7631,21 @@ function updateMapMarkers() {
   }
 }
 
+function handleSecurityOverrideFailure() {
+  keypadInput = "";
+  const display = document.getElementById("keypad-display");
+  if (display) {
+    display.value = "ERROR";
+    display.classList.add("shake-error");
+    window.setTimeout(() => {
+      display.value = "";
+      display.classList.remove("shake-error");
+    }, 800);
+  }
+  if (audioManager) audioManager.playSound("decrypt_failure", { volume: 0.6 });
+  caption.textContent = "ACCESS DENIED. INVALID PASSCODE.";
+}
+
 function handleSecurityOverrideSuccess() {
   academicDoorUnlocked = true;
   caption.textContent = "PASSCODE ACCEPTED. ACADEMIC ANCHOR BYPASS ONLINE.";

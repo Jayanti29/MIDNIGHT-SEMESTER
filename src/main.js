@@ -5864,6 +5864,20 @@ function executeCommand(cmdStr) {
       addConsoleLog("  /skipminigame - Skip and win active locker breathing minigames");
       break;
 
+    case "triggerending":
+      if (args.length >= 1) {
+        const endingId = args[0].toUpperCase();
+        if (["A", "B", "C", "D"].includes(endingId)) {
+          triggerEnding(endingId);
+          addConsoleLog(`Cheat: Triggering ending ${endingId}.`);
+        } else {
+          addConsoleLog("Cheat Error: Ending must be A, B, C, or D.");
+        }
+      } else {
+        addConsoleLog("Usage: /triggerending <A|B|C|D>");
+      }
+      break;
+
     case "skipdecryption":
     case "sd":
       if (gameState === GameState.DECRYPTING) {

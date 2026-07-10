@@ -577,6 +577,7 @@ const PropFactory = {
   }
 };
 
+// Local level builder utility
 const RoomBuilder = {
   buildRoom: (name, type, position, size) => {
     const group = new THREE.Group();

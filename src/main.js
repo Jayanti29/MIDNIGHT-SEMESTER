@@ -7697,6 +7697,14 @@ document.querySelectorAll(".paper-btn").forEach((btn) => {
   });
 });
 
+const closeMapBtn = document.getElementById("close-map-btn");
+closeMapBtn?.addEventListener("click", () => {
+  const mapModal = document.getElementById("map-overlay");
+  if (mapModal) mapModal.style.display = "none";
+  setGameState(GameState.PLAYING);
+  requestPointerLock();
+});
+
 closeSettings.addEventListener("click", () => {
   settingsPanel.classList.remove("open");
   if (gameState === GameState.MENU) {

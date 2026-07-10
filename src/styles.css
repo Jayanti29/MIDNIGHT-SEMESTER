@@ -1044,6 +1044,14 @@ body:not(.started) .quick-actions {
   color: #7a6652;
 }
 
+.menu-btn-highlight {
+  transition: text-shadow 0.25s ease, color 0.25s ease;
+}
+.menu-btn-highlight:hover {
+  text-shadow: 0 0 10px rgba(255,0,0,0.8);
+  color: #ff3333;
+}
+
 .paper-btn:hover {
   background-color: rgba(180, 40, 40, 0.15);
   border-color: #8b0000;

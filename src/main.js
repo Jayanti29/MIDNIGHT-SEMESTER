@@ -734,6 +734,7 @@ let p1DebrisCount = 0;
 let p2DebrisCount = 0;
 let activeNoiseEventZ = null;
 let noiseInvestigateTimer = 0;
+// --- Library Level Specific Global States ---
 let libraryFoldersCollected = new Set();
 let searchedCabinets = new Set();
 let decryptedLogsCount = 0;

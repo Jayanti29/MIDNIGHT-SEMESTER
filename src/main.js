@@ -3059,6 +3059,12 @@ function buildCorridor() {
   scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [2.6, 0, -34.5], color: 0xc9d5cf, ghostly: true, identity: "Meera" });
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 
+  // Academic Wing Corridor Strobe Light
+  const strobeLight = new THREE.PointLight(0xff0000, 1.5, 8, 2.0);
+  strobeLight.position.set(3.5, 2.5, -15.0);
+  addToActiveLevel(strobeLight);
+  flickerLights.push({ light: strobeLight, base: strobeLight.intensity, phase: Math.random() * Math.PI * 2 });
+
   // Academic Wing Classroom Annex (X > 3.0)
   const consoleTable = box("security_terminal", [0.8, 0.95, 0.8], [2.0, 0.48, -20.0], materials.brass, true, true, true);
   tagInteractable(consoleTable, "security_terminal", "Access Security System");

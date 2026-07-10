@@ -4588,6 +4588,10 @@ function updateState(delta) {
     minigamePanel1.style.display = p1LockerMinigameActive ? "flex" : "none";
   }
 
+  if (document.getElementById("map-overlay")?.style.display === "block") {
+    updateMapMarkers();
+  }
+
   if (gameState === GameState.DECRYPTING) {
     decryptIndicatorPos += decryptOscillationDir * delta * 80 * decryptSpeedMultiplier;
     if (decryptIndicatorPos >= 95) {

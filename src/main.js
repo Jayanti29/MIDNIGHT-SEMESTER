@@ -2011,6 +2011,19 @@ function createRadioStaticBuffer(ctx) {
   return buffer;
 }
 
+function createCameraSwitchBuffer(ctx) {
+  const duration = 0.15;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    data[i] = Math.sin(2 * Math.PI * 650 * t) * Math.exp(-8.0 * t) * 0.15;
+  }
+  return buffer;
+}
+
 function createButtonClickBuffer(ctx) {
   const duration = 0.12;
   const sampleRate = ctx.sampleRate;

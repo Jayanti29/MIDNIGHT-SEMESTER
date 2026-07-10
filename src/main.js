@@ -1995,6 +1995,20 @@ function createButtonClickBuffer(ctx) {
   return buffer;
 }
 
+function createPaperRustleBuffer(ctx) {
+  const duration = 0.55;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.sin(Math.PI * (t / duration));
+    data[i] = (Math.random() * 2 - 1) * envelope * 0.16;
+  }
+  return buffer;
+}
+
 function createDecryptFailureBuffer(ctx) {
   const duration = 0.45;
   const sampleRate = ctx.sampleRate;

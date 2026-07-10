@@ -5990,6 +5990,19 @@ function inspectObject(hit, isPlayer2 = false) {
     return;
   }
 
+  if (type === "security_door") {
+    if (academicDoorUnlocked) {
+      hit.object.visible = false;
+      colliders = colliders.filter(c => c.name !== "academic_door");
+      caption.textContent = "You opened the Classroom Annex door.";
+      if (audioManager) audioManager.playSound("door_creak", { volume: 0.5 });
+    } else {
+      caption.textContent = "The security door requires keypad authorization at the monitor table.";
+      if (audioManager) audioManager.playSound("door_latch", { volume: 0.4 });
+    }
+    return;
+  }
+
   if (type === "blueprint_map") {
     document.exitPointerLock?.();
     const mapModal = document.getElementById("map-overlay");

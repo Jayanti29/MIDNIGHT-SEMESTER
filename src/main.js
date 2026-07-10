@@ -4607,6 +4607,12 @@ function updateState(delta) {
 
   if (document.getElementById("map-overlay")?.style.display === "block") {
     updateMapMarkers();
+    if (keys.has("ShiftLeft") || keys.has("ShiftRight")) {
+      const mapModal = document.getElementById("map-overlay");
+      if (mapModal) mapModal.style.display = "none";
+      setGameState(GameState.PLAYING);
+      requestPointerLock();
+    }
   }
 
   if (gameState === GameState.DECRYPTING) {

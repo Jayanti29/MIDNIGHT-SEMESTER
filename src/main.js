@@ -3343,6 +3343,7 @@ function buildEcgSensorsProp(position, dormGroup) {
   bodyMesh.castShadow = true;
   bodyMesh.receiveShadow = true;
   group.add(bodyMesh);
+  registerCollider(bodyMesh);
 
   const ledGeo = new THREE.SphereGeometry(0.008, 8, 8);
   const ledMat = new THREE.MeshBasicMaterial({ color: 0x39ff14 });

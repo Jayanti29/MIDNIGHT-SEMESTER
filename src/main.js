@@ -700,6 +700,7 @@ let creepyWhisperTimer = 0;
 let shadowFigures = [];
 let meeraFinalEventPlayed = false;
 let kulkarniLibraryEventPlayed = false;
+let academicDoorUnlocked = false;
 let activeApparitionWalk = false;
 let apparitionGhost = null;
 let apparitionFadeTimer = 0;
@@ -3036,6 +3037,8 @@ function buildCorridor() {
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 
   // Academic Wing Classroom Annex (X > 3.0)
+  const academicDoor = box("academic_door", [0.15, 2.2, 1.0], [3.02, 1.15, -15.0], materials.darkWood, true, true, true);
+  tagInteractable(academicDoor, "security_door", "Inspect locked door");
   box("academic_table_1", [1.6, 0.75, 0.8], [6.0, 0.38, -13.0], materials.darkWood, true, true, true);
   box("academic_table_2", [1.6, 0.75, 0.8], [6.0, 0.38, -17.0], materials.darkWood, true, true, true);
   box("academic floor", [8, 0.18, 12], [7.0, -0.1, -15.0], materials.floor, false, true);

@@ -860,7 +860,16 @@ class GameStateManager {
         const epilogueEl = document.getElementById("win-epilogue");
         if (epilogueEl) {
           epilogueEl.textContent = "";
-          const epilogue = "The corridor was quiet for the first time since midnight. Aarav walked out into the pre-dawn fog, the evidence drive warm in his pocket. Block A would never open again.";
+          let epilogue = "The corridor was quiet for the first time since midnight. Aarav walked out into the pre-dawn fog, the evidence drive warm in his pocket. Block A would never open again.";
+          if (activeEndingPath === "A") {
+            epilogue = "Aarav initiated a public broadcast of the 2004 sensory isolation data, exposing Ravenswood's illegal cognitive experiments. Meera's story is finally known. The facility was permanently closed following a federal probe.";
+          } else if (activeEndingPath === "B") {
+            epilogue = "Aarav securely transferred all data directly to Professor Kulkarni. Within hours, the server was wiped and the basement staircase was walled over. Aarav received his degree, and the silence remains.";
+          } else if (activeEndingPath === "C") {
+            epilogue = "Aarav manually cut all power grids and stayed in the dark with Meera, matching the metronome's ticking. No one ever found him, but the backup grid still hums at 12Hz...";
+          } else if (activeEndingPath === "D") {
+            epilogue = "Aarav triggered the emergency release hatch and escaped into the cold morning air, leaving the data behind. He survived, but the weight of what he left behind will follow him forever.";
+          }
           let i = 0;
           const typeInterval = window.setInterval(() => {
             epilogueEl.textContent += epilogue[i];

@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.2.3-advanced] — 2026-07-10
+### Added
+- retro scanline terminal overlay minigame
+- dynamic blueprint facility layout map
+- branching epilogues based on player choices
+- sound synthesizers for paper rustle, lockers, and buttons
+
 ## [0.2.2-advanced] — 2026-07-09
 
 ### Added

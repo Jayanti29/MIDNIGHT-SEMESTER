@@ -1978,6 +1978,20 @@ function createDrawerSlideBuffer(ctx) {
   return buffer;
 }
 
+function createButtonClickBuffer(ctx) {
+  const duration = 0.12;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    const envelope = Math.exp(-12.0 * t);
+    data[i] = Math.sin(2 * Math.PI * 880 * t) * envelope * 0.2;
+  }
+  return buffer;
+}
+
 function createDecryptFailureBuffer(ctx) {
   const duration = 0.45;
   const sampleRate = ctx.sampleRate;

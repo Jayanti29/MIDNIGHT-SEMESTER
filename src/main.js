@@ -5886,6 +5886,17 @@ function inspectObject(hit, isPlayer2 = false) {
     return;
   }
 
+  if (type === "blueprint_map") {
+    document.exitPointerLock?.();
+    const mapModal = document.getElementById("map-overlay");
+    if (mapModal) mapModal.style.display = "block";
+    setGameState(GameState.PAUSED);
+    updateMapMarkers();
+    if (audioManager) audioManager.playSound("paper_rustle", { volume: 0.5 });
+    caption.textContent = "Viewing Facility Blueprint. Press Escape or click Close to exit.";
+    return;
+  }
+
   if (type === "decryptor_terminal") {
     if (libraryFoldersCollected.size === 0) {
       caption.textContent = "The decryptor screen displays: 'INSERT DATA DRIVE'.";

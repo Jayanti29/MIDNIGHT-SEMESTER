@@ -4857,6 +4857,15 @@ function updateState(delta) {
       triggerKulkarniLibraryDialogue();
     }
 
+    // Ghost search checks for hidden players
+    if (meeraState === AiState.PATROL && (isPlayerHidden || isPlayer2Hidden) && !lockerAlertState && Math.random() < 0.005) {
+      const lockerGroup = scene.getObjectByName("locker_group") || scene.getObjectByName("locker_prop");
+      if (lockerGroup) {
+        lockerAlertState = true;
+        lockerTargetToInspect = lockerGroup;
+      }
+    }
+
     if (meeraState !== AiState.INACTIVE) {
       if (lockerAlertState && lockerTargetToInspect) {
         meeraSpeed = 1.65 * meeraSpeedMultiplier;

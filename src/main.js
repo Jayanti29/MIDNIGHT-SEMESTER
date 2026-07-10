@@ -3035,6 +3035,13 @@ function buildCorridor() {
   scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [2.6, 0, -34.5], color: 0xc9d5cf, ghostly: true, identity: "Meera" });
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 
+  // Academic Wing Classroom Annex (X > 3.0)
+  box("academic floor", [8, 0.18, 12], [7.0, -0.1, -15.0], materials.floor, false, true);
+  box("academic ceiling", [8, 0.24, 12], [7.0, 3.0, -15.0], materials.wall, false, true);
+  box("academic back wall", [8, 3.0, 0.24], [7.0, 1.41, -21.02], materials.wall, true, true, true);
+  box("academic front wall", [8, 3.0, 0.24], [7.0, 1.41, -8.98], materials.wall, true, true, true);
+  box("academic right wall", [0.24, 3.0, 12], [11.02, 1.41, -15.0], materials.wall, true, true, true);
+
   // Spawn a blueprint map paper on the starting desk
   const blueprintPaper = box("blueprint_map", [0.45, 0.01, 0.35], [0.8, 0.8, -24.8], materials.brass, false, true);
   tagInteractable(blueprintPaper, "blueprint_map", "Read blueprint map");

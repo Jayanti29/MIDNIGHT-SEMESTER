@@ -1477,6 +1477,9 @@ function initAudio() {
   const breathOutBuffer = createBreathOutBuffer(audioCtx);
   audioManager.buffers.set("breath_out", breathOutBuffer);
 
+  const terminalBeepBuffer = createTerminalBeepBuffer(audioCtx);
+  audioManager.buffers.set("terminal_beep", terminalBeepBuffer);
+
   // Play spatial buzzing hum on a couple of the corridor lights
   flickerLights.forEach((lightObj, index) => {
     if (index % 2 === 0) {

@@ -5742,6 +5742,24 @@ function inspectObject(hit, isPlayer2 = false) {
     return;
   }
 
+  if (type === "decryptor_terminal") {
+    if (libraryFoldersCollected.size === 0) {
+      caption.textContent = "The decryptor screen displays: 'INSERT DATA DRIVE'.";
+      sayLine(playerName, "I need to find the encrypted data folders in the filing cabinets first.");
+      if (audioManager) audioManager.playSound("terminal_beep", { volume: 0.3 });
+    } else {
+      activeDecryptionTerminal = hit.object;
+      document.exitPointerLock?.();
+      decryptProgress = 0;
+      const modal = document.getElementById("decryptor-terminal-modal");
+      if (modal) modal.style.display = "block";
+      setGameState(GameState.DECRYPTING);
+      caption.textContent = "Accessing Decryption Gateway. Align cyclical frequencies.";
+      if (audioManager) audioManager.playSound("terminal_beep", { volume: 0.5 });
+    }
+    return;
+  }
+
   if (type === "bookshelf") {
     caption.textContent = "Rows of old textbooks, university circulars, and disused binders.";
     sayLine(playerName, "Nothing useful here. Just dust and old academic documents.");

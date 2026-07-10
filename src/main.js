@@ -3492,6 +3492,11 @@ function buildDecryptorTerminalProp(position, parentGroup) {
   group.name = "decryptor_terminal_prop";
   group.position.set(...position);
 
+  const screenLight = new THREE.PointLight(0x00ff33, 0.4, 2.5, 2.0);
+  screenLight.position.set(0, 0.72, 0.4);
+  group.add(screenLight);
+  flickerLights.push({ light: screenLight, base: screenLight.intensity, phase: Math.random() * Math.PI * 2 });
+
   // Server/desk base cabinet
   const baseGeo = new THREE.BoxGeometry(0.9, 0.9, 0.75);
   const baseMat = new THREE.MeshStandardMaterial({ color: 0x242729, metalness: 0.6, roughness: 0.5 });

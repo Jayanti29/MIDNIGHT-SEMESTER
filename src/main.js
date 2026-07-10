@@ -7417,7 +7417,7 @@ document.addEventListener("mousemove", (event) => {
   camera.rotation.set(pitch, yaw, 0, "YXZ");
 });
 
-function checkDecryptionAlignment() {
+function checkDecryptionAlignment() { // Sync minigame status
   if (gameState !== GameState.DECRYPTING) return;
   const diff = Math.abs(decryptIndicatorPos - decryptTargetPos);
   if (diff <= 10) {

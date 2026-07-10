@@ -1784,6 +1784,7 @@ body:not(.coop-active) #breath-minigame-p1 {
 }
 
 /* Locker Slat Peeking Styles */
+/* Unified overlay declarations */
 .locker-slat-overlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;

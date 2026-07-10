@@ -7007,6 +7007,10 @@ function resetGame() {
     collectedDocuments.clear();
     collectedBatteries.clear();
     readLoreNotes.clear();
+    libraryFoldersCollected.clear();
+    searchedCabinets.clear();
+    decryptedLogsCount = 0;
+    activeEndingPath = null;
     
     currentLevel = 1;
     activeLevelGroup = level1Group;

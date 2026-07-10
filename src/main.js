@@ -5618,7 +5618,10 @@ function inspectObject(hit, isPlayer2 = false) {
         inspected: inspected,
         blackoutTriggered: blackoutTriggered,
         level: currentLevel,
-        ecgSensorsCollected: ecgSensorsCollected
+        ecgSensorsCollected: ecgSensorsCollected,
+        libraryFoldersCollected: Array.from(libraryFoldersCollected),
+        searchedCabinets: Array.from(searchedCabinets),
+        decryptedLogsCount: decryptedLogsCount
       };
       caption.textContent = "Progress checkpoint saved.";
       sayLine(playerName, "A backup power console. The terminal says security log saved.");

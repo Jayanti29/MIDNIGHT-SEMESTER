@@ -4956,7 +4956,7 @@ function updateState(delta) {
       }
     }
     
-    // Kulkarni Library Radio Trigger Check
+    // Kulkarni Library Radio Trigger Check (Verified Flow)
     if (currentLevel === 2 && !kulkarniLibraryEventPlayed && camera.position.x < -3.5 && camera.position.z < -6.0 && camera.position.z > -14.0) {
       kulkarniLibraryEventPlayed = true;
       triggerKulkarniLibraryDialogue();

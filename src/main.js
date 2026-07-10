@@ -3399,6 +3399,7 @@ function buildBookshelfProp(position, parentGroup) {
   frameMesh.castShadow = true;
   frameMesh.receiveShadow = true;
   group.add(frameMesh);
+  registerCollider(frameMesh);
 
   // Decorative shelves indent panels
   const indentMat = new THREE.MeshStandardMaterial({ color: 0x1d140e, roughness: 0.9 });

@@ -1828,6 +1828,25 @@ body:not(.coop-active) #breath-minigame-p1 {
   background-size: 20px 20px;
 }
 
+.keypad-btn {
+  background: rgba(0, 255, 51, 0.05);
+  border: 1px solid #00ff33;
+  color: #00ff33;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+}
+.keypad-btn:hover {
+  background: rgba(0, 255, 51, 0.2);
+}
+#keypad-clear, #keypad-enter {
+  background: rgba(255, 51, 51, 0.05);
+  border: 1px solid #00ff33;
+  color: #00ff33;
+  cursor: pointer;
+  font-family: inherit;
+}
+
 #debug-input {
   caret-color: #73d08a;
   text-shadow: 0 0 3px rgba(115, 208, 138, 0.8);

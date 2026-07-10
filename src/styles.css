@@ -1787,6 +1787,15 @@ body:not(.coop-active) #breath-minigame-p1 {
   box-shadow: inset 0 0 100px rgba(0,0,0,0.95);
 }
 
+@keyframes scanline-flicker {
+  0% { opacity: 0.15; }
+  50% { opacity: 0.22; }
+  100% { opacity: 0.15; }
+}
+.decryptor-scanlines {
+  animation: scanline-flicker 0.15s infinite;
+}
+
 @keyframes terminal-blink {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }

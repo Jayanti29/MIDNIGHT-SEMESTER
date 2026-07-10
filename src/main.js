@@ -7503,6 +7503,18 @@ pauseSettings.addEventListener("click", () => {
   pauseMenu.classList.remove("open");
   settingsPanel.classList.add("open");
 });
+const decryptBtn = document.getElementById("decrypt-align-btn");
+decryptBtn?.addEventListener("click", () => {
+  checkDecryptionAlignment();
+});
+const closeDecryptBtn = document.getElementById("close-decryptor");
+closeDecryptBtn?.addEventListener("click", () => {
+  setGameState(GameState.PLAYING);
+  const modal = document.getElementById("decryptor-terminal-modal");
+  if (modal) modal.style.display = "none";
+  requestPointerLock();
+});
+
 closeSettings.addEventListener("click", () => {
   settingsPanel.classList.remove("open");
   if (gameState === GameState.MENU) {

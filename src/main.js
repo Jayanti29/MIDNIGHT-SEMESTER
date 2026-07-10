@@ -2045,6 +2045,19 @@ function createStrobeBuzzBuffer(ctx) {
   return buffer;
 }
 
+function createDoorUnlockBeepBuffer(ctx) {
+  const duration = 0.22;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    data[i] = Math.sin(2 * Math.PI * 1920 * t) * Math.exp(-6.0 * t) * 0.2;
+  }
+  return buffer;
+}
+
 function createButtonClickBuffer(ctx) {
   const duration = 0.12;
   const sampleRate = ctx.sampleRate;

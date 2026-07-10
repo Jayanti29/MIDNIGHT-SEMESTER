@@ -1523,6 +1523,9 @@ function initAudio() {
   const terminalBeepBuffer = createTerminalBeepBuffer(audioCtx);
   audioManager.buffers.set("terminal_beep", terminalBeepBuffer);
 
+  const strobeBuzzBuffer = createStrobeBuzzBuffer(audioCtx);
+  audioManager.buffers.set("strobe_buzz", strobeBuzzBuffer);
+
   const cameraSwitchBuffer = createCameraSwitchBuffer(audioCtx);
   audioManager.buffers.set("camera_switch", cameraSwitchBuffer);
 

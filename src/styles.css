@@ -1847,6 +1847,17 @@ body:not(.coop-active) #breath-minigame-p1 {
   font-family: inherit;
 }
 
+@keyframes keypad-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
+}
+.shake-error {
+  animation: keypad-shake 0.15s ease-in-out 3;
+  border-color: #ff3333 !important;
+  color: #ff3333 !important;
+}
+
 #debug-input {
   caret-color: #73d08a;
   text-shadow: 0 0 3px rgba(115, 208, 138, 0.8);

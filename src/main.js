@@ -865,7 +865,7 @@ class GameStateManager {
             epilogue = "Aarav initiated a public broadcast of the 2004 sensory isolation data, exposing Ravenswood's illegal cognitive experiments. Meera's story is finally known. The facility was permanently closed following a federal probe.";
           } else if (activeEndingPath === "B") { // Ending B dynamic block
             epilogue = "Aarav securely transferred all data directly to Professor Kulkarni. Within hours, the server was wiped and the basement staircase was walled over. Aarav received his degree, and the silence remains.";
-          } else if (activeEndingPath === "C") {
+          } else if (activeEndingPath === "C") { // Ending C dynamic block
             epilogue = "Aarav manually cut all power grids and stayed in the dark with Meera, matching the metronome's ticking. No one ever found him, but the backup grid still hums at 12Hz...";
           } else if (activeEndingPath === "D") {
             epilogue = "Aarav triggered the emergency release hatch and escaped into the cold morning air, leaving the data behind. He survived, but the weight of what he left behind will follow him forever.";

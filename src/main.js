@@ -7859,6 +7859,15 @@ clearBtn?.addEventListener("click", () => {
   if (audioManager) audioManager.playSound("button_click", { volume: 0.35 });
 });
 
+const enterBtn = document.getElementById("keypad-enter");
+enterBtn?.addEventListener("click", () => {
+  if (keypadInput === "4812") {
+    handleSecurityOverrideSuccess();
+  } else {
+    handleSecurityOverrideFailure();
+  }
+});
+
 const switchBtn = document.getElementById("cctv-switch-btn");
 switchBtn?.addEventListener("click", () => {
   currentCctvCam = currentCctvCam === 3 ? 1 : currentCctvCam + 1;

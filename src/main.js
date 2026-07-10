@@ -3037,6 +3037,8 @@ function buildCorridor() {
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 
   // Academic Wing Classroom Annex (X > 3.0)
+  const consoleTable = box("security_terminal", [0.8, 0.95, 0.8], [2.0, 0.48, -20.0], materials.brass, true, true, true);
+  tagInteractable(consoleTable, "security_terminal", "Access Security System");
   const academicDoor = box("academic_door", [0.15, 2.2, 1.0], [3.02, 1.15, -15.0], materials.darkWood, true, true, true);
   tagInteractable(academicDoor, "security_door", "Inspect locked door");
   box("academic_table_1", [1.6, 0.75, 0.8], [6.0, 0.38, -13.0], materials.darkWood, true, true, true);

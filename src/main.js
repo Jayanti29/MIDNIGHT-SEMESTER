@@ -7469,11 +7469,13 @@ canvas.addEventListener("click", () => {
 document.addEventListener("pointerlockchange", () => {
   pointerLocked = document.pointerLockElement === canvas;
   if (pointerLocked) {
+    document.body.style.cursor = "none";
     caption.textContent = "Mouse look enabled. WASD move, E interact, F flashlight.";
     if (gameState === GameState.PAUSED) {
       setGameState(GameState.PLAYING);
     }
   } else {
+    document.body.style.cursor = "auto";
     caption.textContent = "Mouse look disabled. Click the game view to resume.";
     if (gameState === GameState.PLAYING) {
       setGameState(GameState.PAUSED);

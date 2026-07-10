@@ -685,6 +685,9 @@ body.started .quick-actions {
 }
 
 #caption {
+  text-shadow: 0 0 8px rgba(255,255,255,0.7);
+  border: 1px solid rgba(88,192,255,0.2);
+  border-radius: 4px;
   position: fixed;
   left: 50%;
   bottom: 24px;

@@ -701,6 +701,7 @@ let shadowFigures = [];
 let meeraFinalEventPlayed = false;
 let kulkarniLibraryEventPlayed = false;
 let currentCctvCam = 1;
+let keypadInput = "";
 const cctvCameras = [
   { id: 1, label: "CAM_01: MAIN LOBBY" },
   { id: 2, label: "CAM_02: BASEMENT ENGINE" },
@@ -7837,6 +7838,25 @@ document.querySelectorAll(".paper-btn").forEach((btn) => {
   btn.addEventListener("click", () => {
     if (audioManager) audioManager.playSound("button_click", { volume: 0.4 });
   });
+});
+
+// Wire numeric keypad buttons
+document.querySelectorAll(".keypad-btn").forEach((btn) => {
+  btn.addEventListener("click", (e) => {
+    if (keypadInput.length < 4) {
+      keypadInput += e.target.textContent;
+      const display = document.getElementById("keypad-display");
+      if (display) display.value = keypadInput;
+      if (audioManager) audioManager.playSound("button_click", { volume: 0.35 });
+    }
+  });
+});
+const clearBtn = document.getElementById("keypad-clear");
+clearBtn?.addEventListener("click", () => {
+  keypadInput = "";
+  const display = document.getElementById("keypad-display");
+  if (display) display.value = "";
+  if (audioManager) audioManager.playSound("button_click", { volume: 0.35 });
 });
 
 const switchBtn = document.getElementById("cctv-switch-btn");

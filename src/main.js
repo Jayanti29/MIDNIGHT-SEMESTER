@@ -7618,6 +7618,18 @@ function updateMapMarkers() {
   }
 }
 
+function handleSecurityOverrideSuccess() {
+  academicDoorUnlocked = true;
+  caption.textContent = "PASSCODE ACCEPTED. ACADEMIC ANCHOR BYPASS ONLINE.";
+  if (audioManager) {
+    audioManager.playSound("decrypt_success", { volume: 0.6 });
+    audioManager.playSound("door_unlock_beep", { volume: 0.5 });
+  }
+  const display = document.getElementById("keypad-display");
+  if (display) display.value = "OPEN";
+  addTaskLog("Classroom Annex override accepted.");
+}
+
 function triggerKulkarniLibraryDialogue() {
   queueStory([
     ["Professor Kulkarni", "Aarav, is that the library annex? Be careful in those files."],

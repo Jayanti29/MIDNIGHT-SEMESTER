@@ -742,6 +742,7 @@ let p2LockerPeeking = false;
 let activeEndingPath = null;
 let activeDecryptionTerminal = null;
 let decryptProgress = 0;
+let p2DecryptingActive = false;
 let decryptTargetPos = 50;
 let decryptIndicatorPos = 0;
 let decryptOscillationDir = 1;
@@ -5870,13 +5871,19 @@ function inspectObject(hit, isPlayer2 = false) {
       if (audioManager) audioManager.playSound("terminal_beep", { volume: 0.3 });
     } else {
       activeDecryptionTerminal = hit.object;
-      document.exitPointerLock?.();
-      decryptProgress = 0;
-      const modal = document.getElementById("decryptor-terminal-modal");
-      if (modal) modal.style.display = "block";
-      setGameState(GameState.DECRYPTING);
-      caption.textContent = "Accessing Decryption Gateway. Align cyclical frequencies.";
-      if (audioManager) audioManager.playSound("terminal_beep", { volume: 0.5 });
+      if (isPlayer2) {
+        p2DecryptingActive = true;
+        caption.textContent = "Player 2 (Rohan) joined Decryption Gateway. Press [Period] to align!";
+        if (audioManager) audioManager.playSound("terminal_beep", { volume: 0.5 });
+      } else {
+        document.exitPointerLock?.();
+        decryptProgress = 0;
+        const modal = document.getElementById("decryptor-terminal-modal");
+        if (modal) modal.style.display = "block";
+        setGameState(GameState.DECRYPTING);
+        caption.textContent = "Accessing Decryption Gateway. Align cyclical frequencies.";
+        if (audioManager) audioManager.playSound("terminal_beep", { volume: 0.5 });
+      }
     }
     return;
   }

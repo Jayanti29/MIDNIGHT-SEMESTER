@@ -5913,7 +5913,7 @@ function inspectObject(hit, isPlayer2 = false) {
     if (mapModal) mapModal.style.display = "block";
     setGameState(GameState.PAUSED);
     updateMapMarkers();
-    if (audioManager) audioManager.playSound("paper_rustle", { volume: 0.5 });
+    if (audioManager) audioManager.playSound("paper_rustle", { volume: 0.5 }); // Play map rustle
     caption.textContent = "Viewing Facility Blueprint. Press Escape or click Close to exit.";
     return;
   }

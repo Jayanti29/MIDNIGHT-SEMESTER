@@ -6018,6 +6018,22 @@ function executeCommand(cmdStr) {
       }
       break;
 
+    case "showmap":
+      const mapOverlay = document.getElementById("map-overlay");
+      if (mapOverlay) {
+        mapOverlay.style.display = mapOverlay.style.display === "block" ? "none" : "block";
+        if (mapOverlay.style.display === "block") {
+          setGameState(GameState.PAUSED);
+          document.exitPointerLock?.();
+          updateMapMarkers();
+        } else {
+          setGameState(GameState.PLAYING);
+          requestPointerLock();
+        }
+        addConsoleLog("Toggled blueprint map overlay.");
+      }
+      break;
+
     case "heartrate": {
       if (args.length === 0) {
         addConsoleLog("Error: Missing BPM value. Usage: /heartrate <bpm> [p1|p2]");

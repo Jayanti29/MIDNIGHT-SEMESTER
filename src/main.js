@@ -3499,6 +3499,7 @@ function buildDecryptorTerminalProp(position, parentGroup) {
   baseMesh.castShadow = true;
   baseMesh.receiveShadow = true;
   group.add(baseMesh);
+  registerCollider(baseMesh);
 
   // Keyboard console shelf
   const kbShelfGeo = new THREE.BoxGeometry(0.8, 0.08, 0.38);

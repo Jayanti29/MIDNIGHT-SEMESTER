@@ -6963,6 +6963,9 @@ function resetGame() {
     }
     ecgSensorsCollected = activeCheckpoint.ecgSensorsCollected || false;
     
+    libraryFoldersCollected = new Set(activeCheckpoint.libraryFoldersCollected || []);
+    searchedCabinets = new Set(activeCheckpoint.searchedCabinets || []);
+    decryptedLogsCount = activeCheckpoint.decryptedLogsCount || 0;
     currentLevel = activeCheckpoint.level || 1;
     activeLevelGroup = currentLevel === 1 ? level1Group : level2Group;
     level1Group.visible = currentLevel === 1;

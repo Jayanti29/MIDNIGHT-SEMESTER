@@ -1484,6 +1484,16 @@ body:not(.started) .quick-actions {
   }
 }
 
+/* Typewriter blinking caret */
+.typewriter-caret {
+  border-right: 2px solid #3b2a1a;
+  animation: caret-blink 0.75s step-end infinite;
+}
+@keyframes caret-blink {
+  from, to { border-color: transparent }
+  50% { border-color: #3b2a1a }
+}
+
 /* Panic screen blur overlays */
 .panic-overlay {
   position: absolute;

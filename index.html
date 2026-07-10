@@ -243,6 +243,34 @@
         <div id="locker-slat-peek-p1" class="locker-slat-overlay"></div>
         <div id="locker-slat-peek-p2" class="locker-slat-overlay"></div>
 
+        <!-- Security CCTV Terminal Modal -->
+        <div id="security-terminal-modal" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 520px; height: 420px; background: rgba(5, 20, 5, 0.96); border: 2px solid #00ff33; border-radius: 6px; z-index: 1000; display: none; padding: 20px; box-sizing: border-box; font-family: monospace; color: #00ff33; box-shadow: 0 0 25px rgba(0,255,51,0.35);">
+          <h3 style="margin-top: 0; border-bottom: 1px solid #00ff33; padding-bottom: 8px; text-align: center;">CCTV SECURITY MONITOR - BLOCK A</h3>
+          <div style="display: flex; gap: 15px; height: 280px; margin-bottom: 15px;">
+            <div style="flex-grow: 1; border: 1px solid #00ff33; position: relative; background: #000; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+              <div id="cctv-feed-noise" style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,255,51,0.08); pointer-events: none;"></div>
+              <div id="cctv-label" style="position: absolute; top: 10px; left: 10px; font-weight: bold;">CAM_01: MAIN LOBBY</div>
+              <div id="cctv-status" style="position: absolute; bottom: 10px; right: 10px; animation: terminal-blink 1s infinite;">REC ●</div>
+              <div id="cctv-static-overlay" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: repeating-linear-gradient(0deg, rgba(255,255,255,0.05), rgba(255,255,255,0.05) 1px, transparent 1px, transparent 2px); pointer-events: none;"></div>
+              <span id="cctv-placeholder" style="font-size: 1.1rem; text-shadow: 0 0 5px #00ff33;">[ FEED ACTIVE ]</span>
+            </div>
+            <div style="width: 140px; border: 1px solid #00ff33; padding: 10px; display: flex; flex-direction: column; gap: 8px;">
+              <div style="font-size: 0.72rem; text-align: center;">KEYPAD OVERRIDE</div>
+              <input id="keypad-display" type="text" disabled style="width: 100%; background: #000; border: 1px solid #00ff33; color: #00ff33; font-family: inherit; font-size: 1.1rem; text-align: center; box-sizing: border-box;" value="" />
+              <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; flex-grow: 1;">
+                <button class="keypad-btn">1</button><button class="keypad-btn">2</button><button class="keypad-btn">3</button>
+                <button class="keypad-btn">4</button><button class="keypad-btn">5</button><button class="keypad-btn">6</button>
+                <button class="keypad-btn">7</button><button class="keypad-btn">8</button><button class="keypad-btn">9</button>
+                <button id="keypad-clear" style="font-size: 0.65rem;">C</button><button class="keypad-btn">0</button><button id="keypad-enter" style="font-size: 0.65rem;">E</button>
+              </div>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <button id="cctv-switch-btn" style="background: transparent; border: 1px solid #00ff33; color: #00ff33; padding: 4px 12px; cursor: pointer;">Next Camera</button>
+            <button id="close-security" style="background: transparent; border: 1px solid #00ff33; color: #00ff33; padding: 4px 12px; cursor: pointer;">Exit Terminal</button>
+          </div>
+        </div>
+
         <!-- Interactive Blueprint Map Overlay Panel -->
         <div id="map-overlay" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 500px; height: 400px; background: rgba(10, 25, 47, 0.95); border: 2px solid #58c0ff; border-radius: 8px; z-index: 1000; display: none; padding: 20px; box-sizing: border-box; font-family: monospace; color: #58c0ff; box-shadow: 0 0 30px rgba(88, 192, 255, 0.4);">
           <h3 style="margin-top: 0; border-bottom: 1px solid #58c0ff; padding-bottom: 8px; text-shadow: 0 0 5px #58c0ff;">FACILITY MAP BLUEPRINT - BLOCK A</h3>

@@ -7193,6 +7193,7 @@ function resetGame() {
     ecgSensorsCollected = activeCheckpoint.ecgSensorsCollected || false;
     
     libraryFoldersCollected = new Set(activeCheckpoint.libraryFoldersCollected || []);
+    academicDoorUnlocked = activeCheckpoint.academicDoorUnlocked || false;
     searchedCabinets = new Set(activeCheckpoint.searchedCabinets || []);
     decryptedLogsCount = activeCheckpoint.decryptedLogsCount || 0;
     currentLevel = activeCheckpoint.level || 1;

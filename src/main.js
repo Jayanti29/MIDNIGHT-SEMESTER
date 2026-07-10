@@ -2028,6 +2028,19 @@ function createCameraSwitchBuffer(ctx) {
   return buffer;
 }
 
+function createStrobeBuzzBuffer(ctx) {
+  const duration = 0.5;
+  const sampleRate = ctx.sampleRate;
+  const numSamples = sampleRate * duration;
+  const buffer = ctx.createBuffer(1, numSamples, sampleRate);
+  const data = buffer.getChannelData(0);
+  for (let i = 0; i < numSamples; i++) {
+    const t = i / sampleRate;
+    data[i] = Math.sin(2 * Math.PI * 60 * t) * (Math.random() * 0.15) * 0.25;
+  }
+  return buffer;
+}
+
 function createButtonClickBuffer(ctx) {
   const duration = 0.12;
   const sampleRate = ctx.sampleRate;

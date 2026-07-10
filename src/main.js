@@ -7675,6 +7675,13 @@ closeDecryptBtn?.addEventListener("click", () => {
   requestPointerLock();
 });
 
+// Wire menu click sounds
+document.querySelectorAll(".paper-btn").forEach((btn) => {
+  btn.addEventListener("click", () => {
+    if (audioManager) audioManager.playSound("button_click", { volume: 0.4 });
+  });
+});
+
 closeSettings.addEventListener("click", () => {
   settingsPanel.classList.remove("open");
   if (gameState === GameState.MENU) {

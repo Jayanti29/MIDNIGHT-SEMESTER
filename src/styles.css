@@ -1044,6 +1044,11 @@ body:not(.started) .quick-actions {
   color: #7a6652;
 }
 
+.paper-btn:hover {
+  background-color: rgba(180, 40, 40, 0.15);
+  border-color: #8b0000;
+  color: #8b0000;
+}
 .paper-btn {
   background: #faf4e8 !important;
   color: #2b1f13 !important;

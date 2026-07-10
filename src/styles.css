@@ -1806,5 +1806,10 @@ body:not(.coop-active) #breath-minigame-p1 {
   50% { opacity: 0.5; }
 }
 
+#debug-input {
+  caret-color: #73d08a;
+  text-shadow: 0 0 3px rgba(115, 208, 138, 0.8);
+}
+
 
 

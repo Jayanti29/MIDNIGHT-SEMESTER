@@ -5864,6 +5864,16 @@ function executeCommand(cmdStr) {
       addConsoleLog("  /skipminigame - Skip and win active locker breathing minigames");
       break;
 
+    case "skipdecryption":
+    case "sd":
+      if (gameState === GameState.DECRYPTING) {
+        handleDecryptionSuccess();
+        addConsoleLog("Cheat: Decryption puzzle bypassed.");
+      } else {
+        addConsoleLog("Cheat Error: No active decryption terminal.");
+      }
+      break;
+
     case "heartrate": {
       if (args.length === 0) {
         addConsoleLog("Error: Missing BPM value. Usage: /heartrate <bpm> [p1|p2]");

@@ -7315,6 +7315,20 @@ function handleDecryptionSuccess() {
   document.exitPointerLock?.();
   if (audioManager) audioManager.playSound("decrypt_success", { volume: 0.7 });
   decryptedLogsCount++;
+  let title = "Cognitive Research Confession";
+  let text = "Subject M trial logs. Dr. Verma confesses to covering up Meera's sensory lock state.";
+  if (decryptedLogsCount === 1) {
+    title = "Cognitive Research Confession";
+    text = "SUBJECT_M_2004 LOG: Dr. Verma confesses to covering up Meera's sensory lock state. 'She is still in the loop. The metronome holds the anchor.'";
+  } else {
+    title = "Applied Cognition Incident Report";
+    text = "INCIDENT REPORT 2005: The board recommends immediate sealing of Block A basement. Disciplinary actions against Dr. Verma are shelved to protect the institution.";
+  }
+  collectedDocuments.set(title, text);
+  inspected++;
+  caption.textContent = `Successfully Decrypted: ${title}! Added to Case Archive.`;
+  addTaskLog(`Decrypted: ${title}.`);
+  updateObjectivesSystem();
   const modal = document.getElementById("decryptor-terminal-modal");
   if (modal) modal.style.display = "none";
 }

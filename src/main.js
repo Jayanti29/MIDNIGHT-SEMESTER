@@ -5331,6 +5331,9 @@ function inspectObject(hit, isPlayer2 = false) {
         player1PreLockerPos = camera.position.clone();
         camera.position.set(hit.object.parent.position.x, 1.7, hit.object.parent.position.z + 0.1);
         caption.textContent = "You are hidden inside the locker. Press [E] to step out.";
+        p1LockerPeeking = true;
+        const peekEl1 = document.getElementById("locker-slat-peek-p1");
+        if (peekEl1) peekEl1.style.display = "block";
         addTaskLog("Entered hiding spot.");
         setFlashlight(false);
         if (ecgSensorsCollected) {
@@ -5353,6 +5356,9 @@ function inspectObject(hit, isPlayer2 = false) {
         caption.textContent = "You stepped out of the locker.";
         addTaskLog("Exited hiding spot.");
         p1LockerMinigameActive = false;
+        p1LockerPeeking = false;
+        const peekEl1 = document.getElementById("locker-slat-peek-p1");
+        if (peekEl1) peekEl1.style.display = "none";
       }
     } else {
       if (!isPlayer2Hidden) {

@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.2.4-advanced] — 2026-07-11
+### Added
+- Academic Wing classroom annex layout
+- Interactive Security CCTV switching carousel and keypad override door bypasses
+- Strobe buzzing light SFX
+- Screen Contrast graphics sliders
+
 ## [0.2.3-advanced] — 2026-07-10
 ### Added
 - retro scanline terminal overlay minigame

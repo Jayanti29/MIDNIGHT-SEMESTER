@@ -327,6 +327,7 @@ const playerRadius = 0.32;
 let yaw = 0;
 let pitch = 0;
 let mouseSensitivity = parseFloat(localStorage.getItem("setting-mouse-sensitivity") || "1.0");
+let vignetteScale = 1.0;
 let masterVolume = parseFloat(localStorage.getItem("setting-master-volume") || "0.8");
 let sfxVolume = parseFloat(localStorage.getItem("setting-sfx-volume") || "0.8");
 let ambientVolume = parseFloat(localStorage.getItem("setting-ambient-volume") || "0.8");
@@ -7808,6 +7809,13 @@ settingAmbientVolume.addEventListener("input", (event) => {
     audioManager.updateCategoryVolumes();
   }
 });
+
+  const settingVignette = document.getElementById("setting-vignette-scale");
+  settingVignette?.addEventListener("input", (event) => {
+    vignetteScale = parseFloat(event.target.value);
+    const vignetteEl = document.getElementById("vignette");
+    if (vignetteEl) vignetteEl.style.boxShadow = `inset 0 0 ${200 * vignetteScale}px rgba(0,0,0,0.95)`;
+  });
 
 settingMouseSensitivity?.addEventListener("input", (event) => {
   mouseSensitivity = parseFloat(event.target.value);

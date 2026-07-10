@@ -5786,6 +5786,7 @@ function inspectObject(hit, isPlayer2 = false) {
         level: currentLevel,
         ecgSensorsCollected: ecgSensorsCollected,
         libraryFoldersCollected: Array.from(libraryFoldersCollected),
+        academicDoorUnlocked: academicDoorUnlocked,
         searchedCabinets: Array.from(searchedCabinets),
         decryptedLogsCount: decryptedLogsCount
       };

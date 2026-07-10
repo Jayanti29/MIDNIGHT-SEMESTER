@@ -1784,6 +1784,13 @@ body:not(.coop-active) #breath-minigame-p1 {
 }
 
 /* Locker Slat Peeking Styles */
+.dialogue-card-fancy {
+  background: rgba(30, 20, 15, 0.92);
+  border: 1px solid #7a6652;
+  border-radius: 4px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.6);
+}
+
 /* Unified overlay declarations */
 .locker-slat-overlay {
   position: absolute;

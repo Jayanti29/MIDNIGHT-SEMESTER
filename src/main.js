@@ -6928,19 +6928,39 @@ function updatePreviewModel() {
 
 function animateCharacterSelect() {
   if (!charSelectActive) return;
-  selectRafId = requestAnimationFrame(animateCharacterSelect);
+  try {
+    selectRafId = requestAnimationFrame(animateCharacterSelect);
 
-  if (selectMesh) {
-    selectMesh.rotation.y += 0.012;
-    const time = performance.now() * 0.0018;
-    const hips = selectMesh.userData.hips;
-    if (hips) {
-      hips.position.y = 0.9 + Math.sin(time) * 0.015;
+    if (selectMesh) {
+      selectMesh.rotation.y += 0.012;
+      const time = performance.now() * 0.0018;
+      const hips = selectMesh.userData.hips;
+      if (hips) {
+        hips.position.y = 0.9 + Math.sin(time) * 0.015;
+      }
     }
-  }
 
-  if (selectRenderer && selectScene && selectCamera) {
-    selectRenderer.render(selectScene, selectCamera);
+    if (selectRenderer && selectScene && selectCamera) {
+      selectRenderer.render(selectScene, selectCamera);
+    }
+  } catch (error) {
+    console.error("Error in character select loop:", error);
+    if (fatalError) {
+      fatalError.innerHTML = `
+        <h2>An Error Occurred</h2>
+        <p>A fatal error occurred in the character select loop. Please check the console for details, or reload the page.</p>
+        <button id="reload-btn" style="margin-top: 15px; padding: 8px 16px; background: #c9a56d; color: #080706; border: none; cursor: pointer; font-weight: bold; border-radius: 4px;">Reload Game</button>
+      `;
+      fatalError.hidden = false;
+      document.getElementById("reload-btn")?.addEventListener("click", () => {
+        window.location.reload();
+      });
+    }
+    if (selectRafId) {
+      cancelAnimationFrame(selectRafId);
+      selectRafId = null;
+    }
+    charSelectActive = false;
   }
 }
 

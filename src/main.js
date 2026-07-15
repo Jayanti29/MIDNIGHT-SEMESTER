@@ -2858,7 +2858,7 @@ function createBookshelf(position, rotation = 0) {
   return group;
 }
 
-function createProceduralHumanoidSkeleton({ name, position, isGhost = false, identity = "", outfitColorOverride = null, hairStyleOverride = null, hasGlassesOverride = null, hasBackpackOverride = null }) {
+function createProceduralHumanoidSkeleton({ name, position, isGhost = false, identity = "", outfitColorOverride = null, hairStyleOverride = null, hasGlassesOverride = null, hasBackpackOverride = null, skinColorOverride = null }) {
   const hips = new THREE.Bone();
   hips.name = "mixamorigHips";
   hips.position.set(0, 0.9, 0);
@@ -2919,6 +2919,7 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   group.position.set(...position);
   group.add(hips);
   let outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x243f5e;
+  let skinColor = 0xfcd0a1;
   let hairColor = 0x111111;
   let hairLength = "short";
   let hasGlasses = false;
@@ -2941,6 +2942,19 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
     } else if (identity === "Rohan") {
       outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x2f4c34;
     }
+  }
+
+  if (isGhost) {
+    skinColor = 0xc9d5cf;
+  } else {
+    if (identity === "Aarav") skinColor = 0xe3a072;
+    else if (identity === "Priya") skinColor = 0xfac08f;
+    else if (identity === "Rohan") skinColor = 0xfcd0a1;
+    else if (identity === "Sam") skinColor = 0xa1683d;
+  }
+
+  if (skinColorOverride) {
+    skinColor = new THREE.Color(skinColorOverride);
   }
 
   if (hasGlassesOverride !== null) {
@@ -2979,7 +2993,14 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
     emissive: isGhost ? outfitColor : 0x000000,
     emissiveIntensity: isGhost ? 0.28 : 0
   });
-  const skinMat = outfitMat;
+  const skinMat = new THREE.MeshStandardMaterial({
+    color: skinColor,
+    roughness: 0.8,
+    transparent: isGhost,
+    opacity: isGhost ? 0.45 : 1.0,
+    emissive: isGhost ? skinColor : 0x000000,
+    emissiveIntensity: isGhost ? 0.28 : 0
+  });
   const hairMat = new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.9 });
   const eyeMat = new THREE.MeshBasicMaterial({ color: isGhost ? 0xb22822 : 0x222222 });
   const body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.55, 8), outfitMat);
@@ -6899,6 +6920,7 @@ let selectedHairStyle = "short";
 let selectedBodyScale = "average";
 let selectedHasGlasses = false;
 let selectedHasBackpack = false;
+let selectedSkinTone = "#e3a072"; // default for Aarav
 
 function initCharacterSelect() {
   const selectCanvas = document.getElementById("char-preview-canvas");
@@ -6964,7 +6986,8 @@ function updatePreviewModel() {
     outfitColorOverride: selectedOutfitColor,
     hairStyleOverride: selectedHairStyle,
     hasGlassesOverride: selectedHasGlasses,
-    hasBackpackOverride: selectedHasBackpack
+    hasBackpackOverride: selectedHasBackpack,
+    skinColorOverride: selectedSkinTone
   });
 
   let scaleMult = 1.0;
@@ -7709,6 +7732,16 @@ hairBtns.forEach(btn => {
   });
 });
 
+const skinBtns = document.querySelectorAll("#skin-swatches .skin-btn");
+skinBtns.forEach(btn => {
+  btn.addEventListener("click", (e) => {
+    selectedSkinTone = e.currentTarget.getAttribute("data-color");
+    skinBtns.forEach(b => b.classList.remove("active"));
+    e.currentTarget.classList.add("active");
+    updatePreviewModel();
+  });
+});
+
 function updateSwatchHighlights() {
   swatchBtns.forEach(btn => {
     if (btn.getAttribute("data-color") === selectedOutfitColor) {
@@ -7724,21 +7757,32 @@ function updateSwatchHighlights() {
       btn.classList.remove("active");
     }
   });
+  skinBtns.forEach(btn => {
+    if (btn.getAttribute("data-color") === selectedSkinTone) {
+      btn.classList.add("active");
+    } else {
+      btn.classList.remove("active");
+    }
+  });
 }
 
 btnCharReset?.addEventListener("click", () => {
   if (selectedVariant === "Aarav") {
     selectedOutfitColor = "#243f5e";
     selectedHairStyle = "short";
+    selectedSkinTone = "#e3a072";
   } else if (selectedVariant === "Priya") {
     selectedOutfitColor = "#d4af37";
     selectedHairStyle = "long";
+    selectedSkinTone = "#fac08f";
   } else if (selectedVariant === "Rohan") {
     selectedOutfitColor = "#2f4c34";
     selectedHairStyle = "short";
+    selectedSkinTone = "#fcd0a1";
   } else if (selectedVariant === "Sam") {
     selectedOutfitColor = "#56382a";
     selectedHairStyle = "cap";
+    selectedSkinTone = "#a1683d";
   }
   selectedBodyScale = "average";
   selectedHasGlasses = false;

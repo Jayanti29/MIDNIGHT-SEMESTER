@@ -3251,6 +3251,7 @@ function loadLevel2() {
   batteryItems.length = 0;
   flickerLights.length = 0;
 
+  clearGroup(level1Group);
   clearGroup(level2Group);
   buildLevel2();
 

@@ -7617,6 +7617,7 @@ const btnCharRohan = document.getElementById("btn-char-rohan");
 const btnCharSam = document.getElementById("btn-char-sam");
 const btnCharRandomize = document.getElementById("btn-char-randomize");
 const btnCharConfirm = document.getElementById("btn-char-confirm");
+const btnCharReset = document.getElementById("btn-char-reset");
 
 function selectVariantHandler(variant, activeBtn) {
   selectedVariant = variant;
@@ -7668,6 +7669,24 @@ function updateSwatchHighlights() {
     }
   });
 }
+
+btnCharReset?.addEventListener("click", () => {
+  if (selectedVariant === "Aarav") {
+    selectedOutfitColor = "#243f5e";
+    selectedHairStyle = "short";
+  } else if (selectedVariant === "Priya") {
+    selectedOutfitColor = "#d4af37";
+    selectedHairStyle = "long";
+  } else if (selectedVariant === "Rohan") {
+    selectedOutfitColor = "#2f4c34";
+    selectedHairStyle = "short";
+  } else if (selectedVariant === "Sam") {
+    selectedOutfitColor = "#56382a";
+    selectedHairStyle = "cap";
+  }
+  updateSwatchHighlights();
+  updatePreviewModel();
+});
 
 btnCharRandomize?.addEventListener("click", () => {
   const variants = ["Aarav", "Priya", "Rohan", "Sam"];

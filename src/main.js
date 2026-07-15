@@ -360,6 +360,33 @@ let frameCount = 0;
 let fpsSum = 0;
 let lastPerfLog = 0;
 
+function disposeMaterial(mat) {
+  if (!mat) return;
+  for (const key in mat) {
+    const prop = mat[key];
+    if (prop && prop.isTexture) {
+      prop.dispose();
+    }
+  }
+  mat.dispose();
+}
+
+function disposeObject3D(obj) {
+  if (!obj) return;
+  obj.traverse((child) => {
+    if (child.geometry) {
+      child.geometry.dispose();
+    }
+    if (child.material) {
+      if (Array.isArray(child.material)) {
+        child.material.forEach(disposeMaterial);
+      } else {
+        disposeMaterial(child.material);
+      }
+    }
+  });
+}
+
 function logPerformanceTelemetry(delta) {
   frameCount++;
   fpsSum += 1 / delta;

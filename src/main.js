@@ -6813,6 +6813,26 @@ function initCharacterSelect() {
   selectRenderer.setSize(selectCanvas.clientWidth, selectCanvas.clientHeight, false);
   selectRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
+  selectCanvas.addEventListener("webglcontextlost", (event) => {
+    event.preventDefault();
+    console.warn("WebGL Context Lost on character-select renderer.");
+    if (fatalError) {
+      fatalError.innerHTML = `
+        <h2>WebGL Context Lost</h2>
+        <p>The graphics context was lost on character selection. Please reload the page.</p>
+        <button id="reload-btn" style="margin-top: 15px; padding: 8px 16px; background: #c9a56d; color: #080706; border: none; cursor: pointer; font-weight: bold; border-radius: 4px;">Reload Game</button>
+      `;
+      fatalError.hidden = false;
+      document.getElementById("reload-btn")?.addEventListener("click", () => {
+        window.location.reload();
+      });
+    }
+  }, false);
+
+  selectCanvas.addEventListener("webglcontextrestored", () => {
+    window.location.reload();
+  }, false);
+
   const ambient = new THREE.AmbientLight(0xffecd9, 0.45);
   selectScene.add(ambient);
 

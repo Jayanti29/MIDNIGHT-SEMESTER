@@ -3191,14 +3191,17 @@ function updateHumanoidAnimations(humanoid, speed, time) {
   }
 }
 
-function createCharacter({ name, position, color, ghostly = false, identity = "", outfitColorOverride = null, hairStyleOverride = null }) {
+function createCharacter({ name, position, color, ghostly = false, identity = "", outfitColorOverride = null, hairStyleOverride = null, hasGlassesOverride = null, hasBackpackOverride = null, skinColorOverride = null }) {
   const group = createProceduralHumanoidSkeleton({ 
     name, 
     position, 
     isGhost: ghostly, 
     identity, 
     outfitColorOverride, 
-    hairStyleOverride 
+    hairStyleOverride,
+    hasGlassesOverride,
+    hasBackpackOverride,
+    skinColorOverride
   });
   return group;
 }
@@ -7092,7 +7095,30 @@ function setupPlayer2() {
     if (child.isMesh) child.layers.set(1);
   });
 
-  scene.userData.player1Character = createCharacter({ name: p1Name, position: [0, 0, 8], color: 0xffffff, identity: p1Model, outfitColorOverride: p1OutfitColor, hairStyleOverride: p1HairStyle });
+  scene.userData.player1Character = createCharacter({
+    name: p1Name,
+    position: [0, 0, 8],
+    color: 0xffffff,
+    identity: p1Model,
+    outfitColorOverride: p1OutfitColor,
+    hairStyleOverride: p1HairStyle,
+    hasGlassesOverride: p1HasGlasses,
+    hasBackpackOverride: p1HasBackpack,
+    skinColorOverride: p1SkinTone
+  });
+
+  let p1ScaleMult = 1.0;
+  if (p1BodyScale === "short") p1ScaleMult = 0.88;
+  else if (p1BodyScale === "tall") p1ScaleMult = 1.12;
+
+  if (p1Model === "Sam") {
+    scene.userData.player1Character.scale.set(1.08 * p1ScaleMult, 1.08 * p1ScaleMult, 1.08 * p1ScaleMult);
+  } else if (p1Model === "Priya") {
+    scene.userData.player1Character.scale.set(0.92 * p1ScaleMult, 0.94 * p1ScaleMult, 0.92 * p1ScaleMult);
+  } else {
+    scene.userData.player1Character.scale.set(1.0 * p1ScaleMult, 1.0 * p1ScaleMult, 1.0 * p1ScaleMult);
+  }
+
   scene.userData.player1Character.layers.set(2);
   scene.userData.player1Character.traverse(child => {
     if (child.isMesh) child.layers.set(2);
@@ -7172,8 +7198,24 @@ function startGame({ lockPointer = true } = {}) {
       color: 0xffffff,
       identity: p1Model,
       outfitColorOverride: p1OutfitColor,
-      hairStyleOverride: p1HairStyle
+      hairStyleOverride: p1HairStyle,
+      hasGlassesOverride: p1HasGlasses,
+      hasBackpackOverride: p1HasBackpack,
+      skinColorOverride: p1SkinTone
     });
+
+    let scaleMult = 1.0;
+    if (p1BodyScale === "short") scaleMult = 0.88;
+    else if (p1BodyScale === "tall") scaleMult = 1.12;
+
+    if (p1Model === "Sam") {
+      scene.userData.player1Character.scale.set(1.08 * scaleMult, 1.08 * scaleMult, 1.08 * scaleMult);
+    } else if (p1Model === "Priya") {
+      scene.userData.player1Character.scale.set(0.92 * scaleMult, 0.94 * scaleMult, 0.92 * scaleMult);
+    } else {
+      scene.userData.player1Character.scale.set(1.0 * scaleMult, 1.0 * scaleMult, 1.0 * scaleMult);
+    }
+
     // In solo mode hide the own-body mesh from the first-person camera
     scene.userData.player1Character.traverse(child => {
       if (child.isMesh) child.layers.enable(0);

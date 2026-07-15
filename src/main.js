@@ -8285,6 +8285,41 @@ btnCharLight?.addEventListener("click", () => {
   }
 });
 
+function enableKeyboardNavForContainer(containerId) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+
+  container.addEventListener("keydown", (e) => {
+    const buttons = Array.from(container.querySelectorAll("button, input[type='range']"));
+    const activeEl = document.activeElement;
+    if (!buttons.includes(activeEl)) return;
+
+    const index = buttons.indexOf(activeEl);
+
+    if (e.key === "ArrowRight" || e.key === "ArrowDown") {
+      e.preventDefault();
+      const nextIndex = (index + 1) % buttons.length;
+      buttons[nextIndex].focus();
+      if (buttons[nextIndex].tagName === "BUTTON") {
+        buttons[nextIndex].click();
+      }
+    } else if (e.key === "ArrowLeft" || e.key === "ArrowUp") {
+      e.preventDefault();
+      const prevIndex = (index - 1 + buttons.length) % buttons.length;
+      buttons[prevIndex].focus();
+      if (buttons[prevIndex].tagName === "BUTTON") {
+        buttons[prevIndex].click();
+      }
+    }
+  });
+}
+
+enableKeyboardNavForContainer("coop-player-tabs");
+enableKeyboardNavForContainer("variant-tabs-container");
+enableKeyboardNavForContainer("outfit-swatches");
+enableKeyboardNavForContainer("skin-swatches");
+enableKeyboardNavForContainer("hair-swatches");
+
 continueButton?.addEventListener("click", () => {
   coopMode = false;
   // Restore saved character directly from localStorage — skip the select screen

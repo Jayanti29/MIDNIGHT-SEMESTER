@@ -6782,8 +6782,7 @@ function initCharacterSelect() {
   if (!selectCanvas) return;
 
   if (selectRenderer) {
-    disposeRenderer(selectRenderer);
-    selectRenderer = null;
+    return;
   }
 
   selectScene = new THREE.Scene();

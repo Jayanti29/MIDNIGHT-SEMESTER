@@ -7934,13 +7934,30 @@ coopButton.addEventListener("click", () => {
   coopMode = true;
   startGame();
 });
-const continueButton = document.getElementById("continue-button");
 continueButton?.addEventListener("click", () => {
   coopMode = false;
   // Restore saved character directly from localStorage — skip the select screen
-  p1Model = localStorage.getItem("setting-p1-model") || p1Model;
-  p1OutfitColor = localStorage.getItem("setting-p1-outfit-color") || p1OutfitColor;
-  p1HairStyle = localStorage.getItem("setting-p1-hair-style") || p1HairStyle;
+  try {
+    const saved = localStorage.getItem("setting-p1-customization");
+    if (saved) {
+      p1Customization = JSON.parse(saved);
+    } else {
+      p1Customization.model = localStorage.getItem("setting-p1-model") || p1Model;
+      p1Customization.outfitColor = localStorage.getItem("setting-p1-outfit-color") || p1OutfitColor;
+      p1Customization.hairStyle = localStorage.getItem("setting-p1-hair-style") || p1HairStyle;
+    }
+  } catch (e) {
+    console.error("Failed to restore character customization in continue flow", e);
+  }
+
+  p1Model = p1Customization.model;
+  p1OutfitColor = p1Customization.outfitColor;
+  p1HairStyle = p1Customization.hairStyle;
+  p1BodyScale = p1Customization.bodyScale || "average";
+  p1HasGlasses = p1Customization.hasGlasses || false;
+  p1HasBackpack = p1Customization.hasBackpack || false;
+  p1SkinTone = p1Customization.skinTone || "#e3a072";
+
   startScreen.classList.add("hidden");
   startGame();
 });

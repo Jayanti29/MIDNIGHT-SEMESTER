@@ -7255,7 +7255,10 @@ function resetGame() {
 
   shadowSpawnTimer = 0;
   creepyWhisperTimer = 0;
-  shadowFigures.forEach(f => scene.remove(f));
+  shadowFigures.forEach(f => {
+    scene.remove(f);
+    disposeObject3D(f);
+  });
   shadowFigures = [];
 
   const sanity1Val = document.getElementById("sanity-p1-val");
@@ -7283,10 +7286,12 @@ function resetGame() {
   }
   if (player2Character) {
     scene.remove(player2Character);
+    disposeObject3D(player2Character);
     player2Character = null;
   }
   if (scene.userData.player1Character) {
     scene.remove(scene.userData.player1Character);
+    disposeObject3D(scene.userData.player1Character);
     scene.userData.player1Character = null;
   }
   player2Keys.clear();

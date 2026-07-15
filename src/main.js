@@ -7623,20 +7623,6 @@ function selectVariantHandler(variant, activeBtn) {
   [btnCharAarav, btnCharPriya, btnCharRohan, btnCharSam].forEach(btn => btn?.classList.remove("active"));
   activeBtn?.classList.add("active");
   
-  if (variant === "Aarav") {
-    selectedOutfitColor = "#243f5e";
-    selectedHairStyle = "short";
-  } else if (variant === "Priya") {
-    selectedOutfitColor = "#d4af37";
-    selectedHairStyle = "long";
-  } else if (variant === "Rohan") {
-    selectedOutfitColor = "#2f4c34";
-    selectedHairStyle = "short";
-  } else if (variant === "Sam") {
-    selectedOutfitColor = "#56382a";
-    selectedHairStyle = "cap";
-  }
-  
   updateSwatchHighlights();
   updatePreviewModel();
 }

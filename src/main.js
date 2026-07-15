@@ -394,7 +394,37 @@ let p1HasGlasses = p1Customization.hasGlasses || false;
 let p1HasBackpack = p1Customization.hasBackpack || false;
 let p1SkinTone = p1Customization.skinTone || "#e3a072";
 let p2Name = localStorage.getItem("setting-p2-name") || "Rohan";
-let p2Model = localStorage.getItem("setting-p2-model") || "Rohan";
+
+let p2Customization = {
+  model: "Rohan",
+  outfitColor: "#2f4c34",
+  hairStyle: "short",
+  bodyScale: "average",
+  hasGlasses: false,
+  hasBackpack: false,
+  skinTone: "#fcd0a1"
+};
+
+try {
+  const savedP2 = localStorage.getItem("setting-p2-customization");
+  if (savedP2) {
+    p2Customization = JSON.parse(savedP2);
+  } else {
+    p2Customization.model = localStorage.getItem("setting-p2-model") || "Rohan";
+    p2Customization.outfitColor = localStorage.getItem("setting-p2-outfit-color") || "#2f4c34";
+    p2Customization.hairStyle = localStorage.getItem("setting-p2-hair-style") || "short";
+  }
+} catch (e) {
+  console.error("Failed to parse P2 character customization setting", e);
+}
+
+let p2Model = p2Customization.model;
+let p2OutfitColor = p2Customization.outfitColor || "#2f4c34";
+let p2HairStyle = p2Customization.hairStyle || "short";
+let p2BodyScale = p2Customization.bodyScale || "average";
+let p2HasGlasses = p2Customization.hasGlasses || false;
+let p2HasBackpack = p2Customization.hasBackpack || false;
+let p2SkinTone = p2Customization.skinTone || "#fcd0a1";
 let screenBrightness = parseFloat(localStorage.getItem("setting-brightness") || "1.25");
 let xrSession = null;
 let activeLineTimer = 0;
@@ -6945,19 +6975,57 @@ composer.addPass(filmPass);
 let charSelectActive = false;
 let selectScene, selectCamera, selectRenderer, selectMesh;
 let selectRafId = null;
+let activeEditingPlayer = 1;
+
 let selectedVariant = "Aarav";
 let selectedOutfitColor = "#243f5e";
 let selectedHairStyle = "short";
 let selectedBodyScale = "average";
 let selectedHasGlasses = false;
 let selectedHasBackpack = false;
-let selectedSkinTone = "#e3a072"; // default for Aarav
+let selectedSkinTone = "#e3a072";
+
+let selectedVariant2 = "Rohan";
+let selectedOutfitColor2 = "#2f4c34";
+let selectedHairStyle2 = "short";
+let selectedBodyScale2 = "average";
+let selectedHasGlasses2 = false;
+let selectedHasBackpack2 = false;
+let selectedSkinTone2 = "#fcd0a1";
 
 function initCharacterSelect() {
+  activeEditingPlayer = 1;
+  const coopPlayerTabs = document.getElementById("coop-player-tabs");
+  if (coopPlayerTabs) {
+    coopPlayerTabs.style.display = coopMode ? "flex" : "none";
+  }
+  const tabP1 = document.getElementById("btn-tab-p1");
+  const tabP2 = document.getElementById("btn-tab-p2");
+  if (tabP1) tabP1.classList.add("active");
+  if (tabP2) tabP2.classList.remove("active");
+
+  selectedVariant = p1Model;
+  selectedOutfitColor = p1OutfitColor;
+  selectedHairStyle = p1HairStyle;
+  selectedBodyScale = p1BodyScale;
+  selectedHasGlasses = p1HasGlasses;
+  selectedHasBackpack = p1HasBackpack;
+  selectedSkinTone = p1SkinTone;
+
+  selectedVariant2 = p2Model;
+  selectedOutfitColor2 = p2OutfitColor;
+  selectedHairStyle2 = p2HairStyle;
+  selectedBodyScale2 = p2BodyScale;
+  selectedHasGlasses2 = p2HasGlasses;
+  selectedHasBackpack2 = p2HasBackpack;
+  selectedSkinTone2 = p2SkinTone;
+
   const selectCanvas = document.getElementById("char-preview-canvas");
   if (!selectCanvas) return;
 
   if (selectRenderer) {
+    updateSwatchHighlights();
+    updatePreviewModel();
     return;
   }
 
@@ -7009,25 +7077,33 @@ function updatePreviewModel() {
     selectMesh = null;
   }
 
+  const currentVar = activeEditingPlayer === 1 ? selectedVariant : selectedVariant2;
+  const currentColor = activeEditingPlayer === 1 ? selectedOutfitColor : selectedOutfitColor2;
+  const currentHair = activeEditingPlayer === 1 ? selectedHairStyle : selectedHairStyle2;
+  const currentGlasses = activeEditingPlayer === 1 ? selectedHasGlasses : selectedHasGlasses2;
+  const currentBackpack = activeEditingPlayer === 1 ? selectedHasBackpack : selectedHasBackpack2;
+  const currentSkin = activeEditingPlayer === 1 ? selectedSkinTone : selectedSkinTone2;
+  const currentScale = activeEditingPlayer === 1 ? selectedBodyScale : selectedBodyScale2;
+
   selectMesh = createProceduralHumanoidSkeleton({
     name: "previewModel",
     position: [0, 0, 0],
     isGhost: false,
-    identity: selectedVariant,
-    outfitColorOverride: selectedOutfitColor,
-    hairStyleOverride: selectedHairStyle,
-    hasGlassesOverride: selectedHasGlasses,
-    hasBackpackOverride: selectedHasBackpack,
-    skinColorOverride: selectedSkinTone
+    identity: currentVar,
+    outfitColorOverride: currentColor,
+    hairStyleOverride: currentHair,
+    hasGlassesOverride: currentGlasses,
+    hasBackpackOverride: currentBackpack,
+    skinColorOverride: currentSkin
   });
 
   let scaleMult = 1.0;
-  if (selectedBodyScale === "short") scaleMult = 0.88;
-  else if (selectedBodyScale === "tall") scaleMult = 1.12;
+  if (currentScale === "short") scaleMult = 0.88;
+  else if (currentScale === "tall") scaleMult = 1.12;
 
-  if (selectedVariant === "Sam") {
+  if (currentVar === "Sam") {
     selectMesh.scale.set(1.08 * scaleMult, 1.08 * scaleMult, 1.08 * scaleMult);
-  } else if (selectedVariant === "Priya") {
+  } else if (currentVar === "Priya") {
     selectMesh.scale.set(0.92 * scaleMult, 0.94 * scaleMult, 0.92 * scaleMult);
   } else {
     selectMesh.scale.set(1.0 * scaleMult, 1.0 * scaleMult, 1.0 * scaleMult);
@@ -7769,7 +7845,11 @@ const btnCharConfirm = document.getElementById("btn-char-confirm");
 const btnCharReset = document.getElementById("btn-char-reset");
 
 function selectVariantHandler(variant, activeBtn) {
-  selectedVariant = variant;
+  if (activeEditingPlayer === 1) {
+    selectedVariant = variant;
+  } else {
+    selectedVariant2 = variant;
+  }
   [btnCharAarav, btnCharPriya, btnCharRohan, btnCharSam].forEach(btn => btn?.classList.remove("active"));
   activeBtn?.classList.add("active");
   
@@ -7785,7 +7865,12 @@ if (btnCharSam) btnCharSam.addEventListener("click", () => selectVariantHandler(
 const swatchBtns = document.querySelectorAll("#outfit-swatches .swatch-btn");
 swatchBtns.forEach(btn => {
   btn.addEventListener("click", (e) => {
-    selectedOutfitColor = e.target.getAttribute("data-color");
+    const col = e.target.getAttribute("data-color");
+    if (activeEditingPlayer === 1) {
+      selectedOutfitColor = col;
+    } else {
+      selectedOutfitColor2 = col;
+    }
     swatchBtns.forEach(b => b.classList.remove("active"));
     e.target.classList.add("active");
     updatePreviewModel();
@@ -7795,7 +7880,12 @@ swatchBtns.forEach(btn => {
 const hairBtns = document.querySelectorAll("#hair-swatches .hair-style-btn");
 hairBtns.forEach(btn => {
   btn.addEventListener("click", (e) => {
-    selectedHairStyle = e.target.getAttribute("data-style");
+    const style = e.target.getAttribute("data-style");
+    if (activeEditingPlayer === 1) {
+      selectedHairStyle = style;
+    } else {
+      selectedHairStyle2 = style;
+    }
     hairBtns.forEach(b => b.classList.remove("active"));
     e.target.classList.add("active");
     updatePreviewModel();
@@ -7805,7 +7895,12 @@ hairBtns.forEach(btn => {
 const skinBtns = document.querySelectorAll("#skin-swatches .skin-btn");
 skinBtns.forEach(btn => {
   btn.addEventListener("click", (e) => {
-    selectedSkinTone = e.currentTarget.getAttribute("data-color");
+    const col = e.currentTarget.getAttribute("data-color");
+    if (activeEditingPlayer === 1) {
+      selectedSkinTone = col;
+    } else {
+      selectedSkinTone2 = col;
+    }
     skinBtns.forEach(b => b.classList.remove("active"));
     e.currentTarget.classList.add("active");
     updatePreviewModel();
@@ -7813,71 +7908,113 @@ skinBtns.forEach(btn => {
 });
 
 function updateSwatchHighlights() {
+  const currentOutfitColor = activeEditingPlayer === 1 ? selectedOutfitColor : selectedOutfitColor2;
+  const currentHairStyle = activeEditingPlayer === 1 ? selectedHairStyle : selectedHairStyle2;
+  const currentSkinTone = activeEditingPlayer === 1 ? selectedSkinTone : selectedSkinTone2;
+  const currentBodyScale = activeEditingPlayer === 1 ? selectedBodyScale : selectedBodyScale2;
+  const currentHasGlasses = activeEditingPlayer === 1 ? selectedHasGlasses : selectedHasGlasses2;
+  const currentHasBackpack = activeEditingPlayer === 1 ? selectedHasBackpack : selectedHasBackpack2;
+  const currentVariant = activeEditingPlayer === 1 ? selectedVariant : selectedVariant2;
+
+  const mapping = { Aarav: btnCharAarav, Priya: btnCharPriya, Rohan: btnCharRohan, Sam: btnCharSam };
+  [btnCharAarav, btnCharPriya, btnCharRohan, btnCharSam].forEach(btn => btn?.classList.remove("active"));
+  mapping[currentVariant]?.classList.add("active");
+
   swatchBtns.forEach(btn => {
-    if (btn.getAttribute("data-color") === selectedOutfitColor) {
+    if (btn.getAttribute("data-color") === currentOutfitColor) {
       btn.classList.add("active");
     } else {
       btn.classList.remove("active");
     }
   });
   hairBtns.forEach(btn => {
-    if (btn.getAttribute("data-style") === selectedHairStyle) {
+    if (btn.getAttribute("data-style") === currentHairStyle) {
       btn.classList.add("active");
     } else {
       btn.classList.remove("active");
     }
   });
   skinBtns.forEach(btn => {
-    if (btn.getAttribute("data-color") === selectedSkinTone) {
+    if (btn.getAttribute("data-color") === currentSkinTone) {
       btn.classList.add("active");
     } else {
       btn.classList.remove("active");
     }
   });
+
+  const bodyScaleSlider = document.getElementById("body-scale-slider");
+  const bodyScaleLabel = document.getElementById("body-scale-label");
+  if (bodyScaleSlider) {
+    if (currentBodyScale === "short") bodyScaleSlider.value = 0;
+    else if (currentBodyScale === "average") bodyScaleSlider.value = 1;
+    else bodyScaleSlider.value = 2;
+  }
+  if (bodyScaleLabel) bodyScaleLabel.textContent = currentBodyScale.toUpperCase();
+
+  const chkCharGlasses = document.getElementById("chk-char-glasses");
+  if (chkCharGlasses) chkCharGlasses.checked = currentHasGlasses;
+
+  const chkCharBackpack = document.getElementById("chk-char-backpack");
+  if (chkCharBackpack) chkCharBackpack.checked = currentHasBackpack;
 }
 
 btnCharReset?.addEventListener("click", () => {
-  if (selectedVariant === "Aarav") {
-    selectedOutfitColor = "#243f5e";
-    selectedHairStyle = "short";
-    selectedSkinTone = "#e3a072";
-  } else if (selectedVariant === "Priya") {
-    selectedOutfitColor = "#d4af37";
-    selectedHairStyle = "long";
-    selectedSkinTone = "#fac08f";
-  } else if (selectedVariant === "Rohan") {
-    selectedOutfitColor = "#2f4c34";
-    selectedHairStyle = "short";
-    selectedSkinTone = "#fcd0a1";
-  } else if (selectedVariant === "Sam") {
-    selectedOutfitColor = "#56382a";
-    selectedHairStyle = "cap";
-    selectedSkinTone = "#a1683d";
+  const currentVar = activeEditingPlayer === 1 ? selectedVariant : selectedVariant2;
+  let defOutfit = "#243f5e";
+  let defHair = "short";
+  let defSkin = "#e3a072";
+
+  if (currentVar === "Priya") {
+    defOutfit = "#d4af37";
+    defHair = "long";
+    defSkin = "#fac08f";
+  } else if (currentVar === "Rohan") {
+    defOutfit = "#2f4c34";
+    defHair = "short";
+    defSkin = "#fcd0a1";
+  } else if (currentVar === "Sam") {
+    defOutfit = "#56382a";
+    defHair = "cap";
+    defSkin = "#a1683d";
   }
-  selectedBodyScale = "average";
-  selectedHasGlasses = false;
-  selectedHasBackpack = false;
-  const bodyScaleSlider = document.getElementById("body-scale-slider");
-  const bodyScaleLabel = document.getElementById("body-scale-label");
-  if (bodyScaleSlider) bodyScaleSlider.value = 1;
-  if (bodyScaleLabel) bodyScaleLabel.textContent = "AVERAGE";
-  const chkCharGlasses = document.getElementById("chk-char-glasses");
-  if (chkCharGlasses) chkCharGlasses.checked = false;
-  const chkCharBackpack = document.getElementById("chk-char-backpack");
-  if (chkCharBackpack) chkCharBackpack.checked = false;
+
+  if (activeEditingPlayer === 1) {
+    selectedOutfitColor = defOutfit;
+    selectedHairStyle = defHair;
+    selectedSkinTone = defSkin;
+    selectedBodyScale = "average";
+    selectedHasGlasses = false;
+    selectedHasBackpack = false;
+  } else {
+    selectedOutfitColor2 = defOutfit;
+    selectedHairStyle2 = defHair;
+    selectedSkinTone2 = defSkin;
+    selectedBodyScale2 = "average";
+    selectedHasGlasses2 = false;
+    selectedHasBackpack2 = false;
+  }
+
   updateSwatchHighlights();
   updatePreviewModel();
 });
 
 const chkCharGlasses = document.getElementById("chk-char-glasses");
 chkCharGlasses?.addEventListener("change", (e) => {
-  selectedHasGlasses = e.target.checked;
+  if (activeEditingPlayer === 1) {
+    selectedHasGlasses = e.target.checked;
+  } else {
+    selectedHasGlasses2 = e.target.checked;
+  }
   updatePreviewModel();
 });
 
 const chkCharBackpack = document.getElementById("chk-char-backpack");
 chkCharBackpack?.addEventListener("change", (e) => {
-  selectedHasBackpack = e.target.checked;
+  if (activeEditingPlayer === 1) {
+    selectedHasBackpack = e.target.checked;
+  } else {
+    selectedHasBackpack2 = e.target.checked;
+  }
   updatePreviewModel();
 });
 
@@ -7886,16 +8023,17 @@ const bodyScaleLabel = document.getElementById("body-scale-label");
 
 bodyScaleSlider?.addEventListener("input", (e) => {
   const val = parseInt(e.target.value);
-  if (val === 0) {
-    selectedBodyScale = "short";
-    if (bodyScaleLabel) bodyScaleLabel.textContent = "SHORT";
-  } else if (val === 1) {
-    selectedBodyScale = "average";
-    if (bodyScaleLabel) bodyScaleLabel.textContent = "AVERAGE";
+  let scaleStr = "average";
+  if (val === 0) scaleStr = "short";
+  else if (val === 2) scaleStr = "tall";
+
+  if (activeEditingPlayer === 1) {
+    selectedBodyScale = scaleStr;
   } else {
-    selectedBodyScale = "tall";
-    if (bodyScaleLabel) bodyScaleLabel.textContent = "TALL";
+    selectedBodyScale2 = scaleStr;
   }
+
+  if (bodyScaleLabel) bodyScaleLabel.textContent = scaleStr.toUpperCase();
   updatePreviewModel();
 });
 
@@ -7907,19 +8045,32 @@ btnCharRandomize?.addEventListener("click", () => {
   const styles = ["short", "long", "cap", "buzzed", "ponytail"];
   const randStyle = styles[Math.floor(Math.random() * styles.length)];
 
-  selectedVariant = randVar;
-  selectedOutfitColor = randColor;
-  selectedHairStyle = randStyle;
-
-  const mapping = { Aarav: btnCharAarav, Priya: btnCharPriya, Rohan: btnCharRohan, Sam: btnCharSam };
-  [btnCharAarav, btnCharPriya, btnCharRohan, btnCharSam].forEach(btn => btn?.classList.remove("active"));
-  mapping[randVar]?.classList.add("active");
+  if (activeEditingPlayer === 1) {
+    selectedVariant = randVar;
+    selectedOutfitColor = randColor;
+    selectedHairStyle = randStyle;
+  } else {
+    selectedVariant2 = randVar;
+    selectedOutfitColor2 = randColor;
+    selectedHairStyle2 = randStyle;
+  }
 
   updateSwatchHighlights();
   updatePreviewModel();
 });
 
 btnCharConfirm?.addEventListener("click", () => {
+  if (coopMode && activeEditingPlayer === 1) {
+    activeEditingPlayer = 2;
+    const tabP1 = document.getElementById("btn-tab-p1");
+    const tabP2 = document.getElementById("btn-tab-p2");
+    tabP1?.classList.remove("active");
+    tabP2?.classList.add("active");
+    updateSwatchHighlights();
+    updatePreviewModel();
+    return;
+  }
+
   charSelectActive = false;
   if (selectRafId) {
     cancelAnimationFrame(selectRafId);
@@ -7950,6 +8101,29 @@ btnCharConfirm?.addEventListener("click", () => {
   localStorage.setItem("setting-p1-outfit-color", p1OutfitColor);
   localStorage.setItem("setting-p1-hair-style", p1HairStyle);
 
+  if (coopMode) {
+    p2Model = selectedVariant2;
+    p2OutfitColor = selectedOutfitColor2;
+    p2HairStyle = selectedHairStyle2;
+    p2BodyScale = selectedBodyScale2;
+    p2HasGlasses = selectedHasGlasses2;
+    p2HasBackpack = selectedHasBackpack2;
+    p2SkinTone = selectedSkinTone2;
+
+    p2Customization = {
+      model: p2Model,
+      outfitColor: p2OutfitColor,
+      hairStyle: p2HairStyle,
+      bodyScale: p2BodyScale,
+      hasGlasses: p2HasGlasses,
+      hasBackpack: p2HasBackpack,
+      skinTone: p2SkinTone
+    };
+
+    localStorage.setItem("setting-p2-customization", JSON.stringify(p2Customization));
+    localStorage.setItem("setting-p2-model", p2Model);
+  }
+
   startGame();
 });
 
@@ -7974,7 +8148,32 @@ startPlusButton?.addEventListener("click", () => {
 coopButton.addEventListener("click", () => {
   hardcoreMode = false;
   coopMode = true;
-  startGame();
+  startScreen.classList.add("hidden");
+  if (charSelectScreen) charSelectScreen.style.display = "block";
+  charSelectActive = true;
+  initCharacterSelect();
+  animateCharacterSelect();
+});
+
+const tabP1 = document.getElementById("btn-tab-p1");
+const tabP2 = document.getElementById("btn-tab-p2");
+
+tabP1?.addEventListener("click", () => {
+  if (activeEditingPlayer === 1) return;
+  activeEditingPlayer = 1;
+  tabP2?.classList.remove("active");
+  tabP1?.classList.add("active");
+  updateSwatchHighlights();
+  updatePreviewModel();
+});
+
+tabP2?.addEventListener("click", () => {
+  if (activeEditingPlayer === 2) return;
+  activeEditingPlayer = 2;
+  tabP1?.classList.remove("active");
+  tabP2?.classList.add("active");
+  updateSwatchHighlights();
+  updatePreviewModel();
 });
 continueButton?.addEventListener("click", () => {
   coopMode = false;

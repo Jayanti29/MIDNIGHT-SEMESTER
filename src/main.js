@@ -2962,6 +2962,9 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
     } else if (hairStyleOverride === "short") {
       hairLength = "short";
       hasCap = false;
+    } else if (hairStyleOverride === "buzzed") {
+      hairLength = "buzzed";
+      hasCap = false;
     }
   }
 
@@ -3055,10 +3058,17 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
     capVisor.position.set(0, 0.2, 0.18);
     head.add(capVisor);
   } else {
-    const hairCap = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.08, 0.22), hairMat);
-    hairCap.name = "hair_short_cap";
-    hairCap.position.set(0, 0.26, 0.02);
-    head.add(hairCap);
+    if (hairLength === "buzzed") {
+      const hairBuzzed = new THREE.Mesh(new THREE.BoxGeometry(0.205, 0.02, 0.205), hairMat);
+      hairBuzzed.name = "hair_buzzed";
+      hairBuzzed.position.set(0, 0.23, 0.015);
+      head.add(hairBuzzed);
+    } else {
+      const hairCap = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.08, 0.22), hairMat);
+      hairCap.name = "hair_short_cap";
+      hairCap.position.set(0, 0.26, 0.02);
+      head.add(hairCap);
+    }
   }
   if (hairLength === "long") {
     const lockL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.52, 0.1), hairMat);
@@ -7771,7 +7781,7 @@ btnCharRandomize?.addEventListener("click", () => {
   const randVar = variants[Math.floor(Math.random() * variants.length)];
   const colors = ["#243f5e", "#d4af37", "#56382a", "#2f4c34", "#7e2e17", "#4a2c5a", "#5a5a5a", "#d6c5b3"];
   const randColor = colors[Math.floor(Math.random() * colors.length)];
-  const styles = ["short", "long", "cap"];
+  const styles = ["short", "long", "cap", "buzzed"];
   const randStyle = styles[Math.floor(Math.random() * styles.length)];
 
   selectedVariant = randVar;

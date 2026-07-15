@@ -6781,6 +6781,11 @@ function initCharacterSelect() {
   const selectCanvas = document.getElementById("char-preview-canvas");
   if (!selectCanvas) return;
 
+  if (selectRenderer) {
+    disposeRenderer(selectRenderer);
+    selectRenderer = null;
+  }
+
   selectScene = new THREE.Scene();
   selectCamera = new THREE.PerspectiveCamera(35, selectCanvas.clientWidth / selectCanvas.clientHeight, 0.1, 10);
   selectCamera.position.set(0, 0.8, 2.6);

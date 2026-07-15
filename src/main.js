@@ -6616,7 +6616,8 @@ function updateMeeraAnimations(meera, state, time) {
 }
 
 function animate() {
-  const delta = Math.min(clock.getDelta(), 0.05);
+  try {
+    const delta = Math.min(clock.getDelta(), 0.05);
   updateMovement(delta);
   updateState(delta);
   updateRain(delta);
@@ -6746,6 +6747,23 @@ function animate() {
       }
     }
     composer.render();
+  }
+  } catch (error) {
+    console.error("Error in game loop:", error);
+    if (fatalError) {
+      fatalError.innerHTML = `
+        <h2>An Error Occurred</h2>
+        <p>A fatal error occurred in the game loop. Please check the console for details, or reload the page.</p>
+        <button id="reload-btn" style="margin-top: 15px; padding: 8px 16px; background: #c9a56d; color: #080706; border: none; cursor: pointer; font-weight: bold; border-radius: 4px;">Reload Game</button>
+      `;
+      fatalError.hidden = false;
+      document.getElementById("reload-btn")?.addEventListener("click", () => {
+        window.location.reload();
+      });
+    }
+    if (renderer) {
+      renderer.setAnimationLoop(null);
+    }
   }
 }
 

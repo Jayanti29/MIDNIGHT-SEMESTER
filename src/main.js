@@ -6773,6 +6773,7 @@ composer.addPass(filmPass);
 // Character Selection State
 let charSelectActive = false;
 let selectScene, selectCamera, selectRenderer, selectMesh;
+let selectRafId = null;
 let selectedVariant = "Aarav";
 let selectedOutfitColor = "#243f5e";
 let selectedHairStyle = "short";
@@ -6834,7 +6835,7 @@ function updatePreviewModel() {
 
 function animateCharacterSelect() {
   if (!charSelectActive) return;
-  requestAnimationFrame(animateCharacterSelect);
+  selectRafId = requestAnimationFrame(animateCharacterSelect);
 
   if (selectMesh) {
     selectMesh.rotation.y += 0.012;
@@ -7586,6 +7587,10 @@ btnCharRandomize?.addEventListener("click", () => {
 
 btnCharConfirm?.addEventListener("click", () => {
   charSelectActive = false;
+  if (selectRafId) {
+    cancelAnimationFrame(selectRafId);
+    selectRafId = null;
+  }
   if (charSelectScreen) charSelectScreen.style.display = "none";
 
   p1Model = selectedVariant;

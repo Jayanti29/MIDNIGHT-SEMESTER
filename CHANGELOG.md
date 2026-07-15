@@ -5,6 +5,24 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.2.6-advanced] — 2026-07-16
+### Added
+- Expanded outfit color choices from 3 to 8 palette shades.
+- Added body scale range slider supporting SHORT, AVERAGE, and TALL skeletal multipliers in character select.
+- Added Glasses and Backpack accessories modelled procedurally onto spine and head bones.
+- Added skin-tone swatch selections (5 tones) mapped to independent head material colors.
+- Added "buzzed" and "ponytail" hair style procedural meshes.
+- Added Player 2 customization dossier panel supporting full co-op mode character select step-by-step layout.
+- Added preview lighting toggles (Daylight vs Nightlight) for high swatch visibility.
+- Extended Randomize function to cover all new options (scale, skin tones, accessories).
+- Added arrow key keyboard navigation support for swatch and candidate lists.
+- Added explicit validation sanitization function fallback guards for character select options in localStorage reading and continue flows.
+- Added aria-label accessibility names for empty outfit and skin swatches.
+
+### Fixed
+- Fixed preset selection variant clicks overwriting custom colors and styles by detaching preset values.
+- Synced body scale, accessories, hair styles, and skin tones into in-game player mesh creation and setup loops.
+
 ## [0.2.5-advanced] — 2026-07-16
 ### Added
 - Recursive WebGL resource disposal helper utilities (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks.

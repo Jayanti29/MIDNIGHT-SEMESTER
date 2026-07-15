@@ -1,8 +1,27 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 319/500**
+Commit counter: **Commit 338/500**
 
 ## Commits Log
+- **Commit 337/500**: Phase 23 - Add keyboard navigation (ArrowLeft/Right/Up/Down) for swatch and candidate select lists.
+- **Commit 336/500**: Phase 23 - Add accessible aria-labels to all empty outfit shade and skin tone buttons in character selection.
+- **Commit 335/500**: Phase 23 - Implement validation sanitization helper `sanitizeCustomization()` with safe model-specific fallback defaults for startup variables loading and continue flows.
+- **Commit 334/500**: Phase 23 - Extend Randomize to cover body height scale, glasses, backpack, and skin tone.
+- **Commit 333/500**: Phase 23 - Add preview screen lighting toggle (Daylight vs Nightlight) for high visibility of color swatches.
+- **Commit 332/500**: Phase 23 - Add Player 2 customization step-by-step panel dossier configuration in co-op mode.
+- **Commit 331/500**: Phase 23 - Sync dynamic customizations, accessories, and scaling into in-game player 1 character mesh spawns (both solo and co-op modes).
+- **Commit 330/500**: Phase 23 - Implement localStorage character customization loading in continue flow.
+- **Commit 329/500**: Phase 23 - Persist complete character customization state object to localStorage in JSON format.
+- **Commit 328/500**: Phase 23 - Implement independent skin tone coloring on humanoid skeleton head material.
+- **Commit 327/500**: Phase 23 - Add skin tone swatch selection UI row.
+- **Commit 326/500**: Phase 23 - Add procedural ponytail hair style option mesh builder.
+- **Commit 325/500**: Phase 23 - Add procedural close-cut buzzed hair style option mesh builder.
+- **Commit 324/500**: Phase 23 - Expand outfit swatches selection palette to 8 distinct shades.
+- **Commit 323/500**: Phase 23 - Implement procedural Backpack accessory mesh and skeletal strap attachment logic.
+- **Commit 322/500**: Phase 23 - Implement procedural Glasses accessory mesh and skeletal nose bridge attachment logic.
+- **Commit 321/500**: Phase 23 - Add interactive body-scale range slider with SHORT, AVERAGE, and TALL multipliers.
+- **Commit 320/500**: Phase 23 - Add dedicated Reset button to character select screen layout.
+- **Commit 319/500**: Phase 23 - Prevent character selection preset cards clicks from overwriting active color selections.
 - **Commit 318/500**: Phase 22 - Wrap animateCharacterSelect() body in try/catch matching animate().
 - **Commit 317/500**: Phase 22 - Wrap animate() body in try/catch with console.error + on-screen error banner.
 - **Commit 316/500**: Phase 22 - Remove dead broken-emoji line in updateDossierPreview().

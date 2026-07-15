@@ -107,4 +107,20 @@ This repository is currently a local Three.js horror prototype. It does not cont
 - Camera Y shake pushes player above floor or causes X coordinate drift (resolved by implementing a non-drifting visual-only camera shake system).
 - No ambient duck on WIN/GAMEOVER state transitions (resolved by implementing linear audio ramping to fade out ambient audio on state changes and restore on restart).
 
+---
+
+## Character Customization System — Track B Summary
+
+### Architecture & Capabilities
+1. **Accouterments & Sizing**: Added interactive ranges and checkboxes for adjusting body height/scale (SHORT: 0.88x, AVERAGE: 1.0x, TALL: 1.12x scaling multipliers) and toggling physical accessory boxes representing glasses (head bone child) and backpacks (spine bone child).
+2. **Shading & Hair Stylization**: Outfit color palette expanded to 8 shades and skin tones expanded to 5 custom swatches. Added custom ponytail and buzzed cap hair geometries.
+3. **Player 2 dossier integration**: Multi-step personnel files config dossier that automatically processes P1 configuration before seamlessly loading the P2 customization panel in co-op mode. Added preview lighting toggle (Daylight vs Nightlight) for high visibility.
+4. **Accessible A11y & Navigation**: Swatch buttons equipped with custom `aria-label` elements and interactive Left/Right/Up/Down Arrow key event listeners for cycling through selections within focused color groups.
+
+### Validation & Fallback Rules
+- Handled via the validation function `sanitizeCustomization(obj, defaultModel)`.
+- Compares variables against explicit arrays of valid models, colors, scales, hair configurations, and skin tones.
+- Automatically reverts single variables to standard fallbacks or variant defaults (e.g. Priyas default outfit gold, Aaravs midnight blue, skin color matched to character presets) on null, malformed inputs, or manually corrupted `localStorage` records.
+- Sanity checks are applied at startup `localStorage` parsing, option modifications, and the main menu `continueButton` restore loops.
+
 

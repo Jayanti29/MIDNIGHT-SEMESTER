@@ -5,6 +5,18 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.2.5-advanced] — 2026-07-16
+### Added
+- Recursive WebGL resource disposal helper utilities (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks.
+- Global texture cache to prevent duplicate GPU uploads of procedural, checkerboard, and peeling wall textures.
+- Main render and character selection loop error boundaries with try-catch blocks and on-screen error banners.
+- WebGL context loss and restoration listeners on main and character-select renderers with reload prompt interfaces.
+
+### Fixed
+- Duplicate WebGL context creation and resource leaks in character select by tracking and canceling animation frame handles and guarding canvas initialization.
+- Player character and shadow figure resource leaks in `resetGame()` via recursive disposal.
+- Dead broken-emoji character code representation in `updateDossierPreview()`.
+
 ## [0.2.4-advanced] — 2026-07-11
 ### Added
 - Academic Wing classroom annex layout

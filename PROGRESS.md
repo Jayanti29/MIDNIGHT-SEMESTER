@@ -1,8 +1,26 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 166/500**
+Commit counter: **Commit 319/500**
 
 ## Commits Log
+- **Commit 318/500**: Phase 22 - Wrap animateCharacterSelect() body in try/catch matching animate().
+- **Commit 317/500**: Phase 22 - Wrap animate() body in try/catch with console.error + on-screen error banner.
+- **Commit 316/500**: Phase 22 - Remove dead broken-emoji line in updateDossierPreview().
+- **Commit 315/500**: Phase 22 - Route proceduralTexture/checkerboard/peelingWall through texture cache.
+- **Commit 314/500**: Phase 22 - Add texture cache keyed by generation params to stop duplicate GPU uploads.
+- **Commit 313/500**: Phase 22 - Call disposeLevel() in resetGame() before rebuilding starting level.
+- **Commit 312/500**: Phase 22 - Call disposeLevel() in loadLevel2() before building level 2 geometry.
+- **Commit 311/500**: Phase 22 - Call disposeLevel() in clearGroup() before rebuilding group contents.
+- **Commit 310/500**: Phase 22 - Add disposeLevel() helper walking addToActiveLevel-tracked objects.
+- **Commit 309/500**: Phase 22 - Add webglcontextlost/restored listeners on character-select renderer.
+- **Commit 308/500**: Phase 22 - Add webglcontextlost/restored listeners on main renderer with reload prompt.
+- **Commit 307/500**: Phase 22 - Dispose selectMesh geometry/material in updatePreviewModel(), not just scene.remove().
+- **Commit 306/500**: Phase 22 - Track animateCharacterSelect() RAF handle and cancel on screen close.
+- **Commit 305/500**: Phase 22 - Guard initCharacterSelect() against duplicate WebGL context creation.
+- **Commit 304/500**: Phase 22 - Dispose previous selectRenderer before creating new one in initCharacterSelect().
+- **Commit 303/500**: Phase 22 - Add disposeRenderer() utility for full WebGLRenderer teardown.
+- **Commit 302/500**: Phase 22 - Add disposeObject3D() utility to recursively free geometries/materials/textures.
+- **Commit 301/500**: Phase 21 - Append release version notes to CHANGELOG.md for version 0.2.4-advanced.
 - **Commit 300/500**: Phase 21 - Update progress metrics log in PROGRESS.md.
 - **Commit 254/500**: Phase 20 - Update the project progress logs in PROGRESS.md.
 - **Commit 166/500**: Phase 19 - Perform code formatting, remove redundant heartbeat variables, and align styles.

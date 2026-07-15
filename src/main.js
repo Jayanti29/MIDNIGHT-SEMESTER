@@ -2189,7 +2189,12 @@ function playJumpscareStinger() {
 
 const textureCache = new Map();
 
-function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#776b5a", scale = 1 }) {
+function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#776b5a", scale = 1 } = {}) {
+  const cacheKey = `procedural_${base}_${grain}_${scratches}_${scale}`;
+  if (textureCache.has(cacheKey)) {
+    return textureCache.get(cacheKey).clone();
+  }
+
   const textureCanvas = document.createElement("canvas");
   textureCanvas.width = 512;
   textureCanvas.height = 512;
@@ -2233,7 +2238,8 @@ function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#
   texture.wrapT = THREE.RepeatWrapping;
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  return texture;
+  textureCache.set(cacheKey, texture);
+  return texture.clone();
 }
 
 function createFlashlightCookie() {
@@ -2288,6 +2294,11 @@ function createFlashlightCookie() {
 }
 
 function createCheckerboardTexture() {
+  const cacheKey = "checkerboard";
+  if (textureCache.has(cacheKey)) {
+    return textureCache.get(cacheKey).clone();
+  }
+
   const canvas = document.createElement("canvas");
   canvas.width = 512;
   canvas.height = 512;
@@ -2347,10 +2358,16 @@ function createCheckerboardTexture() {
   texture.wrapT = THREE.RepeatWrapping;
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  return texture;
+  textureCache.set(cacheKey, texture);
+  return texture.clone();
 }
 
 function createPeelingWallTexture() {
+  const cacheKey = "peelingWall";
+  if (textureCache.has(cacheKey)) {
+    return textureCache.get(cacheKey).clone();
+  }
+
   const canvas = document.createElement("canvas");
   canvas.width = 512;
   canvas.height = 512;
@@ -2413,7 +2430,8 @@ function createPeelingWallTexture() {
   texture.wrapT = THREE.RepeatWrapping;
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  return texture;
+  textureCache.set(cacheKey, texture);
+  return texture.clone();
 }
 
 const floorTexture = createCheckerboardTexture();

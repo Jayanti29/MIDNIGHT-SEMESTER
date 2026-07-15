@@ -2858,7 +2858,7 @@ function createBookshelf(position, rotation = 0) {
   return group;
 }
 
-function createProceduralHumanoidSkeleton({ name, position, isGhost = false, identity = "", outfitColorOverride = null, hairStyleOverride = null }) {
+function createProceduralHumanoidSkeleton({ name, position, isGhost = false, identity = "", outfitColorOverride = null, hairStyleOverride = null, hasGlassesOverride = null }) {
   const hips = new THREE.Bone();
   hips.name = "mixamorigHips";
   hips.position.set(0, 0.9, 0);
@@ -2940,6 +2940,10 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
     } else if (identity === "Rohan") {
       outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x2f4c34;
     }
+  }
+
+  if (hasGlassesOverride !== null) {
+    hasGlasses = hasGlassesOverride;
   }
 
   // Handle hairStyleOverride explicitly
@@ -6850,6 +6854,7 @@ let selectedVariant = "Aarav";
 let selectedOutfitColor = "#243f5e";
 let selectedHairStyle = "short";
 let selectedBodyScale = "average";
+let selectedHasGlasses = false;
 
 function initCharacterSelect() {
   const selectCanvas = document.getElementById("char-preview-canvas");
@@ -6913,7 +6918,8 @@ function updatePreviewModel() {
     isGhost: false,
     identity: selectedVariant,
     outfitColorOverride: selectedOutfitColor,
-    hairStyleOverride: selectedHairStyle
+    hairStyleOverride: selectedHairStyle,
+    hasGlassesOverride: selectedHasGlasses
   });
 
   let scaleMult = 1.0;
@@ -7690,11 +7696,20 @@ btnCharReset?.addEventListener("click", () => {
     selectedHairStyle = "cap";
   }
   selectedBodyScale = "average";
+  selectedHasGlasses = false;
   const bodyScaleSlider = document.getElementById("body-scale-slider");
   const bodyScaleLabel = document.getElementById("body-scale-label");
   if (bodyScaleSlider) bodyScaleSlider.value = 1;
   if (bodyScaleLabel) bodyScaleLabel.textContent = "AVERAGE";
+  const chkCharGlasses = document.getElementById("chk-char-glasses");
+  if (chkCharGlasses) chkCharGlasses.checked = false;
   updateSwatchHighlights();
+  updatePreviewModel();
+});
+
+const chkCharGlasses = document.getElementById("chk-char-glasses");
+chkCharGlasses?.addEventListener("change", (e) => {
+  selectedHasGlasses = e.target.checked;
   updatePreviewModel();
 });
 

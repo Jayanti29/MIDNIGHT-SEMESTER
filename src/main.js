@@ -387,6 +387,16 @@ function disposeObject3D(obj) {
   });
 }
 
+function disposeRenderer(renderer) {
+  if (!renderer) return;
+  renderer.dispose();
+  const gl = renderer.getContext();
+  if (gl) {
+    const ext = gl.getExtension("WEBGL_lose_context");
+    if (ext) ext.loseContext();
+  }
+}
+
 function logPerformanceTelemetry(delta) {
   frameCount++;
   fpsSum += 1 / delta;

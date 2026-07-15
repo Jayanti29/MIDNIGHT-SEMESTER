@@ -363,24 +363,81 @@ const collectedBatteries = new Set();
 const readLoreNotes = new Set();
 let p1Name = localStorage.getItem("setting-p1-name") || "Aarav";
 
-let p1Customization = {
-  model: "Aarav",
-  outfitColor: "#243f5e",
-  hairStyle: "short",
-  bodyScale: "average",
-  hasGlasses: false,
-  hasBackpack: false,
-  skinTone: "#e3a072"
-};
+function sanitizeCustomization(obj, defaultModel = "Aarav") {
+  const validModels = ["Aarav", "Priya", "Rohan", "Sam"];
+  const validHairStyles = ["short", "long", "cap", "buzzed", "ponytail"];
+  const validOutfitColors = ["#243f5e", "#d4af37", "#56382a", "#2f4c34", "#7e2e17", "#4a2c5a", "#5a5a5a", "#d6c5b3"];
+  const validSkinTones = ["#fcd0a1", "#fac08f", "#e3a072", "#a1683d", "#5c3818"];
+  const validScales = ["short", "average", "tall"];
+
+  const safe = {};
+  
+  if (obj && typeof obj === "object" && validModels.includes(obj.model)) {
+    safe.model = obj.model;
+  } else {
+    safe.model = defaultModel;
+  }
+
+  let defaultOutfit = "#243f5e";
+  let defaultHair = "short";
+  let defaultSkin = "#e3a072";
+  if (safe.model === "Priya") {
+    defaultOutfit = "#d4af37";
+    defaultHair = "long";
+    defaultSkin = "#fac08f";
+  } else if (safe.model === "Rohan") {
+    defaultOutfit = "#2f4c34";
+    defaultHair = "short";
+    defaultSkin = "#fcd0a1";
+  } else if (safe.model === "Sam") {
+    defaultOutfit = "#56382a";
+    defaultHair = "cap";
+    defaultSkin = "#a1683d";
+  }
+
+  if (obj && typeof obj === "object" && validOutfitColors.includes(obj.outfitColor)) {
+    safe.outfitColor = obj.outfitColor;
+  } else {
+    safe.outfitColor = defaultOutfit;
+  }
+
+  if (obj && typeof obj === "object" && validHairStyles.includes(obj.hairStyle)) {
+    safe.hairStyle = obj.hairStyle;
+  } else {
+    safe.hairStyle = defaultHair;
+  }
+
+  if (obj && typeof obj === "object" && validScales.includes(obj.bodyScale)) {
+    safe.bodyScale = obj.bodyScale;
+  } else {
+    safe.bodyScale = "average";
+  }
+
+  safe.hasGlasses = (obj && typeof obj === "object" && typeof obj.hasGlasses === "boolean") ? obj.hasGlasses : false;
+  safe.hasBackpack = (obj && typeof obj === "object" && typeof obj.hasBackpack === "boolean") ? obj.hasBackpack : false;
+
+  if (obj && typeof obj === "object" && validSkinTones.includes(obj.skinTone)) {
+    safe.skinTone = obj.skinTone;
+  } else {
+    safe.skinTone = defaultSkin;
+  }
+
+  return safe;
+}
+
+let p1Customization = sanitizeCustomization(null, "Aarav");
 
 try {
   const savedP1 = localStorage.getItem("setting-p1-customization");
   if (savedP1) {
-    p1Customization = JSON.parse(savedP1);
+    p1Customization = sanitizeCustomization(JSON.parse(savedP1), "Aarav");
   } else {
-    p1Customization.model = localStorage.getItem("setting-p1-model") || "Aarav";
-    p1Customization.outfitColor = localStorage.getItem("setting-p1-outfit-color") || "#243f5e";
-    p1Customization.hairStyle = localStorage.getItem("setting-p1-hair-style") || "short";
+    const legacy = {
+      model: localStorage.getItem("setting-p1-model"),
+      outfitColor: localStorage.getItem("setting-p1-outfit-color"),
+      hairStyle: localStorage.getItem("setting-p1-hair-style")
+    };
+    p1Customization = sanitizeCustomization(legacy, "Aarav");
   }
 } catch (e) {
   console.error("Failed to parse P1 character customization setting", e);
@@ -389,42 +446,37 @@ try {
 let p1Model = p1Customization.model;
 let p1OutfitColor = p1Customization.outfitColor;
 let p1HairStyle = p1Customization.hairStyle;
-let p1BodyScale = p1Customization.bodyScale || "average";
-let p1HasGlasses = p1Customization.hasGlasses || false;
-let p1HasBackpack = p1Customization.hasBackpack || false;
-let p1SkinTone = p1Customization.skinTone || "#e3a072";
-let p2Name = localStorage.getItem("setting-p2-name") || "Rohan";
+let p1BodyScale = p1Customization.bodyScale;
+let p1HasGlasses = p1Customization.hasGlasses;
+let p1HasBackpack = p1Customization.hasBackpack;
+let p1SkinTone = p1Customization.skinTone;
 
-let p2Customization = {
-  model: "Rohan",
-  outfitColor: "#2f4c34",
-  hairStyle: "short",
-  bodyScale: "average",
-  hasGlasses: false,
-  hasBackpack: false,
-  skinTone: "#fcd0a1"
-};
+let p2Name = localStorage.getItem("setting-p2-name") || "Rohan";
+let p2Customization = sanitizeCustomization(null, "Rohan");
 
 try {
   const savedP2 = localStorage.getItem("setting-p2-customization");
   if (savedP2) {
-    p2Customization = JSON.parse(savedP2);
+    p2Customization = sanitizeCustomization(JSON.parse(savedP2), "Rohan");
   } else {
-    p2Customization.model = localStorage.getItem("setting-p2-model") || "Rohan";
-    p2Customization.outfitColor = localStorage.getItem("setting-p2-outfit-color") || "#2f4c34";
-    p2Customization.hairStyle = localStorage.getItem("setting-p2-hair-style") || "short";
+    const legacy = {
+      model: localStorage.getItem("setting-p2-model"),
+      outfitColor: localStorage.getItem("setting-p2-outfit-color"),
+      hairStyle: localStorage.getItem("setting-p2-hair-style")
+    };
+    p2Customization = sanitizeCustomization(legacy, "Rohan");
   }
 } catch (e) {
   console.error("Failed to parse P2 character customization setting", e);
 }
 
 let p2Model = p2Customization.model;
-let p2OutfitColor = p2Customization.outfitColor || "#2f4c34";
-let p2HairStyle = p2Customization.hairStyle || "short";
-let p2BodyScale = p2Customization.bodyScale || "average";
-let p2HasGlasses = p2Customization.hasGlasses || false;
-let p2HasBackpack = p2Customization.hasBackpack || false;
-let p2SkinTone = p2Customization.skinTone || "#fcd0a1";
+let p2OutfitColor = p2Customization.outfitColor;
+let p2HairStyle = p2Customization.hairStyle;
+let p2BodyScale = p2Customization.bodyScale;
+let p2HasGlasses = p2Customization.hasGlasses;
+let p2HasBackpack = p2Customization.hasBackpack;
+let p2SkinTone = p2Customization.skinTone;
 let screenBrightness = parseFloat(localStorage.getItem("setting-brightness") || "1.25");
 let xrSession = null;
 let activeLineTimer = 0;
@@ -8239,11 +8291,14 @@ continueButton?.addEventListener("click", () => {
   try {
     const saved = localStorage.getItem("setting-p1-customization");
     if (saved) {
-      p1Customization = JSON.parse(saved);
+      p1Customization = sanitizeCustomization(JSON.parse(saved), "Aarav");
     } else {
-      p1Customization.model = localStorage.getItem("setting-p1-model") || p1Model;
-      p1Customization.outfitColor = localStorage.getItem("setting-p1-outfit-color") || p1OutfitColor;
-      p1Customization.hairStyle = localStorage.getItem("setting-p1-hair-style") || p1HairStyle;
+      const legacy = {
+        model: localStorage.getItem("setting-p1-model"),
+        outfitColor: localStorage.getItem("setting-p1-outfit-color"),
+        hairStyle: localStorage.getItem("setting-p1-hair-style")
+      };
+      p1Customization = sanitizeCustomization(legacy, "Aarav");
     }
   } catch (e) {
     console.error("Failed to restore character customization in continue flow", e);
@@ -8252,10 +8307,10 @@ continueButton?.addEventListener("click", () => {
   p1Model = p1Customization.model;
   p1OutfitColor = p1Customization.outfitColor;
   p1HairStyle = p1Customization.hairStyle;
-  p1BodyScale = p1Customization.bodyScale || "average";
-  p1HasGlasses = p1Customization.hasGlasses || false;
-  p1HasBackpack = p1Customization.hasBackpack || false;
-  p1SkinTone = p1Customization.skinTone || "#e3a072";
+  p1BodyScale = p1Customization.bodyScale;
+  p1HasGlasses = p1Customization.hasGlasses;
+  p1HasBackpack = p1Customization.hasBackpack;
+  p1SkinTone = p1Customization.skinTone;
 
   startScreen.classList.add("hidden");
   startGame();

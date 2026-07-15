@@ -2858,7 +2858,7 @@ function createBookshelf(position, rotation = 0) {
   return group;
 }
 
-function createProceduralHumanoidSkeleton({ name, position, isGhost = false, identity = "", outfitColorOverride = null, hairStyleOverride = null, hasGlassesOverride = null }) {
+function createProceduralHumanoidSkeleton({ name, position, isGhost = false, identity = "", outfitColorOverride = null, hairStyleOverride = null, hasGlassesOverride = null, hasBackpackOverride = null }) {
   const hips = new THREE.Bone();
   hips.name = "mixamorigHips";
   hips.position.set(0, 0.9, 0);
@@ -2923,6 +2923,7 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   let hairLength = "short";
   let hasGlasses = false;
   let hasCap = false;
+  let hasBackpack = false;
   if (isGhost) {
     outfitColor = 0xc9d5cf;
     hairLength = "long";
@@ -2944,6 +2945,10 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
 
   if (hasGlassesOverride !== null) {
     hasGlasses = hasGlassesOverride;
+  }
+
+  if (hasBackpackOverride !== null) {
+    hasBackpack = hasBackpackOverride;
   }
 
   // Handle hairStyleOverride explicitly
@@ -3008,6 +3013,25 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   legR.position.y = -0.24;
   legR.castShadow = true;
   rightLeg.add(legR);
+
+  if (hasBackpack) {
+    const backpackMat = new THREE.MeshStandardMaterial({ color: 0x3e2723, roughness: 0.8 });
+    const backpackBody = new THREE.Mesh(new THREE.BoxGeometry(0.24, 0.32, 0.12), backpackMat);
+    backpackBody.name = "backpack";
+    backpackBody.position.set(0, 0.28, -0.22);
+    backpackBody.castShadow = true;
+    spine.add(backpackBody);
+
+    const strapL = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.36, 0.02), backpackMat);
+    strapL.name = "backpack_strap_L";
+    strapL.position.set(-0.11, 0.28, -0.11);
+    spine.add(strapL);
+
+    const strapR = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.36, 0.02), backpackMat);
+    strapR.name = "backpack_strap_R";
+    strapR.position.set(0.11, 0.28, -0.11);
+    spine.add(strapR);
+  }
   if (hasGlasses) {
     const frameMat = new THREE.MeshBasicMaterial({ color: 0x111111 });
     const bridge = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.015, 0.015), frameMat);
@@ -6855,6 +6879,7 @@ let selectedOutfitColor = "#243f5e";
 let selectedHairStyle = "short";
 let selectedBodyScale = "average";
 let selectedHasGlasses = false;
+let selectedHasBackpack = false;
 
 function initCharacterSelect() {
   const selectCanvas = document.getElementById("char-preview-canvas");
@@ -6919,7 +6944,8 @@ function updatePreviewModel() {
     identity: selectedVariant,
     outfitColorOverride: selectedOutfitColor,
     hairStyleOverride: selectedHairStyle,
-    hasGlassesOverride: selectedHasGlasses
+    hasGlassesOverride: selectedHasGlasses,
+    hasBackpackOverride: selectedHasBackpack
   });
 
   let scaleMult = 1.0;
@@ -7697,12 +7723,15 @@ btnCharReset?.addEventListener("click", () => {
   }
   selectedBodyScale = "average";
   selectedHasGlasses = false;
+  selectedHasBackpack = false;
   const bodyScaleSlider = document.getElementById("body-scale-slider");
   const bodyScaleLabel = document.getElementById("body-scale-label");
   if (bodyScaleSlider) bodyScaleSlider.value = 1;
   if (bodyScaleLabel) bodyScaleLabel.textContent = "AVERAGE";
   const chkCharGlasses = document.getElementById("chk-char-glasses");
   if (chkCharGlasses) chkCharGlasses.checked = false;
+  const chkCharBackpack = document.getElementById("chk-char-backpack");
+  if (chkCharBackpack) chkCharBackpack.checked = false;
   updateSwatchHighlights();
   updatePreviewModel();
 });
@@ -7710,6 +7739,12 @@ btnCharReset?.addEventListener("click", () => {
 const chkCharGlasses = document.getElementById("chk-char-glasses");
 chkCharGlasses?.addEventListener("change", (e) => {
   selectedHasGlasses = e.target.checked;
+  updatePreviewModel();
+});
+
+const chkCharBackpack = document.getElementById("chk-char-backpack");
+chkCharBackpack?.addEventListener("change", (e) => {
+  selectedHasBackpack = e.target.checked;
   updatePreviewModel();
 });
 

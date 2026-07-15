@@ -362,9 +362,37 @@ const collectedEvidence = new Set();
 const collectedBatteries = new Set();
 const readLoreNotes = new Set();
 let p1Name = localStorage.getItem("setting-p1-name") || "Aarav";
-let p1Model = localStorage.getItem("setting-p1-model") || "Aarav";
-let p1OutfitColor = localStorage.getItem("setting-p1-outfit-color") || "#243f5e";
-let p1HairStyle = localStorage.getItem("setting-p1-hair-style") || "short";
+
+let p1Customization = {
+  model: "Aarav",
+  outfitColor: "#243f5e",
+  hairStyle: "short",
+  bodyScale: "average",
+  hasGlasses: false,
+  hasBackpack: false,
+  skinTone: "#e3a072"
+};
+
+try {
+  const savedP1 = localStorage.getItem("setting-p1-customization");
+  if (savedP1) {
+    p1Customization = JSON.parse(savedP1);
+  } else {
+    p1Customization.model = localStorage.getItem("setting-p1-model") || "Aarav";
+    p1Customization.outfitColor = localStorage.getItem("setting-p1-outfit-color") || "#243f5e";
+    p1Customization.hairStyle = localStorage.getItem("setting-p1-hair-style") || "short";
+  }
+} catch (e) {
+  console.error("Failed to parse P1 character customization setting", e);
+}
+
+let p1Model = p1Customization.model;
+let p1OutfitColor = p1Customization.outfitColor;
+let p1HairStyle = p1Customization.hairStyle;
+let p1BodyScale = p1Customization.bodyScale || "average";
+let p1HasGlasses = p1Customization.hasGlasses || false;
+let p1HasBackpack = p1Customization.hasBackpack || false;
+let p1SkinTone = p1Customization.skinTone || "#e3a072";
 let p2Name = localStorage.getItem("setting-p2-name") || "Rohan";
 let p2Model = localStorage.getItem("setting-p2-model") || "Rohan";
 let screenBrightness = parseFloat(localStorage.getItem("setting-brightness") || "1.25");
@@ -7860,6 +7888,22 @@ btnCharConfirm?.addEventListener("click", () => {
   p1Model = selectedVariant;
   p1OutfitColor = selectedOutfitColor;
   p1HairStyle = selectedHairStyle;
+  p1BodyScale = selectedBodyScale;
+  p1HasGlasses = selectedHasGlasses;
+  p1HasBackpack = selectedHasBackpack;
+  p1SkinTone = selectedSkinTone;
+
+  p1Customization = {
+    model: p1Model,
+    outfitColor: p1OutfitColor,
+    hairStyle: p1HairStyle,
+    bodyScale: p1BodyScale,
+    hasGlasses: p1HasGlasses,
+    hasBackpack: p1HasBackpack,
+    skinTone: p1SkinTone
+  };
+
+  localStorage.setItem("setting-p1-customization", JSON.stringify(p1Customization));
   localStorage.setItem("setting-p1-model", p1Model);
   localStorage.setItem("setting-p1-outfit-color", p1OutfitColor);
   localStorage.setItem("setting-p1-hair-style", p1HairStyle);
@@ -8388,6 +8432,8 @@ settingP1Name?.addEventListener("input", (event) => {
 settingP1Model?.addEventListener("change", (event) => {
   p1Model = event.target.value;
   localStorage.setItem("setting-p1-model", p1Model);
+  p1Customization.model = p1Model;
+  localStorage.setItem("setting-p1-customization", JSON.stringify(p1Customization));
   // Auto update default names
   if (settingP1Name && (settingP1Name.value === "Aarav" || settingP1Name.value === "Priya" || settingP1Name.value === "Prof. Kulkarni")) {
     p1Name = p1Model === "Kulkarni" ? "Prof. Kulkarni" : p1Model;

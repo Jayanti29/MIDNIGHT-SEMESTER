@@ -316,6 +316,25 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.25;
 renderer.xr.enabled = true;
 
+canvas.addEventListener("webglcontextlost", (event) => {
+  event.preventDefault();
+  if (fatalError) {
+    fatalError.innerHTML = `
+      <h2>WebGL Context Lost</h2>
+      <p>The graphics context was lost. Please reload the page to restart the game.</p>
+      <button id="reload-btn" style="margin-top: 15px; padding: 8px 16px; background: #c9a56d; color: #080706; border: none; cursor: pointer; font-weight: bold; border-radius: 4px;">Reload Game</button>
+    `;
+    fatalError.hidden = false;
+    document.getElementById("reload-btn")?.addEventListener("click", () => {
+      window.location.reload();
+    });
+  }
+}, false);
+
+canvas.addEventListener("webglcontextrestored", () => {
+  window.location.reload();
+}, false);
+
 const clock = new THREE.Clock();
 const keys = new Set();
 const interactables = [];

@@ -3231,10 +3231,7 @@ function buildCorridor() {
 
 function clearGroup(group) {
   if (!group) return;
-  while (group.children.length > 0) {
-    const child = group.children[0];
-    group.remove(child);
-  }
+  disposeLevel(group);
 }
 
 function loadLevel2() {

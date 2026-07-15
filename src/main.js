@@ -6849,6 +6849,7 @@ let selectRafId = null;
 let selectedVariant = "Aarav";
 let selectedOutfitColor = "#243f5e";
 let selectedHairStyle = "short";
+let selectedBodyScale = "average";
 
 function initCharacterSelect() {
   const selectCanvas = document.getElementById("char-preview-canvas");
@@ -6915,12 +6916,16 @@ function updatePreviewModel() {
     hairStyleOverride: selectedHairStyle
   });
 
+  let scaleMult = 1.0;
+  if (selectedBodyScale === "short") scaleMult = 0.88;
+  else if (selectedBodyScale === "tall") scaleMult = 1.12;
+
   if (selectedVariant === "Sam") {
-    selectMesh.scale.set(1.08, 1.08, 1.08);
+    selectMesh.scale.set(1.08 * scaleMult, 1.08 * scaleMult, 1.08 * scaleMult);
   } else if (selectedVariant === "Priya") {
-    selectMesh.scale.set(0.92, 0.94, 0.92);
+    selectMesh.scale.set(0.92 * scaleMult, 0.94 * scaleMult, 0.92 * scaleMult);
   } else {
-    selectMesh.scale.set(1.0, 1.0, 1.0);
+    selectMesh.scale.set(1.0 * scaleMult, 1.0 * scaleMult, 1.0 * scaleMult);
   }
 
   selectScene.add(selectMesh);
@@ -7684,7 +7689,30 @@ btnCharReset?.addEventListener("click", () => {
     selectedOutfitColor = "#56382a";
     selectedHairStyle = "cap";
   }
+  selectedBodyScale = "average";
+  const bodyScaleSlider = document.getElementById("body-scale-slider");
+  const bodyScaleLabel = document.getElementById("body-scale-label");
+  if (bodyScaleSlider) bodyScaleSlider.value = 1;
+  if (bodyScaleLabel) bodyScaleLabel.textContent = "AVERAGE";
   updateSwatchHighlights();
+  updatePreviewModel();
+});
+
+const bodyScaleSlider = document.getElementById("body-scale-slider");
+const bodyScaleLabel = document.getElementById("body-scale-label");
+
+bodyScaleSlider?.addEventListener("input", (e) => {
+  const val = parseInt(e.target.value);
+  if (val === 0) {
+    selectedBodyScale = "short";
+    if (bodyScaleLabel) bodyScaleLabel.textContent = "SHORT";
+  } else if (val === 1) {
+    selectedBodyScale = "average";
+    if (bodyScaleLabel) bodyScaleLabel.textContent = "AVERAGE";
+  } else {
+    selectedBodyScale = "tall";
+    if (bodyScaleLabel) bodyScaleLabel.textContent = "TALL";
+  }
   updatePreviewModel();
 });
 

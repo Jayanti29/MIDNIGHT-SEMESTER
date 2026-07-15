@@ -6976,6 +6976,8 @@ let charSelectActive = false;
 let selectScene, selectCamera, selectRenderer, selectMesh;
 let selectRafId = null;
 let activeEditingPlayer = 1;
+let selectAmbientLight, selectPointLight;
+let selectLightingMode = "night";
 
 let selectedVariant = "Aarav";
 let selectedOutfitColor = "#243f5e";
@@ -7003,6 +7005,18 @@ function initCharacterSelect() {
   const tabP2 = document.getElementById("btn-tab-p2");
   if (tabP1) tabP1.classList.add("active");
   if (tabP2) tabP2.classList.remove("active");
+
+  selectLightingMode = "night";
+  const btnCharLight = document.getElementById("btn-char-light");
+  if (btnCharLight) btnCharLight.textContent = "☀️ DAYLIGHT MODE";
+  if (selectAmbientLight) {
+    selectAmbientLight.intensity = 0.45;
+    selectAmbientLight.color.setHex(0xffecd9);
+  }
+  if (selectPointLight) {
+    selectPointLight.intensity = 1.8;
+    selectPointLight.color.setHex(0xfff5d9);
+  }
 
   selectedVariant = p1Model;
   selectedOutfitColor = p1OutfitColor;
@@ -7057,13 +7071,13 @@ function initCharacterSelect() {
     window.location.reload();
   }, false);
 
-  const ambient = new THREE.AmbientLight(0xffecd9, 0.45);
-  selectScene.add(ambient);
+  selectAmbientLight = new THREE.AmbientLight(0xffecd9, 0.45);
+  selectScene.add(selectAmbientLight);
 
-  const spot = new THREE.PointLight(0xfff5d9, 1.8, 10);
-  spot.position.set(0.6, 1.8, 1.2);
-  spot.castShadow = true;
-  selectScene.add(spot);
+  selectPointLight = new THREE.PointLight(0xfff5d9, 1.8, 10);
+  selectPointLight.position.set(0.6, 1.8, 1.2);
+  selectPointLight.castShadow = true;
+  selectScene.add(selectPointLight);
 
   updatePreviewModel();
 }
@@ -8175,6 +8189,34 @@ tabP2?.addEventListener("click", () => {
   updateSwatchHighlights();
   updatePreviewModel();
 });
+
+const btnCharLight = document.getElementById("btn-char-light");
+btnCharLight?.addEventListener("click", () => {
+  if (selectLightingMode === "night") {
+    selectLightingMode = "day";
+    if (btnCharLight) btnCharLight.textContent = "🌙 NIGHTLIGHT MODE";
+    if (selectAmbientLight) {
+      selectAmbientLight.intensity = 1.1;
+      selectAmbientLight.color.setHex(0xffffff);
+    }
+    if (selectPointLight) {
+      selectPointLight.intensity = 2.5;
+      selectPointLight.color.setHex(0xffffff);
+    }
+  } else {
+    selectLightingMode = "night";
+    if (btnCharLight) btnCharLight.textContent = "☀️ DAYLIGHT MODE";
+    if (selectAmbientLight) {
+      selectAmbientLight.intensity = 0.45;
+      selectAmbientLight.color.setHex(0xffecd9);
+    }
+    if (selectPointLight) {
+      selectPointLight.intensity = 1.8;
+      selectPointLight.color.setHex(0xfff5d9);
+    }
+  }
+});
+
 continueButton?.addEventListener("click", () => {
   coopMode = false;
   // Restore saved character directly from localStorage — skip the select screen

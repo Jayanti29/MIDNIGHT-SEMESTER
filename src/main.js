@@ -8058,15 +8058,31 @@ btnCharRandomize?.addEventListener("click", () => {
   const randColor = colors[Math.floor(Math.random() * colors.length)];
   const styles = ["short", "long", "cap", "buzzed", "ponytail"];
   const randStyle = styles[Math.floor(Math.random() * styles.length)];
+  
+  const scales = ["short", "average", "tall"];
+  const randScale = scales[Math.floor(Math.random() * scales.length)];
+  const randGlasses = Math.random() < 0.5;
+  const randBackpack = Math.random() < 0.5;
+  
+  const skinTones = ["#fcd0a1", "#fac08f", "#e3a072", "#a1683d", "#5c3818"];
+  const randSkin = skinTones[Math.floor(Math.random() * skinTones.length)];
 
   if (activeEditingPlayer === 1) {
     selectedVariant = randVar;
     selectedOutfitColor = randColor;
     selectedHairStyle = randStyle;
+    selectedBodyScale = randScale;
+    selectedHasGlasses = randGlasses;
+    selectedHasBackpack = randBackpack;
+    selectedSkinTone = randSkin;
   } else {
     selectedVariant2 = randVar;
     selectedOutfitColor2 = randColor;
     selectedHairStyle2 = randStyle;
+    selectedBodyScale2 = randScale;
+    selectedHasGlasses2 = randGlasses;
+    selectedHasBackpack2 = randBackpack;
+    selectedSkinTone2 = randSkin;
   }
 
   updateSwatchHighlights();

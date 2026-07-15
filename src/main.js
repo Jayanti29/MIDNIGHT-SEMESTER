@@ -8240,7 +8240,6 @@ function updateDossierPreview() {
   } else if (p1Model === "Priya") {
     polaroidImagePlaceholder.textContent = "👩‍🎓";
   } else if (p1Model === "Kulkarni") {
-    polaroidImagePlaceholder.textContent = "👨‍½"; // Grey hair professor symbol representation
     polaroidImagePlaceholder.innerHTML = "<span style='font-size: 2.2rem;'>👨‍🏫</span>";
   }
 }

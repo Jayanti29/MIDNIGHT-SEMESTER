@@ -416,6 +416,23 @@ function disposeRenderer(renderer) {
   }
 }
 
+function disposeLevel(group) {
+  if (!group) return;
+  group.traverse((child) => {
+    if (child.geometry) {
+      child.geometry.dispose();
+    }
+    if (child.material) {
+      if (Array.isArray(child.material)) {
+        child.material.forEach(disposeMaterial);
+      } else {
+        disposeMaterial(child.material);
+      }
+    }
+  });
+  group.clear();
+}
+
 function logPerformanceTelemetry(delta) {
   frameCount++;
   fpsSum += 1 / delta;

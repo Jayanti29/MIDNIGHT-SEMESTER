@@ -1,9 +1,19 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 338/500**
+Commit counter: **Commit 348/500**
 
 ## Commits Log
-- **Commit 337/500**: Phase 23 - Add keyboard navigation (ArrowLeft/Right/Up/Down) for swatch and candidate select lists.
+- **Commit 348/500**: Phase 24 (Track C) - chore: update PROGRESS.md and CHANGELOG.md with Track C audio module summary.
+- **Commit 347/500**: Phase 24 (Track C) - refactor: wire main.js audio calls through new audio module (remove duplicate AudioManager + buffer generators from main.js).
+- **Commit 346/500**: Phase 24 (Track C) - refactor: add modules/audio/index.js barrel export (AudioManager + sfx-buffers + voice-buffers).
+- **Commit 345/500**: Phase 24 (Track C) - refactor: extract dialogue/whisper buffer generators (createWhisperBuffer, createCreepyWhisperBuffer) to voice-buffers.js.
+- **Commit 344/500**: Phase 24 (Track C) - refactor: extract procedural SFX buffer generators (29 functions) to sfx-buffers.js.
+- **Commit 343/500**: Phase 24 (Track C) - refactor: extract AudioManager class to modules/audio/AudioManager.js, using state.ambientVolume from gameState.
+- **Commit 342/500**: Phase 24 (Track C) - refactor: introduce gameState.js for shared mutable state (GameState enum, coopMode, volume defaults from localStorage).
+- **Commit 341/500**: Phase 24 (Track C) - docs: add src/modules/README.md documenting module boundaries and architecture.
+- **Commit 340/500**: Phase 24 (Track C) - chore: create src/modules directory structure (audio, textures, level, character, player, interaction, minigames, npc, ui, flow, input, core).
+- **Commit 339/500**: Phase 23 - chore: update PROGRESS.md and CHANGELOG.md with Track B summary.
+- **Commit 338/500**: Phase 23 - Add keyboard navigation (ArrowLeft/Right/Up/Down) for swatch and candidate select lists.
 - **Commit 336/500**: Phase 23 - Add accessible aria-labels to all empty outfit shade and skin tone buttons in character selection.
 - **Commit 335/500**: Phase 23 - Implement validation sanitization helper `sanitizeCustomization()` with safe model-specific fallback defaults for startup variables loading and continue flows.
 - **Commit 334/500**: Phase 23 - Extend Randomize to cover body height scale, glasses, backpack, and skin tone.

@@ -5,6 +5,17 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.2.7-advanced] — 2026-07-16
+### Refactored
+- Introduced `src/modules/` directory structure with subdirectories for `audio`, `textures`, `level`, `character`, `player`, `interaction`, `minigames`, `npc`, `ui`, `flow`, `input`, and `core`.
+- Added `src/modules/README.md` documenting module boundaries and architecture overview.
+- Introduced `src/modules/gameState.js` exporting the shared `GameState` enum and a mutable `state` object (coopMode, volume controls with `localStorage` hydration).
+- Extracted `AudioManager` class into `src/modules/audio/AudioManager.js`, now reading `state.ambientVolume` and `state.sfxVolume` from the shared gameState module instead of closure variables.
+- Extracted 29 procedural Web Audio buffer generator functions (drone, footsteps, flashlight, doors, buzz, heartbeat, breath, EMF, jumpscare, UI sounds, and more) into `src/modules/audio/sfx-buffers.js`.
+- Extracted whisper and creepy-whisper buffer generators into `src/modules/audio/voice-buffers.js`.
+- Added `src/modules/audio/index.js` barrel export re-exporting `AudioManager`, `sfx-buffers`, and `voice-buffers`.
+- Wired all audio module exports into `src/main.js` via named imports; removed ~890 lines of duplicate definitions from `main.js`.
+
 ## [0.2.6-advanced] — 2026-07-16
 ### Added
 - Expanded outfit color choices from 3 to 8 palette shades.

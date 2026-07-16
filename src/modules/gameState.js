@@ -14,7 +14,7 @@ export const state = {
   hardcoreMode: false,
   
   // Volume controls
-  masterVolume: 1.0,
-  sfxVolume: 1.0,
-  ambientVolume: 1.0
+  masterVolume: parseFloat(localStorage.getItem("setting-master-volume") || "1.0"),
+  sfxVolume: parseFloat(localStorage.getItem("setting-sfx-volume") || "0.8"),
+  ambientVolume: parseFloat(localStorage.getItem("setting-ambient-volume") || "0.8")
 };

@@ -122,4 +122,24 @@ export class AudioManager {
       }
     });
   }
+
+  stopSound(name) {
+    const sound = this.activeSounds.get(name);
+    if (sound) {
+      if (sound.isPlaying) {
+        sound.stop();
+      }
+      if (sound.parent) {
+        sound.parent.remove(sound);
+      }
+      this.activeSounds.delete(name);
+    }
+  }
+
+  setVolume(name, volume) {
+    const sound = this.activeSounds.get(name);
+    if (sound) {
+      sound.setVolume(volume);
+    }
+  }
 }

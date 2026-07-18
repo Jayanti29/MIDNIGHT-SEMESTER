@@ -1,0 +1,14 @@
+{
+  "nodes": {
+    "start": {
+      "text": "Shh. This is a library. Can I help you find something?",
+      "choices": [
+        { "label": "Books on algorithms?", "next": "algo" },
+        { "label": "Where are the study rooms?", "next": "rooms" },
+        { "label": "Sorry, just passing through.", "next": "__end__" }
+      ]
+    },
+    "algo": { "text": "Section 4B, third shelf. Cormen and Sedgewick are both there.", "choices": [] },
+    "rooms": { "text": "Down the hall, turn left. First come, first served. Max 2 hours.", "choices": [] }
+  }
+}

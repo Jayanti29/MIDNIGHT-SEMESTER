@@ -220,3 +220,25 @@ Commit counter: **Commit 348/500**
 
 
 
+
+---
+## Track D — Module Scaffolding & Tooling (2026-07-18)
+
+### Completed
+- [x] All 12 module directories scaffolded with barrel exports
+- [x] Core engine: GameLoop, Renderer, EventBus, Camera, AssetLoader, DebugOverlay
+- [x] Player: Player, PlayerStats, Inventory + character system
+- [x] NPC: NPC, DialogueEngine + 4 dialogue JSON files
+- [x] Flow: FlowController, SaveManager, AchievementManager
+- [x] Mini-games: ExamPanic, CoffeeRush, DeadlineDash, MinigameManager
+- [x] UI: 10 components including HUD, menus, overlays
+- [x] Audio: AudioManager, sfx.js, dialogue.js fully consolidated
+- [x] Utils: math, time, storage, dom, async
+- [x] CSS design tokens, utility classes, component stylesheets
+- [x] Tooling: ESLint, Prettier, EditorConfig, jsconfig
+- [x] CI/CD: GitHub Actions lint + build workflows
+
+### Next Steps
+- [ ] Connect EventBus across all modules in main.js
+- [ ] First playable vertical slice
+- [ ] Populate campus-layout.json with full room data

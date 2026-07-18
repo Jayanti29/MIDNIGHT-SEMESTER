@@ -1,0 +1,20 @@
+{
+  "nodes": {
+    "start": {
+      "text": "Dude, are you seriously still awake? It's 3am.",
+      "choices": [
+        { "label": "I have an exam tomorrow.", "next": "exam" },
+        { "label": "I couldn't sleep.", "next": "sleep" }
+      ]
+    },
+    "exam": {
+      "text": "Sleep deprivation tanks your memory. Close the laptop.",
+      "choices": [
+        { "label": "You're right. Goodnight.", "next": "__end__" },
+        { "label": "Just one more hour.", "next": "stubborn" }
+      ]
+    },
+    "sleep": { "text": "Put on rain sounds. Use my speaker.", "choices": [] },
+    "stubborn": { "text": "Your funeral. I'm putting headphones on.", "choices": [] }
+  }
+}

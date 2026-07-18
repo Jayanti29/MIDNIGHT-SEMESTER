@@ -1,15 +1,21 @@
-# Midnight Semester ESM Modules
+# Module Boundaries
 
-This directory contains the modular ESM splits of the original `src/main.js` script. To maintain strict clean boundaries and avoid circular dependencies, the codebase is split as follows:
+| Module | Responsibility | Public API |
+|---|---|---|
+| `audio` | Web Audio SFX / music | `AudioManager` |
+| `character` | Sprite controller + animator | `CharacterController`, `CharacterAnimator` |
+| `core` | Game loop, renderer, event bus, camera | `GameLoop`, `Renderer`, `EventBus`, `Camera`, `AssetLoader`, `DebugOverlay` |
+| `flow` | Game state machine + save/load + achievements | `FlowController`, `SaveManager`, `AchievementManager` |
+| `input` | Keyboard / pointer state | `InputManager` |
+| `interaction` | Player↔world trigger zones | `InteractionSystem`, `Interactable` |
+| `level` | Level loading + room management | `LevelManager`, `Room`, `CollisionMap` |
+| `minigames` | Embedded mini-game logic | `ExamPanic`, `CoffeeRush`, `DeadlineDash`, `MinigameManager` |
+| `npc` | NPC AI + dialogue trees | `NPC`, `DialogueEngine` |
+| `player` | Player facade (stats + movement + inventory) | `Player`, `PlayerStats`, `Inventory` |
+| `textures` | Procedural canvas textures | `TextureGenerator` |
+| `ui` | HUD, menus, notifications, dialogs | `HUD`, `MainMenu`, `PauseMenu`, `NotificationManager`, `DialogueBox`, `Journal`, `LoadingScreen`, `InventoryUI`, `SettingsMenu` |
 
-## Module Map
-
-- **`gameState.js`**: Shared, centralized mutable state variables (e.g. `gameState`, `coopMode`, `fear`, etc.) and basic reactive state change listener patterns.
-- **`audio/`**: Orchestrates Promise-based Web Audio buffer caching, Category volumes, spatialized `PositionalAudio` sources, and ducking loops.
-  - `AudioManager.js`: Central core class for volume adjustments, playback tracking, and loading operations.
-  - `sfx-buffers.js`: Generates synthesized footsteps, clicks, locks, metronomes, clangs, and screens.
-  - `voice-buffers.js`: Monologue narration and professor dialogue buffers.
-- **`textures/`**: Keyed LRU procedural textures generators cache.
-- **`level/`**: Campus corridor builder utilities, light configurations, backup generator puzzles, and emergency pedestal saves.
-- **`character/`**: Humanoid skeletal rigs, procedural accessories, preset variant files, select renderer loops, and swatches triggers.
-- **`player/`**: Movement controllers, boundary collision, and dual viewport split-screen coordination.
+## Rules
+1. Modules communicate via `EventBus` — no direct cross-module imports.
+2. `gameState.js` is the single source of truth.
+3. All exported functions must have JSDoc comments.

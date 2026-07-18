@@ -124,3 +124,21 @@ This repository is currently a local Three.js horror prototype. It does not cont
 - Sanity checks are applied at startup `localStorage` parsing, option modifications, and the main menu `continueButton` restore loops.
 
 
+
+---
+## Track D Complete — 2026-07-18
+
+Module scaffolding pass complete. The project now has:
+- **12 feature modules** each with barrel exports and documented APIs
+- **5 utility modules** (math, time, storage, dom, async)
+- **10+ documentation files** covering every major system
+- **Comprehensive CSS** design tokens and utility classes
+- **Proper tooling**: ESLint, Prettier, EditorConfig, jsconfig
+- **CI/CD**: GitHub Actions lint and build workflows
+
+### Architecture decisions
+1. **Fixed-timestep game loop** — prevents physics inconsistencies
+2. **Procedural audio only** — no external files, small bundle
+3. **JSON dialogue trees** — writers author NPC conversations without touching code
+4. **CSS custom properties** — enables runtime theming
+5. **EventBus communication** — flat dependency graph, independently testable modules

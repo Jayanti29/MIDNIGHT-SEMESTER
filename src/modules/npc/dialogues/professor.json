@@ -1,0 +1,20 @@
+{
+  "nodes": {
+    "start": {
+      "text": "Ah, there you are. You look exhausted. Have you been sleeping at all this semester?",
+      "choices": [
+        { "label": "I'm fine, Professor Chen.", "next": "fine" },
+        { "label": "Not really… the workload is intense.", "next": "honest" }
+      ]
+    },
+    "fine": { "text": "Your last assignment tells a different story. Office hours are Tuesdays.", "choices": [] },
+    "honest": {
+      "text": "Honesty! Come to office hours — we can talk about extensions. Mental health matters.",
+      "choices": [
+        { "label": "Thank you, I'll come by.", "next": "thanks" },
+        { "label": "I'll manage on my own.", "next": "__end__" }
+      ]
+    },
+    "thanks": { "text": "Good. Tuesday, 2pm. Now get some rest.", "choices": [] }
+  }
+}

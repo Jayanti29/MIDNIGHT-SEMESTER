@@ -123,3 +123,26 @@ See [PROGRESS.md](PROGRESS.md) for the full 500-commit log and [NOTES.md](NOTES.
 *A final-year engineering student stays behind alone on campus to finish a project during semester break — and discovers the university has been quietly finishing something else since 2005.*
 
 Full narrative in the internal Story Bible (not included in this repository).
+
+## Module Structure
+All game logic lives under `src/modules/`. Each module exposes a public API via its `index.js`.
+See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full overview.
+
+## Quick Start
+```bash
+npm install && npm run dev
+```
+
+## Documentation
+| File | Contents |
+|---|---|
+| [ARCHITECTURE.md](docs/ARCHITECTURE.md) | High-level system design |
+| [CONTRIBUTING.md](docs/CONTRIBUTING.md) | Commit conventions & PR guide |
+| [AUDIO_SYSTEM.md](docs/AUDIO_SYSTEM.md) | Audio module docs |
+| [NPC_SYSTEM.md](docs/NPC_SYSTEM.md) | NPC dialogue & AI |
+| [MINIGAMES.md](docs/MINIGAMES.md) | Mini-game registry |
+| [LEVEL_DESIGN.md](docs/LEVEL_DESIGN.md) | Level & room schema |
+| [PLAYER_MECHANICS.md](docs/PLAYER_MECHANICS.md) | Stats & controls |
+| [TESTING.md](docs/TESTING.md) | Testing strategy |
+| [DEPLOYMENT.md](docs/DEPLOYMENT.md) | Build & deploy |
+| [ROADMAP.md](docs/ROADMAP.md) | Version milestones |

@@ -1,0 +1,22 @@
+{
+  "nodes": {
+    "start": {
+      "text": "Welcome to Campus Brew! The usual?",
+      "choices": [
+        { "label": "Double espresso, please.", "next": "espresso" },
+        { "label": "What do you recommend?", "next": "recommend" },
+        { "label": "Just water, I'm broke.", "next": "water" }
+      ]
+    },
+    "espresso": { "text": "Coming right up! That's $3.50.", "choices": [] },
+    "recommend": {
+      "text": "The oat milk latte. Basically a hug in a cup. $4.75.",
+      "choices": [
+        { "label": "I'll take one.", "next": "latte" },
+        { "label": "Maybe next time.", "next": "__end__" }
+      ]
+    },
+    "latte": { "text": "Great choice! Coming right up.", "choices": [] },
+    "water": { "text": "No worries — water's always free. Stay hydrated!", "choices": [] }
+  }
+}

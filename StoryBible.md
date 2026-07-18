@@ -109,3 +109,25 @@ Player who skips most collectibles just escapes through the generator room witho
 - A prequel DLC playable as Meera during the 2004 trial itself (found-footage/log style, shorter format).
 - New Game+ mode with all case-file documents visible from the start, changing the horror from "discovery" to "dread of what you already know is coming."
 - Multiple-endings achievement/epilogue gallery unlocked after first completion.
+
+---
+## Update — 2026-07-18
+
+### Endings Detail
+
+| Ending | Condition | Final Scene |
+|---|---|---|
+| **Graduate** | GPA ≥ 3.0 AND Social ≥ 60 | Graduation ceremony, letter from Professor Chen |
+| **Dropout** | GPA < 2.0 | Packing boxes in the dorm, bittersweet monologue |
+| **Burned Out** | Stress = 100 | Waking up in the campus clinic, reflective ending |
+
+### Campus Rooms (v0.3.0 target)
+1. **Dormitory** — starting room, has computer, bed, roommate NPC
+2. **Main Hall** — hub, connects to all buildings
+3. **Library** — ExamPanic mini-game trigger, Librarian NPC
+4. **Cafeteria** — CoffeeRush mini-game, Barista NPC, energy refill
+5. **Science Block** — DeadlineDash mini-game, late-night study spots
+
+### Character Arc Notes
+The player character starts overwhelmed and ends — depending on choices — either
+resilient, defeated, or transformed. All endings avoid cheap moralising.

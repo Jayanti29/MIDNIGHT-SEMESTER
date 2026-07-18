@@ -323,3 +323,20 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Error monitoring: `LoadingManager` errors, `window.onerror`, WebGL context-lost handler
 - `PROGRESS.md` tracking 500-commit budget
 - `NOTES.md` audit (broken/missing systems at start)
+
+## [0.2.0] — 2026-07-18
+
+### Added
+- 10 documentation files in `docs/`
+- 12 module directories fully scaffolded with barrel exports
+- Core engine: `GameLoop`, `Renderer`, `EventBus`, `Camera`, `AssetLoader`, `DebugOverlay`
+- Player system: `Player`, `PlayerStats`, `Inventory`
+- NPC system: `NPC`, `DialogueEngine`, 4 dialogue JSON files
+- Game flow: `FlowController`, `SaveManager`, `AchievementManager`
+- Mini-games: `ExamPanic`, `CoffeeRush`, `DeadlineDash`, `MinigameManager`
+- UI: `HUD`, `MainMenu`, `PauseMenu`, `NotificationManager`, `DialogueBox`, `Journal`, `LoadingScreen`, `InventoryUI`, `SettingsMenu`, `AchievementPopup`
+- Utilities: `math.js`, `time.js`, `storage.js`, `dom.js`, `async.js`
+- CSS design tokens and utility classes
+- Tooling: ESLint, Prettier, EditorConfig, jsconfig, vite path aliases
+- GitHub Actions: lint.yml, build.yml
+- GitHub: issue templates, PR template

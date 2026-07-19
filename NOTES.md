@@ -153,3 +153,4 @@ Module scaffolding pass complete. The project now has:
 - Player movement responsive, speed slightly increased
 - Flashlight brightness significantly improved for horror atmosphere
 - Battery lasts longer for more exploration time
+- Darkness sanity drain reduced to give players more time to react

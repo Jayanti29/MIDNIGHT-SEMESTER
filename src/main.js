@@ -8093,7 +8093,7 @@ if (savedFov) {
   camera.updateProjectionMatrix();
   settingFov.value = savedFov;
 } else {
-  settingFov.value = 72;
+  settingFov.value = 75;
 }
 
 const savedSubtitles = localStorage.getItem("setting-subtitles");

@@ -150,3 +150,4 @@ Module scaffolding pass complete. The project now has:
 - Brightness fix: initial exposure of 2.0 instead of 1.25, ambient hemisphere boosted from 0.35 to 0.65
 
 ## Game Feel Pass (2026-07-19)
+- Player movement responsive, speed slightly increased

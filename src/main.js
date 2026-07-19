@@ -3671,7 +3671,7 @@ function updateMovement(delta) {
     caption.textContent = "Aarav is winded. Release Shift to recover.";
   }
   if (!wantsSprint && stamina > 35) sprintExhausted = false;
-  const speed = sprint ? 5.4 : 3.0;
+  const speed = sprint ? 5.8 : 3.2;
   
   // Player 1 Mouse / Keyboard Look (if not using split-screen keyboard keys, P1 can look with mouse, but if shared keyboard let's allow arrow keys only if NOT co-op mode)
   let lookX = 0;

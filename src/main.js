@@ -3686,6 +3686,7 @@ function updateMovement(delta) {
 
   const direction = new THREE.Vector3(strafe, 0, -forward).normalize().multiplyScalar(speed * delta);
   direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
+  moveDirection.copy(direction).normalize();
   const candidate = camera.position.clone().add(direction);
   if (canOccupy(candidate)) {
     camera.position.copy(candidate);
@@ -3749,6 +3750,7 @@ function updateMovement(delta) {
 
     const direction2 = new THREE.Vector3(gpStrafe, 0, gpForward).normalize().multiplyScalar(speed2 * delta);
     direction2.applyAxisAngle(new THREE.Vector3(0, 1, 0), player2Yaw);
+    moveDirection2.copy(direction2).normalize();
     const candidate2 = camera2.position.clone().add(direction2);
     if (canOccupy(candidate2)) {
       camera2.position.copy(candidate2);

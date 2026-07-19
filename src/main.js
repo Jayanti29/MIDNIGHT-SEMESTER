@@ -4762,7 +4762,7 @@ function updateState(delta) {
     shakeOffset.y += (Math.random() - 0.5) * 0.03 * sanityIntensity * camShakeMultiplier;
     camera.rotation.z += Math.sin(clock.elapsedTime * 6) * 0.02 * sanityIntensity * camShakeMultiplier;
   }
-  if (p1HeartRate > 90) {
+  if (p1HeartRate > 80) {
     const hrIntensity = (p1HeartRate - 90) / 80;
     const pulseSpeed = (p1HeartRate / 60) * Math.PI * 2;
     camera.rotation.z += Math.sin(clock.elapsedTime * pulseSpeed) * 0.03 * hrIntensity * camShakeMultiplier;
@@ -6087,7 +6087,7 @@ function animate() {
     renderer.setViewport(0, 0, window.innerWidth, window.innerHeight);
     if (filmPass) {
       filmPass.uniforms.time.value = clock.elapsedTime * 60.0;
-      if (p1HeartRate > 90) {
+      if (p1HeartRate > 80) {
         const shift = Math.min(1.0, (p1HeartRate - 90) / 80);
         filmPass.uniforms.redShiftAmount.value = shift * 0.5;
         filmPass.uniforms.desaturationAmount.value = shift * 0.65;

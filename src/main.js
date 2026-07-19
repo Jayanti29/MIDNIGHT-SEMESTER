@@ -3402,7 +3402,7 @@ function addAtmosphere() {
 
   const dustGeometry = new THREE.BufferGeometry();
   const positions = [];
-  for (let i = 0; i < 950; i += 1) {
+  for (let i = 0; i < 1200; i += 1) {
     positions.push(
       (Math.random() - 0.5) * 7.4,
       Math.random() * 3.3 + 0.25,

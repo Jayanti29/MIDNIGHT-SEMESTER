@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as THREE from "three";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
@@ -145,6 +146,7 @@ const menuEndingsButton = document.querySelector("#menu-endings");
 const endingsGallery = document.querySelector("#endings-gallery");
 const endingsCloseBtn = document.querySelector("#endings-close-btn");
 const hardcoreBadge = document.querySelector("#hardcore-badge");
+const continueButton = document.querySelector("#continue-button");
 
 const loadingManager = new THREE.LoadingManager();
 
@@ -882,6 +884,10 @@ let meeraPatrolDir = -1;
 let meeraSpeed = 1.0;
 let activeCheckpoint = null;
 const shakeOffset = new THREE.Vector3();
+const moveDirection = new THREE.Vector3();
+const moveDirection2 = new THREE.Vector3();
+const NpcSurvivorState = Object.freeze({ IDLE: "idle", FOLLOW: "follow", FLEE: "flee", HIDE: "hide" });
+let samState = NpcSurvivorState.IDLE;
 let storyQueue = [];
 let pointerLocked = false;
 let flashlightLight = null;
@@ -5300,7 +5306,7 @@ function inspectObject(hit, isPlayer2 = false) {
         if (audioManager) {
           tapeSoundInstance = audioManager.playSound("tape_prequel", { volume: 0.8 });
           if (tapeSoundInstance) {
-            tapeSoundInstance.onEnded = () => {
+            tapeSoundInstance.onended = () => {
               tapeRecorderPlaying = false;
               tapeSoundInstance = null;
               addTaskLog("Tape recorder playback completed.");

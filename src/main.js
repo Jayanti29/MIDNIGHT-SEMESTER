@@ -4037,7 +4037,7 @@ function updateState(delta) {
     p1Sanity = 100;
   } else {
     const depthFear = THREE.MathUtils.clamp((-camera.position.z - 6) * 1.7, 0, 58);
-    const darknessFear = flashlightOn ? 0 : 24;
+    const darknessFear = flashlightOn ? 0 : 18;
     fear = THREE.MathUtils.lerp(fear, depthFear + darknessFear + inspected * 5, delta * 0.9);
     if (fear >= 100 && gameState === GameState.PLAYING) {
       triggerGameOver("Aarav's heart could not take the terror. The dark claimed him.");

@@ -156,3 +156,4 @@ Module scaffolding pass complete. The project now has:
 - Darkness sanity drain reduced to give players more time to react
 - Vignette and FOV defaults improved for immersion without blindness
 - Shadow figures appear less frequently for better pacing
+- Meera AI slightly slower to give player fair chase gameplay

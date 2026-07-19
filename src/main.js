@@ -5988,7 +5988,7 @@ function animate() {
     // Shadow figures spawn logic
     shadowSpawnTimer -= delta;
     if (shadowSpawnTimer <= 0) {
-      shadowSpawnTimer = 12.0 + Math.random() * 10.0;
+      shadowSpawnTimer = 15.0 + Math.random() * 12.0;
       const targetSanity = coopMode ? Math.min(p1Sanity, p2Sanity) : p1Sanity;
       if (targetSanity < 45) {
         const activeCam = (coopMode && p2Sanity < p1Sanity) ? camera2 : camera;

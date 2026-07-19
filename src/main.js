@@ -881,7 +881,7 @@ const AiState = {
 };
 let meeraState = AiState.INACTIVE;
 let meeraPatrolDir = -1;
-let meeraSpeed = 1.0;
+let meeraSpeed = 0.9;
 let activeCheckpoint = null;
 const shakeOffset = new THREE.Vector3();
 const moveDirection = new THREE.Vector3();

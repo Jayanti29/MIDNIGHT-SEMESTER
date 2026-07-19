@@ -152,3 +152,4 @@ Module scaffolding pass complete. The project now has:
 ## Game Feel Pass (2026-07-19)
 - Player movement responsive, speed slightly increased
 - Flashlight brightness significantly improved for horror atmosphere
+- Battery lasts longer for more exploration time

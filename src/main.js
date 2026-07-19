@@ -5975,7 +5975,7 @@ function animate() {
 
   // Handle sanity creepy whispers looping audio triggers
   if (gameState === GameState.PLAYING) {
-    if (p1Sanity < 45 || (coopMode && p2Sanity < 45)) {
+    if (p1Sanity < 50 || (coopMode && p2Sanity < 50)) {
       creepyWhisperTimer -= delta;
       if (creepyWhisperTimer <= 0) {
         creepyWhisperTimer = 16.0 + Math.random() * 12.0;

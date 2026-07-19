@@ -3374,7 +3374,7 @@ function initLoreNotes() {
 
 function addAtmosphere() {
   scene.add(new THREE.HemisphereLight(0x8899aa, 0x302820, 0.65));
-  const moon = new THREE.DirectionalLight(0xb0c6ff, 0.72);
+  const moon = new THREE.DirectionalLight(0xb8d0ff, 0.95);
   moon.position.set(-5, 9, 9);
   moon.castShadow = true;
   scene.add(moon);

@@ -351,3 +351,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Improved**: Default screen brightness raised from 1.25 to 2.0 (was too dark to navigate)
 - **Improved**: Ambient hemisphere light intensity increased for better visibility
 - **Improved**: Brightness slider max extended to 3.5 for ultra-bright accessibility option
+
+## [Balance] 2026-07-19 — Game Feel Improvements
+- **Fix**: moveDirection/moveDirection2 now sync properly each frame for skeleton animations
+- **Fix**: tapeSoundInstance.onended casing bug fixed (was onEnded)
+- **Fix**: continueButton now properly queried from DOM (#continue-button)
+- **Fix**: samState variable declared with NpcSurvivorState enum
+- **Feat**: Flashlight intensity boosted 5.5 → 8.0, wider cone for better visibility
+- **Feat**: Moon directional light 0.72 → 0.95 intensity
+- **Feat**: Player speed increased slightly (3.0 → 3.2, sprint 5.4 → 5.8)
+- **Balance**: Stamina drain reduced, recovery improved
+- **Balance**: Battery drain reduced 1.15 → 0.85/s
+- **Balance**: Darkness fear drain 24 → 18/s
+- **Balance**: Shadow figure spawn interval lengthened
+- **Feat**: Default vignette lowered to 0.7 for better visibility
+- **Feat**: Default FOV updated to 75
+- **Feat**: Camera shake default reduced to 0.7

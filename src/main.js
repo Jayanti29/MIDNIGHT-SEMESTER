@@ -3932,7 +3932,7 @@ function updateState(delta) {
   }
 
   const batteryMultiplier = hardcoreMode ? 1.6 : 1.0;
-  if (flashlightOn && !infiniteBatteryActive) battery = Math.max(0, battery - delta * 1.15 * batteryMultiplier);
+  if (flashlightOn && !infiniteBatteryActive) battery = Math.max(0, battery - delta * 0.85 * batteryMultiplier);
   if (battery <= 0 && flashlightOn) setFlashlight(false);
 
   if (emfActive && !infiniteBatteryActive) {
@@ -4220,7 +4220,7 @@ function updateState(delta) {
 
   // Player 2 Flashlight, Battery, and Fear updates
   if (coopMode && camera2 && player2Flashlight) {
-    if (flashlightOn2 && !infiniteBatteryActive) battery2 = Math.max(0, battery2 - delta * 1.15 * batteryMultiplier);
+    if (flashlightOn2 && !infiniteBatteryActive) battery2 = Math.max(0, battery2 - delta * 0.85 * batteryMultiplier);
     if (battery2 <= 0 && flashlightOn2) setFlashlight2(false);
 
     if (emfActive2 && !infiniteBatteryActive) {

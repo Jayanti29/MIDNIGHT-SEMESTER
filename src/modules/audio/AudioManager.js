@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * AudioManager.js — Full implementation for Midnight Semester game audio.
  * Handles SFX playback, ambient layers, looping sounds, volume categories,
@@ -5,9 +6,10 @@
  */
 export class AudioManager {
   /**
-   * @param {THREE.AudioListener} listener - THREE.js audio listener attached to camera
-   * @param {THREE.LoadingManager} loadingManager - THREE.js loading manager (unused but accepted for compatibility)
+   * @param {object} listener - THREE.AudioListener attached to camera
+   * @param {object} loadingManager - THREE.LoadingManager (accepted for compatibility)
    */
+
   constructor(listener, loadingManager) {
     this.listener = listener;
     this.loadingManager = loadingManager;

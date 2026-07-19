@@ -3379,7 +3379,7 @@ function addAtmosphere() {
   moon.castShadow = true;
   scene.add(moon);
 
-  const flashlight = new THREE.SpotLight(0xffe0a4, 5.5, 30, Math.PI / 6.5, 0.6, 1.0);
+  const flashlight = new THREE.SpotLight(0xffe0a4, 8.0, 32, Math.PI / 6.0, 0.55, 1.0);
   flashlight.position.set(0, 0, 0);
   flashlight.target.position.set(0, 0, -1);
   flashlight.map = createFlashlightCookie(); // Project realistic lens dust cookie

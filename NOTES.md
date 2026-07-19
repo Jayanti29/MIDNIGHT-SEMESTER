@@ -148,3 +148,5 @@ Module scaffolding pass complete. The project now has:
 - Secondary issue: audio/index.js did not re-export any of the 37 sfx-buffer functions
 - Tertiary: colliders const reassignment caused Vite esbuild dependency scan failure
 - Brightness fix: initial exposure of 2.0 instead of 1.25, ambient hemisphere boosted from 0.35 to 0.65
+
+## Game Feel Pass (2026-07-19)

@@ -3664,7 +3664,7 @@ function updateMovement(delta) {
   const wantsSprint = keys.has("ShiftLeft");
   const moving = forward !== 0 || strafe !== 0;
   const sprint = wantsSprint && moving && stamina > 0 && !sprintExhausted;
-  stamina = THREE.MathUtils.clamp(stamina + (sprint ? -34 : 22) * delta, 0, 100);
+  stamina = THREE.MathUtils.clamp(stamina + (sprint ? -28 : 24) * delta, 0, 100);
   if (sprint) statStaminaDrained += 34 * delta;
   if (stamina <= 0 && !sprintExhausted) {
     sprintExhausted = true;

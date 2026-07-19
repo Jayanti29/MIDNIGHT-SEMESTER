@@ -157,3 +157,4 @@ Module scaffolding pass complete. The project now has:
 - Vignette and FOV defaults improved for immersion without blindness
 - Shadow figures appear less frequently for better pacing
 - Meera AI slightly slower to give player fair chase gameplay
+- Camera shake default lowered to 0.7 to reduce motion sickness

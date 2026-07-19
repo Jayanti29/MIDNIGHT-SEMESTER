@@ -3,7 +3,7 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import campusLayoutData from "./campus-layout.json";
-import { state } from "./modules/gameState.js";
+// gameState module (not used directly — main.js manages state internally)
 import {
   AudioManager,
   createProceduralDroneBuffer,
@@ -212,7 +212,7 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.25;
+renderer.toneMappingExposure = 2.0;
 renderer.xr.enabled = true;
 
 canvas.addEventListener("webglcontextlost", (event) => {
@@ -376,7 +376,7 @@ let p2BodyScale = p2Customization.bodyScale;
 let p2HasGlasses = p2Customization.hasGlasses;
 let p2HasBackpack = p2Customization.hasBackpack;
 let p2SkinTone = p2Customization.skinTone;
-let screenBrightness = parseFloat(localStorage.getItem("setting-brightness") || "1.25");
+let screenBrightness = parseFloat(localStorage.getItem("setting-brightness") || "2.0");
 let xrSession = null;
 let activeLineTimer = 0;
 let introPlayed = false;
@@ -3367,7 +3367,7 @@ function initLoreNotes() {
 }
 
 function addAtmosphere() {
-  scene.add(new THREE.HemisphereLight(0x6d766f, 0x080706, 0.35));
+  scene.add(new THREE.HemisphereLight(0x8899aa, 0x302820, 0.65));
   const moon = new THREE.DirectionalLight(0xb0c6ff, 0.72);
   moon.position.set(-5, 9, 9);
   moon.castShadow = true;
@@ -4139,7 +4139,8 @@ function updateState(delta) {
 
   const feedNoise = document.getElementById("cctv-feed-noise");
   if (feedNoise && document.getElementById("security-terminal-modal")?.style.display === "block") {
-    const distToGhost = camera.position.distanceTo(meera.position);
+    const meeraChar = scene.userData.meeraCharacter;
+    const distToGhost = meeraChar ? camera.position.distanceTo(meeraChar.position) : 9999;
     if (distToGhost < 8.0) {
       feedNoise.style.background = `rgba(0, 255, 51, ${0.08 + Math.random() * 0.15})`;
     } else {
@@ -5469,7 +5470,8 @@ function inspectObject(hit, isPlayer2 = false) {
   if (type === "security_door") {
     if (academicDoorUnlocked) {
       hit.object.visible = false;
-      colliders = colliders.filter(c => c.name !== "academic_door");
+      const acadIdx = colliders.findIndex(c => c.name === "academic_door");
+      if (acadIdx !== -1) colliders.splice(acadIdx, 1);
       caption.textContent = "You opened the Classroom Annex door.";
       if (audioManager) audioManager.playSound("door_creak", { volume: 0.5 });
     } else {

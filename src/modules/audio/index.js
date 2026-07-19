@@ -1,3 +1,42 @@
 export { AudioManager }                      from './AudioManager.js';
 export { generateNoiseBurst, generateBlip }  from './sfx.js';
 export { generateWhisper }                   from './dialogue.js';
+export {
+  createProceduralDroneBuffer,
+  createConcreteStepBuffer,
+  createTileStepBuffer,
+  createFlashlightClickOnBuffer,
+  createFlashlightClickOffBuffer,
+  createDoorCreakBuffer,
+  createDoorLatchBuffer,
+  createBuzzBuffer,
+  createBlackoutCueBuffer,
+  createGeneratorStartBuffer,
+  createUiHoverBuffer,
+  createDebrisImpactBuffer,
+  createUiSelectBuffer,
+  createUiPauseOpenBuffer,
+  createUiPauseCloseBuffer,
+  createPhoneRingBuffer,
+  createTickingBuffer,
+  createTapePrequelBuffer,
+  createEmfTickBuffer,
+  createHeartBeatSlowBuffer,
+  createHeartBeatFastBuffer,
+  createBreathInBuffer,
+  createBreathOutBuffer,
+  createPillConsumeBuffer,
+  createJumpscareStingerBuffer,
+  createTerminalBeepBuffer,
+  createDecryptSuccessBuffer,
+  createLockerShakeBuffer,
+  createDrawerSlideBuffer,
+  createRadioStaticBuffer,
+  createCameraSwitchBuffer,
+  createStrobeBuzzBuffer,
+  createDoorUnlockBeepBuffer,
+  createButtonClickBuffer,
+  createPaperRustleBuffer,
+  createDecryptFailureBuffer
+} from './sfx-buffers.js';
+export { createWhisperBuffer, createCreepyWhisperBuffer } from './voice-buffers.js';

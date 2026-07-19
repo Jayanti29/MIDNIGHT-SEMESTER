@@ -340,3 +340,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Tooling: ESLint, Prettier, EditorConfig, jsconfig, vite path aliases
 - GitHub Actions: lint.yml, build.yml
 - GitHub: issue templates, PR template
+
+## [Hotfix] 2026-07-19 — Critical Bug Fixes
+- **Fixed**: `const colliders` reassignment crash in security door handler (replaced with findIndex/splice)
+- **Fixed**: `AudioManager` stub replaced with full implementation (playSound, buffers, fadeAmbientOut, duckAmbient, updateCategoryVolumes)
+- **Fixed**: `audio/index.js` now re-exports all 37 procedural SFX buffer functions from sfx-buffers.js
+- **Fixed**: `voice-buffers.js` exports (createWhisperBuffer, createCreepyWhisperBuffer) now available
+- **Fixed**: Undefined `meera` reference replaced with `scene.userData.meeraCharacter`
+- **Fixed**: `gameState.js` import corrected (was `{ state }`, module exports `gameState`)
+- **Improved**: Default screen brightness raised from 1.25 to 2.0 (was too dark to navigate)
+- **Improved**: Ambient hemisphere light intensity increased for better visibility
+- **Improved**: Brightness slider max extended to 3.5 for ultra-bright accessibility option

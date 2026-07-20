@@ -1964,3 +1964,5 @@ body:not(.coop-active) #breath-minigame-p1 {
 /* Subtitle size clamp values to adjust viewport scales */
 
 /* Custom solid borders for dossier folder buttons */
+
+/* Smooth cubic bezier easing for buttons transition */

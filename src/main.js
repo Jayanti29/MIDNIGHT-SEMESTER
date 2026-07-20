@@ -2634,6 +2634,22 @@ function loadLevel2() {
   yaw = 0;
   pitch = 0;
 
+  if (camera2) {
+    camera2.position.set(0.8, 1.7, 8);
+    camera2.rotation.set(0, 0, 0);
+    player2Yaw = 0;
+    player2Pitch = 0;
+  }
+
+  if (scene.userData.player1Character) {
+    scene.userData.player1Character.position.set(0, 0, 8);
+    scene.userData.player1Character.rotation.set(0, 0, 0);
+  }
+  if (player2Character) {
+    player2Character.position.set(0.8, 0, 8);
+    player2Character.rotation.set(0, 0, 0);
+  }
+
   caption.textContent = "A cold, damp basement smell. Backup batteries hum in the dark.";
   sayLine("Aarav", "I'm in... it's completely sealed. The generator room should be down the hall.");
   

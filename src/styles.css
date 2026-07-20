@@ -1924,3 +1924,7 @@ body:not(.coop-active) #breath-minigame-p1 {
 :root {
   --stamp-transition-time: 0.4s;
 }
+
+:root {
+  --terminal-glow-offset: 2px;
+}

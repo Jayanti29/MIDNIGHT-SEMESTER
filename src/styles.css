@@ -1908,3 +1908,7 @@ body:not(.coop-active) #breath-minigame-p1 {
 :root {
   --menu-blur-amount: 8px;
 }
+
+:root {
+  --hud-pulse-scale: 1.05;
+}

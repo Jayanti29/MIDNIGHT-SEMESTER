@@ -6747,6 +6747,7 @@ function resetGame() {
     tapeSoundInstance = null;
   }
   tapeRecorderPlaying = false;
+  if (taskLogList) taskLogList.innerHTML = "";
 
   if (emfActive) setEmfActive(false);
   if (emfActive2) setEmfActive2(false);

@@ -4580,11 +4580,12 @@ function updateState(delta) {
               activeNoiseEventZ = null;
             }
           } else {
+            let targetX = 0; // default: hallway center
             if (currentLevel === 2 && Math.abs(meera.position.z - (-10)) < 1.0 && Math.random() < 0.01) {
-              meera.position.x = -3.0; // patrols library
-            } else {
-              meera.position.x = 0; // return to hallway
+              targetX = -3.0; // patrols library occasionally
             }
+            // Smoothly lerp toward target X rather than snapping to 0 instantly
+            meera.position.x = THREE.MathUtils.lerp(meera.position.x, targetX, delta * 2.5);
             meera.position.z += meeraPatrolDir * meeraSpeed * delta;
             const zMin = currentLevel === 1 ? -45 : -35;
             const zMax = currentLevel === 1 ? -16 : 8;
@@ -4594,7 +4595,6 @@ function updateState(delta) {
               meeraPatrolDir = -1;
             }
           }
-          meera.position.x = THREE.MathUtils.lerp(meera.position.x, 0, delta * 3);
         } else if (meeraState === AiState.CHASE && targetCamera) {
           meeraSpeed = ((currentLevel === 2 ? 1.48 : 1.6) + (targetFear / 160)) * meeraSpeedMultiplier;
           const toPlayer = new THREE.Vector3().subVectors(targetCamera.position, meera.position);

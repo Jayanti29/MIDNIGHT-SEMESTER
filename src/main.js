@@ -7377,10 +7377,12 @@ btnCharConfirm?.addEventListener("click", () => {
     localStorage.setItem("setting-p2-model", p2Model);
   }
 
+  resetGame();
   startGame();
 });
 
 startButton.addEventListener("click", () => {
+  activeCheckpoint = null;
   hardcoreMode = false;
   coopMode = false;
   startScreen.classList.add("hidden");
@@ -7390,6 +7392,7 @@ startButton.addEventListener("click", () => {
   animateCharacterSelect();
 });
 startPlusButton?.addEventListener("click", () => {
+  activeCheckpoint = null;
   hardcoreMode = true;
   coopMode = false;
   startScreen.classList.add("hidden");
@@ -7399,6 +7402,7 @@ startPlusButton?.addEventListener("click", () => {
   animateCharacterSelect();
 });
 coopButton.addEventListener("click", () => {
+  activeCheckpoint = null;
   hardcoreMode = false;
   coopMode = true;
   startScreen.classList.add("hidden");

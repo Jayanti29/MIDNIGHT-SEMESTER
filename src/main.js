@@ -6834,6 +6834,11 @@ function resetGame() {
   const hudP2 = document.querySelector("#hud-p2");
   if (hudP2) hudP2.style.display = "none";
 
+  const bMinigameP1 = document.getElementById("breath-minigame-p1");
+  if (bMinigameP1) bMinigameP1.style.display = "none";
+  const bMinigameP2 = document.getElementById("breath-minigame-p2");
+  if (bMinigameP2) bMinigameP2.style.display = "none";
+
   if (reticleP1) {
     reticleP1.style.left = "50%";
   }

@@ -1940,3 +1940,5 @@ body:not(.coop-active) #breath-minigame-p1 {
 :root {
   --vignette-focus-opacity: 0.95;
 }
+
+/* Root variables for core theme configuration */

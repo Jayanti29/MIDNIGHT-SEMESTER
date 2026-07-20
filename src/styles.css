@@ -1952,3 +1952,5 @@ body:not(.coop-active) #breath-minigame-p1 {
 /* Overlay styling for full-screen menu states */
 
 /* Start menu placement using CSS grid alignment */
+
+/* Transition rules for toggling overlay opacity */

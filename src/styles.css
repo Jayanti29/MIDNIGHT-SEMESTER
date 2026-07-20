@@ -1904,3 +1904,7 @@ body:not(.coop-active) #breath-minigame-p1 {
 :root {
   --scrollbar-transition: 0.3s;
 }
+
+:root {
+  --menu-blur-amount: 8px;
+}

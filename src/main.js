@@ -3829,7 +3829,7 @@ function updateState(delta) {
 
   if (gameState === GameState.MENU) return;
   
-  if (gameState === GameState.PLAYING && !blackoutTriggered && camera.position.z < -10) {
+  if (gameState === GameState.PLAYING && !blackoutTriggered && camera.position.z < -24) {
     blackoutTriggered = true;
     triggerBlackoutSequence();
   }

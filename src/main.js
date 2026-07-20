@@ -5282,6 +5282,14 @@ function inspectObject(hit, isPlayer2 = false) {
         searchedCabinets: Array.from(searchedCabinets),
         decryptedLogsCount: decryptedLogsCount
       };
+      try {
+        localStorage.setItem("ms_active_checkpoint", JSON.stringify(activeCheckpoint));
+        if (continueButton) {
+          continueButton.style.display = "block";
+        }
+      } catch (e) {
+        console.error("Failed to save active checkpoint to localStorage:", e);
+      }
       caption.textContent = "Progress checkpoint saved.";
       sayLine(playerName, "A backup power console. The terminal says security log saved.");
       if (audioManager) {

@@ -8170,6 +8170,10 @@ if (unlockedEndings.length > 0 && startPlusButton) {
   startPlusButton.style.display = "block";
 }
 
+if (!activeCheckpoint && continueButton) {
+  continueButton.style.display = "none";
+}
+
 menuEndingsButton?.addEventListener("click", openEndingsGallery);
 endingsCloseBtn?.addEventListener("click", () => {
   endingsGallery.style.display = "none";

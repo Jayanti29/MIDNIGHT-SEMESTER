@@ -6007,7 +6007,7 @@ function animate() {
       shadowSpawnTimer = 15.0 + Math.random() * 12.0;
       const targetSanity = coopMode ? Math.min(p1Sanity, p2Sanity) : p1Sanity;
       if (targetSanity < 45) {
-        const activeCam = (coopMode && p2Sanity < p1Sanity) ? camera2 : camera;
+        const activeCam = (coopMode && p2Sanity < p1Sanity && camera2) ? camera2 : camera;
         const forwardDir = new THREE.Vector3(0, 0, -1).applyQuaternion(activeCam.quaternion);
         forwardDir.y = 0;
         forwardDir.normalize();

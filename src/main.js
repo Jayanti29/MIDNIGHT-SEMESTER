@@ -7399,6 +7399,8 @@ btnCharConfirm?.addEventListener("click", () => {
 
 startButton.addEventListener("click", () => {
   activeCheckpoint = null;
+  localStorage.removeItem("ms_active_checkpoint");
+  if (continueButton) continueButton.style.display = "none";
   hardcoreMode = false;
   coopMode = false;
   startScreen.classList.add("hidden");
@@ -7409,6 +7411,8 @@ startButton.addEventListener("click", () => {
 });
 startPlusButton?.addEventListener("click", () => {
   activeCheckpoint = null;
+  localStorage.removeItem("ms_active_checkpoint");
+  if (continueButton) continueButton.style.display = "none";
   hardcoreMode = true;
   coopMode = false;
   startScreen.classList.add("hidden");
@@ -7419,6 +7423,8 @@ startPlusButton?.addEventListener("click", () => {
 });
 coopButton.addEventListener("click", () => {
   activeCheckpoint = null;
+  localStorage.removeItem("ms_active_checkpoint");
+  if (continueButton) continueButton.style.display = "none";
   hardcoreMode = false;
   coopMode = true;
   startScreen.classList.add("hidden");

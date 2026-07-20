@@ -5968,10 +5968,10 @@ function updateMeeraAnimations(meera, state, time) {
 function animate() {
   try {
     const delta = Math.min(clock.getDelta(), 0.05);
-  updateMovement(delta);
-  updateState(delta);
-  updateRain(delta);
-  updateThunder(delta);
+    updateMovement(delta);
+    updateState(delta);
+    updateRain(delta);
+    updateThunder(delta);
 
   // Handle sanity creepy whispers looping audio triggers
   if (gameState === GameState.PLAYING) {

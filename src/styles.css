@@ -1912,3 +1912,7 @@ body:not(.coop-active) #breath-minigame-p1 {
 :root {
   --hud-pulse-scale: 1.05;
 }
+
+:root {
+  --polaroid-radius: 4px;
+}

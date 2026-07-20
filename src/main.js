@@ -7933,6 +7933,9 @@ settingMasterVolume.addEventListener("input", (event) => {
   if (audioListener) {
     audioListener.setMasterVolume(masterVolume);
   }
+  if (audioManager) {
+    audioManager.setMasterVolume(masterVolume);
+  }
 });
 
 settingSfxVolume.addEventListener("input", (event) => {
@@ -7940,7 +7943,7 @@ settingSfxVolume.addEventListener("input", (event) => {
   localStorage.setItem("setting-sfx-volume", sfxVolume);
   caption.textContent = `SFX Volume: ${Math.round(sfxVolume * 100)}%`;
   if (audioManager) {
-    audioManager.updateCategoryVolumes();
+    audioManager.setSFXVolume(sfxVolume);
   }
 });
 
@@ -7949,7 +7952,7 @@ settingAmbientVolume.addEventListener("input", (event) => {
   localStorage.setItem("setting-ambient-volume", ambientVolume);
   caption.textContent = `Ambient Volume: ${Math.round(ambientVolume * 100)}%`;
   if (audioManager) {
-    audioManager.updateCategoryVolumes();
+    audioManager.setAmbientVolume(ambientVolume);
   }
 });
 

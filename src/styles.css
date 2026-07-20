@@ -1928,3 +1928,7 @@ body:not(.coop-active) #breath-minigame-p1 {
 :root {
   --terminal-glow-offset: 2px;
 }
+
+:root {
+  --secure-glow-color: #00ff33;
+}

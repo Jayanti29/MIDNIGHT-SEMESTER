@@ -1950,3 +1950,5 @@ body:not(.coop-active) #breath-minigame-p1 {
 /* Dark default color to prevent light flicker on startup */
 
 /* Overlay styling for full-screen menu states */
+
+/* Start menu placement using CSS grid alignment */

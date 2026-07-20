@@ -6501,8 +6501,9 @@ function startGame({ lockPointer = true } = {}) {
     if (hardcoreBadge) hardcoreBadge.style.display = "none";
   }
 
-  // Spawn solo player character (always, even outside coop mode)
-  if (!scene.userData.player1Character) {
+  // Spawn solo player character only when NOT in coop mode
+  // (In coop mode, setupPlayer2() already created player1Character)
+  if (!coopMode && !scene.userData.player1Character) {
     scene.userData.player1Character = createCharacter({
       name: p1Name,
       position: [0, 0, 8],

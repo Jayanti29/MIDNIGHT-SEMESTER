@@ -1936,3 +1936,7 @@ body:not(.coop-active) #breath-minigame-p1 {
 :root {
   --dossier-grid-gap: 12px;
 }
+
+:root {
+  --vignette-focus-opacity: 0.95;
+}

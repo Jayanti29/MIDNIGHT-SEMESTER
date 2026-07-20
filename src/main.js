@@ -7523,6 +7523,7 @@ continueButton?.addEventListener("click", () => {
   p1SkinTone = p1Customization.skinTone;
 
   startScreen.classList.add("hidden");
+  resetGame();
   startGame();
 });
 menuSettings.addEventListener("click", () => {

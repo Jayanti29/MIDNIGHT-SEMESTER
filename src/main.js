@@ -8088,6 +8088,14 @@ choiceEndingD?.addEventListener("click", () => {
 settingMasterVolume.value = masterVolume;
 settingSfxVolume.value = sfxVolume;
 settingAmbientVolume.value = ambientVolume;
+if (audioListener) {
+  audioListener.setMasterVolume(masterVolume);
+}
+if (audioManager) {
+  audioManager.setMasterVolume(masterVolume);
+  audioManager.setSFXVolume(sfxVolume);
+  audioManager.setAmbientVolume(ambientVolume);
+}
 if (settingMouseSensitivity) settingMouseSensitivity.value = mouseSensitivity; // loaded sensitivity
 const savedFov = localStorage.getItem("setting-fov");
 if (savedFov) {

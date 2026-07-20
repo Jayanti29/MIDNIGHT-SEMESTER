@@ -883,6 +883,14 @@ let meeraState = AiState.INACTIVE;
 let meeraPatrolDir = -1;
 let meeraSpeed = 0.9;
 let activeCheckpoint = null;
+try {
+  const savedCP = localStorage.getItem("ms_active_checkpoint");
+  if (savedCP) {
+    activeCheckpoint = JSON.parse(savedCP);
+  }
+} catch (e) {
+  console.error("Failed to load active checkpoint from localStorage:", e);
+}
 const shakeOffset = new THREE.Vector3();
 const moveDirection = new THREE.Vector3();
 const moveDirection2 = new THREE.Vector3();

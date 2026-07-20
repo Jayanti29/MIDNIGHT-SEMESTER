@@ -8128,6 +8128,36 @@ quitToMenu.addEventListener("click", () => {
   setGameState(GameState.MENU);
 });
 
+document.getElementById("gameover-quit-button")?.addEventListener("click", () => {
+  if (p1HeartbeatSlowNode) { try { p1HeartbeatSlowNode.stop(); } catch(e) {} p1HeartbeatSlowNode = null; }
+  if (p1HeartbeatFastNode) { try { p1HeartbeatFastNode.stop(); } catch(e) {} p1HeartbeatFastNode = null; }
+  if (p2HeartbeatSlowNode) { try { p2HeartbeatSlowNode.stop(); } catch(e) {} p2HeartbeatSlowNode = null; }
+  if (p2HeartbeatFastNode) { try { p2HeartbeatFastNode.stop(); } catch(e) {} p2HeartbeatFastNode = null; }
+  if (audioManager) {
+    audioManager.stopSound("metronome_tick");
+    audioManager.stopSound("electric_buzz");
+    audioManager.stopSound("strobe_buzz");
+    audioManager.stopSound("creepy_whispers");
+  }
+  resetGame();
+  setGameState(GameState.MENU);
+});
+
+document.getElementById("win-quit-button")?.addEventListener("click", () => {
+  if (p1HeartbeatSlowNode) { try { p1HeartbeatSlowNode.stop(); } catch(e) {} p1HeartbeatSlowNode = null; }
+  if (p1HeartbeatFastNode) { try { p1HeartbeatFastNode.stop(); } catch(e) {} p1HeartbeatFastNode = null; }
+  if (p2HeartbeatSlowNode) { try { p2HeartbeatSlowNode.stop(); } catch(e) {} p2HeartbeatSlowNode = null; }
+  if (p2HeartbeatFastNode) { try { p2HeartbeatFastNode.stop(); } catch(e) {} p2HeartbeatFastNode = null; }
+  if (audioManager) {
+    audioManager.stopSound("metronome_tick");
+    audioManager.stopSound("electric_buzz");
+    audioManager.stopSound("strobe_buzz");
+    audioManager.stopSound("creepy_whispers");
+  }
+  resetGame();
+  setGameState(GameState.MENU);
+});
+
 choiceEndingA?.addEventListener("click", () => {
   choiceScreen.classList.remove("open");
   triggerEnding("A");

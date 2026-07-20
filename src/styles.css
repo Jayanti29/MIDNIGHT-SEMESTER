@@ -1932,3 +1932,7 @@ body:not(.coop-active) #breath-minigame-p1 {
 :root {
   --secure-glow-color: #00ff33;
 }
+
+:root {
+  --dossier-grid-gap: 12px;
+}

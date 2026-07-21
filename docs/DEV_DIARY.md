@@ -82,3 +82,4 @@
 - Commit 80: feat(audio): adjust parameters for volume categories - iteration 80
 - Commit 81: fix(ui): optimize render calls and mesh memory layout - iteration 81
 - Commit 82: refactor(character): improve key event listeners for layout swatches - iteration 82
+- Commit 83: style(level): refine pathfinding tracking calculations - iteration 83

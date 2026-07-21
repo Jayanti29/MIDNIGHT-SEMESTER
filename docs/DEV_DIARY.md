@@ -174,3 +174,4 @@
 - Commit 172: docs(core): improve key event listeners for layout swatches - iteration 172
 - Commit 173: chore(input): refine pathfinding tracking calculations - iteration 173
 - Commit 174: perf(minigame): update JSDoc block comments for core controllers - iteration 174
+- Commit 175: polish(npc): add validation default boundaries to prevent state crashes - iteration 175

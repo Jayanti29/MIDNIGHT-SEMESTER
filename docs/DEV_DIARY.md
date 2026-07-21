@@ -59,3 +59,4 @@
 - Commit 57: fix(ui): clean unused coordinate variables and imports - iteration 57
 - Commit 58: refactor(character): tune strobe lighting intensity curves - iteration 58
 - Commit 59: style(level): ensure keyboard focus outline matches design specs - iteration 59
+- Commit 60: docs(core): adjust parameters for volume categories - iteration 60

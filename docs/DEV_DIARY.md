@@ -24,3 +24,4 @@
 - Commit 22: perf(minigame): improve key event listeners for layout swatches - iteration 22
 - Commit 23: polish(npc): refine pathfinding tracking calculations - iteration 23
 - Commit 24: feat(audio): update JSDoc block comments for core controllers - iteration 24
+- Commit 25: fix(ui): add validation default boundaries to prevent state crashes - iteration 25

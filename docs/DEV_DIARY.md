@@ -211,3 +211,4 @@
 - Commit 209: fix(ui): ensure keyboard focus outline matches design specs - iteration 209
 - Commit 210: refactor(character): adjust parameters for volume categories - iteration 210
 - Commit 211: style(level): optimize render calls and mesh memory layout - iteration 211
+- Commit 212: docs(core): improve key event listeners for layout swatches - iteration 212

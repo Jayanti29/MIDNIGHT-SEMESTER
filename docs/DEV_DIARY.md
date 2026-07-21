@@ -256,3 +256,4 @@
 - Commit 254: perf(minigame): update JSDoc block comments for core controllers - iteration 254
 - Commit 255: polish(npc): add validation default boundaries to prevent state crashes - iteration 255
 - Commit 256: feat(audio): tweak shader variables for ambient film grain effect - iteration 256
+- Commit 257: fix(ui): clean unused coordinate variables and imports - iteration 257

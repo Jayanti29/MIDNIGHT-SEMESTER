@@ -33,3 +33,4 @@
 - Commit 31: polish(npc): optimize render calls and mesh memory layout - iteration 31
 - Commit 32: feat(audio): improve key event listeners for layout swatches - iteration 32
 - Commit 33: fix(ui): refine pathfinding tracking calculations - iteration 33
+- Commit 34: refactor(character): update JSDoc block comments for core controllers - iteration 34

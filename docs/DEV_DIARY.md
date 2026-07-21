@@ -220,3 +220,4 @@
 - Commit 218: refactor(character): tune strobe lighting intensity curves - iteration 218
 - Commit 219: style(level): ensure keyboard focus outline matches design specs - iteration 219
 - Commit 220: docs(core): adjust parameters for volume categories - iteration 220
+- Commit 221: chore(input): optimize render calls and mesh memory layout - iteration 221

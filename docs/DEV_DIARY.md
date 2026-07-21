@@ -189,3 +189,4 @@
 - Commit 187: style(level): clean unused coordinate variables and imports - iteration 187
 - Commit 188: docs(core): tune strobe lighting intensity curves - iteration 188
 - Commit 189: chore(input): ensure keyboard focus outline matches design specs - iteration 189
+- Commit 190: perf(minigame): adjust parameters for volume categories - iteration 190

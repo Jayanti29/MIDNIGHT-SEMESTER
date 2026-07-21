@@ -116,3 +116,4 @@
 - Commit 114: refactor(character): update JSDoc block comments for core controllers - iteration 114
 - Commit 115: style(level): add validation default boundaries to prevent state crashes - iteration 115
 - Commit 116: docs(core): tweak shader variables for ambient film grain effect - iteration 116
+- Commit 117: chore(input): clean unused coordinate variables and imports - iteration 117

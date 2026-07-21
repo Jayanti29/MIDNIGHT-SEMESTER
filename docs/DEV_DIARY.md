@@ -43,3 +43,4 @@
 - Commit 41: fix(ui): optimize render calls and mesh memory layout - iteration 41
 - Commit 42: refactor(character): improve key event listeners for layout swatches - iteration 42
 - Commit 43: style(level): refine pathfinding tracking calculations - iteration 43
+- Commit 44: docs(core): update JSDoc block comments for core controllers - iteration 44

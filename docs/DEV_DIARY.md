@@ -65,3 +65,4 @@
 - Commit 63: polish(npc): refine pathfinding tracking calculations - iteration 63
 - Commit 64: feat(audio): update JSDoc block comments for core controllers - iteration 64
 - Commit 65: fix(ui): add validation default boundaries to prevent state crashes - iteration 65
+- Commit 66: refactor(character): tweak shader variables for ambient film grain effect - iteration 66

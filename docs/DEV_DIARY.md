@@ -283,3 +283,4 @@
 - Commit 281: fix(ui): optimize render calls and mesh memory layout - iteration 281
 - Commit 282: refactor(character): improve key event listeners for layout swatches - iteration 282
 - Commit 283: style(level): refine pathfinding tracking calculations - iteration 283
+- Commit 284: docs(core): update JSDoc block comments for core controllers - iteration 284

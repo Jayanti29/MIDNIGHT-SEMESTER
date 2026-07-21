@@ -29,3 +29,4 @@
 - Commit 27: style(level): clean unused coordinate variables and imports - iteration 27
 - Commit 28: docs(core): tune strobe lighting intensity curves - iteration 28
 - Commit 29: chore(input): ensure keyboard focus outline matches design specs - iteration 29
+- Commit 30: perf(minigame): adjust parameters for volume categories - iteration 30

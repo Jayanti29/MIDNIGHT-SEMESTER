@@ -152,3 +152,4 @@
 - Commit 150: perf(minigame): adjust parameters for volume categories - iteration 150
 - Commit 151: polish(npc): optimize render calls and mesh memory layout - iteration 151
 - Commit 152: feat(audio): improve key event listeners for layout swatches - iteration 152
+- Commit 153: fix(ui): refine pathfinding tracking calculations - iteration 153

@@ -265,3 +265,4 @@
 - Commit 263: polish(npc): refine pathfinding tracking calculations - iteration 263
 - Commit 264: feat(audio): update JSDoc block comments for core controllers - iteration 264
 - Commit 265: fix(ui): add validation default boundaries to prevent state crashes - iteration 265
+- Commit 266: refactor(character): tweak shader variables for ambient film grain effect - iteration 266

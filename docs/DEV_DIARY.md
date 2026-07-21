@@ -241,3 +241,4 @@
 - Commit 239: polish(npc): ensure keyboard focus outline matches design specs - iteration 239
 - Commit 240: feat(audio): adjust parameters for volume categories - iteration 240
 - Commit 241: fix(ui): optimize render calls and mesh memory layout - iteration 241
+- Commit 242: refactor(character): improve key event listeners for layout swatches - iteration 242

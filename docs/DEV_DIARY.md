@@ -80,3 +80,4 @@
 - Commit 78: perf(minigame): tune strobe lighting intensity curves - iteration 78
 - Commit 79: polish(npc): ensure keyboard focus outline matches design specs - iteration 79
 - Commit 80: feat(audio): adjust parameters for volume categories - iteration 80
+- Commit 81: fix(ui): optimize render calls and mesh memory layout - iteration 81

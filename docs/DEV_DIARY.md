@@ -153,3 +153,4 @@
 - Commit 151: polish(npc): optimize render calls and mesh memory layout - iteration 151
 - Commit 152: feat(audio): improve key event listeners for layout swatches - iteration 152
 - Commit 153: fix(ui): refine pathfinding tracking calculations - iteration 153
+- Commit 154: refactor(character): update JSDoc block comments for core controllers - iteration 154

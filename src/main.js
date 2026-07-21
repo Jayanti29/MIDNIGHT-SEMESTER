@@ -2276,53 +2276,126 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
     emissive: isGhost ? outfitColor : 0x000000,
     emissiveIntensity: isGhost ? 0.28 : 0
   });
-  const skinMat = new THREE.MeshStandardMaterial({
-    color: skinColor,
+  const pantsMat = new THREE.MeshStandardMaterial({
+    color: isGhost ? 0xc9d5cf : 0x222831,
+    roughness: 0.85,
+    transparent: isGhost,
+    opacity: isGhost ? 0.45 : 1.0,
+    emissive: isGhost ? 0xc9d5cf : 0x000000,
+    emissiveIntensity: isGhost ? 0.28 : 0
+  });
+  const shoeMat = new THREE.MeshStandardMaterial({
+    color: isGhost ? 0xc9d5cf : 0xeeeeee,
     roughness: 0.8,
     transparent: isGhost,
     opacity: isGhost ? 0.45 : 1.0,
-    emissive: isGhost ? skinColor : 0x000000,
+    emissive: isGhost ? 0xc9d5cf : 0x000000,
     emissiveIntensity: isGhost ? 0.28 : 0
   });
-  const hairMat = new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.9 });
-  const eyeMat = new THREE.MeshBasicMaterial({ color: isGhost ? 0xb22822 : 0x222222 });
-  const body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.55, 8), outfitMat);
-  body.name = "body";
-  body.position.y = 0.28;
-  body.castShadow = true;
-  body.receiveShadow = true;
-  spine.add(body);
+
+  const shirt = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.33, 8), outfitMat);
+  shirt.name = "shirt";
+  shirt.position.y = 0.39;
+  shirt.castShadow = true;
+  shirt.receiveShadow = true;
+  spine.add(shirt);
+
+  const pants = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.22, 8), pantsMat);
+  pants.name = "pants";
+  pants.position.y = 0.115;
+  pants.castShadow = true;
+  pants.receiveShadow = true;
+  spine.add(pants);
+
+  const beltMat = new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 });
+  const belt = new THREE.Mesh(new THREE.CylinderGeometry(0.205, 0.205, 0.025, 8), beltMat);
+  belt.name = "belt";
+  belt.position.y = 0.225;
+  spine.add(belt);
+
   const headMesh = new THREE.Mesh(new THREE.SphereGeometry(0.18, 16, 12), skinMat);
   headMesh.name = "head_sphere";
   headMesh.position.y = 0.12;
   headMesh.castShadow = true;
   head.add(headMesh);
+
+  if (!isGhost) {
+    const nose = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.032, 0.025), skinMat);
+    nose.name = "nose";
+    nose.position.set(0, 0.11, 0.18);
+    head.add(nose);
+
+    const earL = new THREE.Mesh(new THREE.SphereGeometry(0.026, 8, 8), skinMat);
+    earL.name = "ear_L";
+    earL.position.set(-0.18, 0.12, 0.01);
+    head.add(earL);
+
+    const earR = new THREE.Mesh(new THREE.SphereGeometry(0.026, 8, 8), skinMat);
+    earR.name = "ear_R";
+    earR.position.set(0.18, 0.12, 0.01);
+    head.add(earR);
+
+    const mouthMat = new THREE.MeshBasicMaterial({ color: 0x5c1d1d });
+    const mouth = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.012, 0.025), mouthMat);
+    mouth.name = "mouth";
+    mouth.position.set(0, 0.05, 0.17);
+    head.add(mouth);
+  }
+
   const leftEye = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 8), eyeMat);
   leftEye.position.set(-0.07, 0.14, 0.14);
   head.add(leftEye);
   const rightEye = new THREE.Mesh(new THREE.SphereGeometry(0.025, 8, 8), eyeMat);
   rightEye.position.set(0.07, 0.14, 0.14);
   head.add(rightEye);
-  const armL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.06), outfitMat);
+
+  const armL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.06), outfitMat);
   armL.name = "left_arm";
-  armL.position.y = -0.21;
+  armL.position.y = -0.16;
   armL.castShadow = true;
   leftArm.add(armL);
-  const armR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.42, 0.06), outfitMat);
+
+  const handL = new THREE.Mesh(new THREE.SphereGeometry(0.038, 8, 8), skinMat);
+  handL.name = "left_hand";
+  handL.position.y = -0.35;
+  handL.castShadow = true;
+  leftArm.add(handL);
+
+  const armR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.06), outfitMat);
   armR.name = "right_arm";
-  armR.position.y = -0.21;
+  armR.position.y = -0.16;
   armR.castShadow = true;
   rightArm.add(armR);
-  const legL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.48, 0.08), outfitMat);
+
+  const handR = new THREE.Mesh(new THREE.SphereGeometry(0.038, 8, 8), skinMat);
+  handR.name = "right_hand";
+  handR.position.y = -0.35;
+  handR.castShadow = true;
+  rightArm.add(handR);
+
+  const legL = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.4, 0.08), pantsMat);
   legL.name = "left_leg";
-  legL.position.y = -0.24;
+  legL.position.y = -0.2;
   legL.castShadow = true;
   leftLeg.add(legL);
-  const legR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.48, 0.08), outfitMat);
+
+  const shoeL = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.06, 0.14), shoeMat);
+  shoeL.name = "left_shoe";
+  shoeL.position.set(0, -0.42, 0.03);
+  shoeL.castShadow = true;
+  leftLeg.add(shoeL);
+
+  const legR = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.4, 0.08), pantsMat);
   legR.name = "right_leg";
-  legR.position.y = -0.24;
+  legR.position.y = -0.2;
   legR.castShadow = true;
   rightLeg.add(legR);
+
+  const shoeR = new THREE.Mesh(new THREE.BoxGeometry(0.09, 0.06, 0.14), shoeMat);
+  shoeR.name = "right_shoe";
+  shoeR.position.set(0, -0.42, 0.03);
+  shoeR.castShadow = true;
+  rightLeg.add(shoeR);
 
   if (hasBackpack) {
     const backpackMat = new THREE.MeshStandardMaterial({ color: 0x3e2723, roughness: 0.8 });
@@ -2366,15 +2439,24 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
     head.add(capVisor);
   } else {
     if (hairLength === "buzzed") {
-      const hairBuzzed = new THREE.Mesh(new THREE.BoxGeometry(0.205, 0.02, 0.205), hairMat);
+      const hairBuzzed = new THREE.Mesh(new THREE.SphereGeometry(0.185, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.55), hairMat);
       hairBuzzed.name = "hair_buzzed";
-      hairBuzzed.position.set(0, 0.23, 0.015);
+      hairBuzzed.position.set(0, 0.09, 0);
+      hairBuzzed.rotation.x = -Math.PI * 0.1;
       head.add(hairBuzzed);
     } else {
-      const hairCap = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.08, 0.22), hairMat);
+      const hairCap = new THREE.Mesh(new THREE.SphereGeometry(0.19, 16, 12, 0, Math.PI * 2, 0, Math.PI * 0.6), hairMat);
       hairCap.name = "hair_short_cap";
-      hairCap.position.set(0, 0.26, 0.02);
+      hairCap.position.set(0, 0.08, 0);
+      hairCap.rotation.x = -Math.PI * 0.15;
       head.add(hairCap);
+
+      const sideburnL = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.06, 0.04), hairMat);
+      sideburnL.position.set(-0.17, 0.08, 0.04);
+      head.add(sideburnL);
+      const sideburnR = new THREE.Mesh(new THREE.BoxGeometry(0.02, 0.06, 0.04), hairMat);
+      sideburnR.position.set(0.17, 0.08, 0.04);
+      head.add(sideburnR);
     }
   }
   if (hairLength === "long") {
@@ -7366,7 +7448,10 @@ btnCharConfirm?.addEventListener("click", () => {
     cancelAnimationFrame(selectRafId);
     selectRafId = null;
   }
-  if (charSelectScreen) charSelectScreen.style.display = "none";
+  if (charSelectScreen) {
+    charSelectScreen.style.display = "none";
+    charSelectScreen.classList.remove("open");
+  }
 
   p1Model = selectedVariant;
   p1OutfitColor = selectedOutfitColor;
@@ -7425,7 +7510,10 @@ startButton.addEventListener("click", () => {
   hardcoreMode = false;
   coopMode = false;
   startScreen.classList.add("hidden");
-  if (charSelectScreen) charSelectScreen.style.display = "block";
+  if (charSelectScreen) {
+    charSelectScreen.style.display = "block";
+    charSelectScreen.classList.add("open");
+  }
   charSelectActive = true;
   initCharacterSelect();
   animateCharacterSelect();
@@ -7437,7 +7525,10 @@ startPlusButton?.addEventListener("click", () => {
   hardcoreMode = true;
   coopMode = false;
   startScreen.classList.add("hidden");
-  if (charSelectScreen) charSelectScreen.style.display = "block";
+  if (charSelectScreen) {
+    charSelectScreen.style.display = "block";
+    charSelectScreen.classList.add("open");
+  }
   charSelectActive = true;
   initCharacterSelect();
   animateCharacterSelect();
@@ -7449,7 +7540,10 @@ coopButton.addEventListener("click", () => {
   hardcoreMode = false;
   coopMode = true;
   startScreen.classList.add("hidden");
-  if (charSelectScreen) charSelectScreen.style.display = "block";
+  if (charSelectScreen) {
+    charSelectScreen.style.display = "block";
+    charSelectScreen.classList.add("open");
+  }
   charSelectActive = true;
   initCharacterSelect();
   animateCharacterSelect();

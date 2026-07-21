@@ -230,3 +230,4 @@
 - Commit 228: docs(core): tune strobe lighting intensity curves - iteration 228
 - Commit 229: chore(input): ensure keyboard focus outline matches design specs - iteration 229
 - Commit 230: perf(minigame): adjust parameters for volume categories - iteration 230
+- Commit 231: polish(npc): optimize render calls and mesh memory layout - iteration 231

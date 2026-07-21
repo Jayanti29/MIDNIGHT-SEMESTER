@@ -119,3 +119,4 @@
 - Commit 117: chore(input): clean unused coordinate variables and imports - iteration 117
 - Commit 118: perf(minigame): tune strobe lighting intensity curves - iteration 118
 - Commit 119: polish(npc): ensure keyboard focus outline matches design specs - iteration 119
+- Commit 120: feat(audio): adjust parameters for volume categories - iteration 120

@@ -73,3 +73,4 @@
 - Commit 71: polish(npc): optimize render calls and mesh memory layout - iteration 71
 - Commit 72: feat(audio): improve key event listeners for layout swatches - iteration 72
 - Commit 73: fix(ui): refine pathfinding tracking calculations - iteration 73
+- Commit 74: refactor(character): update JSDoc block comments for core controllers - iteration 74

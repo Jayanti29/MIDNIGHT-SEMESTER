@@ -212,3 +212,4 @@
 - Commit 210: refactor(character): adjust parameters for volume categories - iteration 210
 - Commit 211: style(level): optimize render calls and mesh memory layout - iteration 211
 - Commit 212: docs(core): improve key event listeners for layout swatches - iteration 212
+- Commit 213: chore(input): refine pathfinding tracking calculations - iteration 213

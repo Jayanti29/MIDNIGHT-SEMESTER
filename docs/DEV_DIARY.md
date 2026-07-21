@@ -12,3 +12,4 @@
 - Commit 10: refactor(character): adjust parameters for volume categories - iteration 10
 - Commit 11: style(level): optimize render calls and mesh memory layout - iteration 11
 - Commit 12: docs(core): improve key event listeners for layout swatches - iteration 12
+- Commit 13: chore(input): refine pathfinding tracking calculations - iteration 13

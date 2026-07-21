@@ -35,3 +35,4 @@
 - Commit 33: fix(ui): refine pathfinding tracking calculations - iteration 33
 - Commit 34: refactor(character): update JSDoc block comments for core controllers - iteration 34
 - Commit 35: style(level): add validation default boundaries to prevent state crashes - iteration 35
+- Commit 36: docs(core): tweak shader variables for ambient film grain effect - iteration 36

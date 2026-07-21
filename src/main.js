@@ -2293,6 +2293,17 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
     emissiveIntensity: isGhost ? 0.28 : 0
   });
 
+  const skinMat = new THREE.MeshStandardMaterial({
+    color: skinColor,
+    roughness: 0.8,
+    transparent: isGhost,
+    opacity: isGhost ? 0.45 : 1.0,
+    emissive: isGhost ? skinColor : 0x000000,
+    emissiveIntensity: isGhost ? 0.28 : 0
+  });
+  const hairMat = new THREE.MeshStandardMaterial({ color: hairColor, roughness: 0.9 });
+  const eyeMat = new THREE.MeshBasicMaterial({ color: isGhost ? 0xb22822 : 0x222222 });
+
   const shirt = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.33, 8), outfitMat);
   shirt.name = "shirt";
   shirt.position.y = 0.39;

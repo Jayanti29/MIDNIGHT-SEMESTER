@@ -14,3 +14,4 @@
 - Commit 12: docs(core): improve key event listeners for layout swatches - iteration 12
 - Commit 13: chore(input): refine pathfinding tracking calculations - iteration 13
 - Commit 14: perf(minigame): update JSDoc block comments for core controllers - iteration 14
+- Commit 15: polish(npc): add validation default boundaries to prevent state crashes - iteration 15

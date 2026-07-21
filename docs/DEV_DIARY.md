@@ -173,3 +173,4 @@
 - Commit 171: style(level): optimize render calls and mesh memory layout - iteration 171
 - Commit 172: docs(core): improve key event listeners for layout swatches - iteration 172
 - Commit 173: chore(input): refine pathfinding tracking calculations - iteration 173
+- Commit 174: perf(minigame): update JSDoc block comments for core controllers - iteration 174

@@ -177,3 +177,4 @@
 - Commit 175: polish(npc): add validation default boundaries to prevent state crashes - iteration 175
 - Commit 176: feat(audio): tweak shader variables for ambient film grain effect - iteration 176
 - Commit 177: fix(ui): clean unused coordinate variables and imports - iteration 177
+- Commit 178: refactor(character): tune strobe lighting intensity curves - iteration 178

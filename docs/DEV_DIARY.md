@@ -139,3 +139,4 @@
 - Commit 137: fix(ui): clean unused coordinate variables and imports - iteration 137
 - Commit 138: refactor(character): tune strobe lighting intensity curves - iteration 138
 - Commit 139: style(level): ensure keyboard focus outline matches design specs - iteration 139
+- Commit 140: docs(core): adjust parameters for volume categories - iteration 140

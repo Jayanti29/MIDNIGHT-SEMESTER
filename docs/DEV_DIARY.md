@@ -47,3 +47,4 @@
 - Commit 45: chore(input): add validation default boundaries to prevent state crashes - iteration 45
 - Commit 46: perf(minigame): tweak shader variables for ambient film grain effect - iteration 46
 - Commit 47: polish(npc): clean unused coordinate variables and imports - iteration 47
+- Commit 48: feat(audio): tune strobe lighting intensity curves - iteration 48

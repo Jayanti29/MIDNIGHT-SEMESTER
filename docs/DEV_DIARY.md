@@ -125,3 +125,4 @@
 - Commit 123: style(level): refine pathfinding tracking calculations - iteration 123
 - Commit 124: docs(core): update JSDoc block comments for core controllers - iteration 124
 - Commit 125: chore(input): add validation default boundaries to prevent state crashes - iteration 125
+- Commit 126: perf(minigame): tweak shader variables for ambient film grain effect - iteration 126

@@ -100,3 +100,4 @@
 - Commit 98: refactor(character): tune strobe lighting intensity curves - iteration 98
 - Commit 99: style(level): ensure keyboard focus outline matches design specs - iteration 99
 - Commit 100: docs(core): adjust parameters for volume categories - iteration 100
+- Commit 101: chore(input): optimize render calls and mesh memory layout - iteration 101

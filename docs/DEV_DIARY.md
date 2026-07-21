@@ -95,3 +95,4 @@
 - Commit 93: chore(input): refine pathfinding tracking calculations - iteration 93
 - Commit 94: perf(minigame): update JSDoc block comments for core controllers - iteration 94
 - Commit 95: polish(npc): add validation default boundaries to prevent state crashes - iteration 95
+- Commit 96: feat(audio): tweak shader variables for ambient film grain effect - iteration 96

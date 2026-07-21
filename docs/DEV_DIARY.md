@@ -151,3 +151,4 @@
 - Commit 149: chore(input): ensure keyboard focus outline matches design specs - iteration 149
 - Commit 150: perf(minigame): adjust parameters for volume categories - iteration 150
 - Commit 151: polish(npc): optimize render calls and mesh memory layout - iteration 151
+- Commit 152: feat(audio): improve key event listeners for layout swatches - iteration 152

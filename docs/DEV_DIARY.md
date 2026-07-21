@@ -69,3 +69,4 @@
 - Commit 67: style(level): clean unused coordinate variables and imports - iteration 67
 - Commit 68: docs(core): tune strobe lighting intensity curves - iteration 68
 - Commit 69: chore(input): ensure keyboard focus outline matches design specs - iteration 69
+- Commit 70: perf(minigame): adjust parameters for volume categories - iteration 70

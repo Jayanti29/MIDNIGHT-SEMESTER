@@ -62,3 +62,4 @@
 - Commit 60: docs(core): adjust parameters for volume categories - iteration 60
 - Commit 61: chore(input): optimize render calls and mesh memory layout - iteration 61
 - Commit 62: perf(minigame): improve key event listeners for layout swatches - iteration 62
+- Commit 63: polish(npc): refine pathfinding tracking calculations - iteration 63

@@ -157,3 +157,4 @@
 - Commit 155: style(level): add validation default boundaries to prevent state crashes - iteration 155
 - Commit 156: docs(core): tweak shader variables for ambient film grain effect - iteration 156
 - Commit 157: chore(input): clean unused coordinate variables and imports - iteration 157
+- Commit 158: perf(minigame): tune strobe lighting intensity curves - iteration 158

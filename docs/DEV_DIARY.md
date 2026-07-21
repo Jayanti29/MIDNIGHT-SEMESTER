@@ -27,3 +27,4 @@
 - Commit 25: fix(ui): add validation default boundaries to prevent state crashes - iteration 25
 - Commit 26: refactor(character): tweak shader variables for ambient film grain effect - iteration 26
 - Commit 27: style(level): clean unused coordinate variables and imports - iteration 27
+- Commit 28: docs(core): tune strobe lighting intensity curves - iteration 28

@@ -21,3 +21,4 @@
 - Commit 19: style(level): ensure keyboard focus outline matches design specs - iteration 19
 - Commit 20: docs(core): adjust parameters for volume categories - iteration 20
 - Commit 21: chore(input): optimize render calls and mesh memory layout - iteration 21
+- Commit 22: perf(minigame): improve key event listeners for layout swatches - iteration 22

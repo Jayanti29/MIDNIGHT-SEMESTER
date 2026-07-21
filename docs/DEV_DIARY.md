@@ -70,3 +70,4 @@
 - Commit 68: docs(core): tune strobe lighting intensity curves - iteration 68
 - Commit 69: chore(input): ensure keyboard focus outline matches design specs - iteration 69
 - Commit 70: perf(minigame): adjust parameters for volume categories - iteration 70
+- Commit 71: polish(npc): optimize render calls and mesh memory layout - iteration 71

@@ -190,3 +190,4 @@
 - Commit 188: docs(core): tune strobe lighting intensity curves - iteration 188
 - Commit 189: chore(input): ensure keyboard focus outline matches design specs - iteration 189
 - Commit 190: perf(minigame): adjust parameters for volume categories - iteration 190
+- Commit 191: polish(npc): optimize render calls and mesh memory layout - iteration 191

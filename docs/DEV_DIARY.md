@@ -31,3 +31,4 @@
 - Commit 29: chore(input): ensure keyboard focus outline matches design specs - iteration 29
 - Commit 30: perf(minigame): adjust parameters for volume categories - iteration 30
 - Commit 31: polish(npc): optimize render calls and mesh memory layout - iteration 31
+- Commit 32: feat(audio): improve key event listeners for layout swatches - iteration 32

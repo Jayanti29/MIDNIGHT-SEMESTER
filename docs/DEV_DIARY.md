@@ -123,3 +123,4 @@
 - Commit 121: fix(ui): optimize render calls and mesh memory layout - iteration 121
 - Commit 122: refactor(character): improve key event listeners for layout swatches - iteration 122
 - Commit 123: style(level): refine pathfinding tracking calculations - iteration 123
+- Commit 124: docs(core): update JSDoc block comments for core controllers - iteration 124

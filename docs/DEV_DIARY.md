@@ -78,3 +78,4 @@
 - Commit 76: docs(core): tweak shader variables for ambient film grain effect - iteration 76
 - Commit 77: chore(input): clean unused coordinate variables and imports - iteration 77
 - Commit 78: perf(minigame): tune strobe lighting intensity curves - iteration 78
+- Commit 79: polish(npc): ensure keyboard focus outline matches design specs - iteration 79

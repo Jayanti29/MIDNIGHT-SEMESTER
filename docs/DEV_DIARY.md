@@ -299,3 +299,4 @@
 - Commit 297: fix(ui): clean unused coordinate variables and imports - iteration 297
 - Commit 298: refactor(character): tune strobe lighting intensity curves - iteration 298
 - Commit 299: style(level): ensure keyboard focus outline matches design specs - iteration 299
+- Commit 300: docs(core): adjust parameters for volume categories - iteration 300

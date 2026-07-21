@@ -188,3 +188,4 @@
 - Commit 186: refactor(character): tweak shader variables for ambient film grain effect - iteration 186
 - Commit 187: style(level): clean unused coordinate variables and imports - iteration 187
 - Commit 188: docs(core): tune strobe lighting intensity curves - iteration 188
+- Commit 189: chore(input): ensure keyboard focus outline matches design specs - iteration 189

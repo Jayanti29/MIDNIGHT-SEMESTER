@@ -99,3 +99,4 @@
 - Commit 97: fix(ui): clean unused coordinate variables and imports - iteration 97
 - Commit 98: refactor(character): tune strobe lighting intensity curves - iteration 98
 - Commit 99: style(level): ensure keyboard focus outline matches design specs - iteration 99
+- Commit 100: docs(core): adjust parameters for volume categories - iteration 100

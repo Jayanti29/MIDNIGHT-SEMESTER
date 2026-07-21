@@ -249,3 +249,4 @@
 - Commit 247: polish(npc): clean unused coordinate variables and imports - iteration 247
 - Commit 248: feat(audio): tune strobe lighting intensity curves - iteration 248
 - Commit 249: fix(ui): ensure keyboard focus outline matches design specs - iteration 249
+- Commit 250: refactor(character): adjust parameters for volume categories - iteration 250

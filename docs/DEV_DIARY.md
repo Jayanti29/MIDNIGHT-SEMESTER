@@ -102,3 +102,4 @@
 - Commit 100: docs(core): adjust parameters for volume categories - iteration 100
 - Commit 101: chore(input): optimize render calls and mesh memory layout - iteration 101
 - Commit 102: perf(minigame): improve key event listeners for layout swatches - iteration 102
+- Commit 103: polish(npc): refine pathfinding tracking calculations - iteration 103

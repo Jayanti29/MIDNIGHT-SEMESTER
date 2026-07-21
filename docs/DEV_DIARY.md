@@ -232,3 +232,4 @@
 - Commit 230: perf(minigame): adjust parameters for volume categories - iteration 230
 - Commit 231: polish(npc): optimize render calls and mesh memory layout - iteration 231
 - Commit 232: feat(audio): improve key event listeners for layout swatches - iteration 232
+- Commit 233: fix(ui): refine pathfinding tracking calculations - iteration 233

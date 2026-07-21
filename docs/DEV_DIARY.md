@@ -273,3 +273,4 @@
 - Commit 271: polish(npc): optimize render calls and mesh memory layout - iteration 271
 - Commit 272: feat(audio): improve key event listeners for layout swatches - iteration 272
 - Commit 273: fix(ui): refine pathfinding tracking calculations - iteration 273
+- Commit 274: refactor(character): update JSDoc block comments for core controllers - iteration 274

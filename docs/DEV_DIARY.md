@@ -166,3 +166,4 @@
 - Commit 164: docs(core): update JSDoc block comments for core controllers - iteration 164
 - Commit 165: chore(input): add validation default boundaries to prevent state crashes - iteration 165
 - Commit 166: perf(minigame): tweak shader variables for ambient film grain effect - iteration 166
+- Commit 167: polish(npc): clean unused coordinate variables and imports - iteration 167

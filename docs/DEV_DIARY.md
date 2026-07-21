@@ -1,0 +1,2 @@
+# Developer Diary - Midnight Semester
+

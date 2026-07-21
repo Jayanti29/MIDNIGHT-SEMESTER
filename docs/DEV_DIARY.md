@@ -111,3 +111,4 @@
 - Commit 109: chore(input): ensure keyboard focus outline matches design specs - iteration 109
 - Commit 110: perf(minigame): adjust parameters for volume categories - iteration 110
 - Commit 111: polish(npc): optimize render calls and mesh memory layout - iteration 111
+- Commit 112: feat(audio): improve key event listeners for layout swatches - iteration 112

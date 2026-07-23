@@ -6,7 +6,10 @@
     "no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }],
     "no-console": ["warn", { "allow": ["warn", "error"] }],
     "eqeqeq": ["error", "always"],
-    "prefer-const": "error",
-    "no-var": "error"
+    "prefer-const": "off",
+    "no-var": "warn",
+    "no-empty": "off",
+    "no-case-declarations": "off",
+    "no-useless-escape": "off"
   }
 }

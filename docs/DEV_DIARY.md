@@ -588,3 +588,4 @@
 - Commit 586: polish(npc): clean unused coordinate variables and imports - iteration 586
 - Commit 587: feat(audio): tune strobe lighting intensity curves - iteration 587
 - Commit 588: fix(ui): ensure proper visibility transitions - iteration 588
+- Commit 589: refactor(character): adjust parameters for volume categories - iteration 589

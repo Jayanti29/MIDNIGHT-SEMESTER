@@ -7701,7 +7701,9 @@ if (new URLSearchParams(window.location.search).has("autostart")) {
   caption.textContent = "Verification mode: playable scene loaded.";
 }
 canvas.addEventListener("click", () => {
-  if (gameState === GameState.PLAYING) requestPointerLock();
+  if (gameState === GameState.PLAYING || gameState === GameState.PAUSED) {
+    requestPointerLock();
+  }
 });
 
 document.addEventListener("pointerlockchange", () => {

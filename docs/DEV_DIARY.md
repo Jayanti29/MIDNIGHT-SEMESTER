@@ -371,3 +371,4 @@
 - Commit 369: refactor(character): adjust parameters for volume categories - iteration 369
 - Commit 370: feat(ui): optimize render layout and mesh scale - iteration 370
 - Commit 371: refactor(character): adjust key event listeners for swatch selections - iteration 371
+- Commit 372: style(level): ensure keyboard focus outline matches specs - iteration 372

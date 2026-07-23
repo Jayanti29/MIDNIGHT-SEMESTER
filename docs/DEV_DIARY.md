@@ -393,3 +393,4 @@
 - Commit 391: refactor(character): adjust key event listeners for swatch selections - iteration 391
 - Commit 392: style(level): ensure keyboard focus outline matches specs - iteration 392
 - Commit 393: docs(core): update JSDoc block comments for core managers - iteration 393
+- Commit 394: chore(input): add validation default boundaries to prevent crashes - iteration 394

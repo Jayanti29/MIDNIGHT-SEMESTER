@@ -562,3 +562,4 @@
 - Commit 560: feat(ui): optimize render layout and mesh scale - iteration 560
 - Commit 561: refactor(character): adjust key event listeners for swatch selections - iteration 561
 - Commit 562: style(level): ensure keyboard focus outline matches specs - iteration 562
+- Commit 563: docs(core): update JSDoc block comments for core managers - iteration 563

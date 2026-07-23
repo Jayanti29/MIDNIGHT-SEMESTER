@@ -465,6 +465,8 @@ body.started .task-log {
   gap: 12px;
   width: min(420px, calc(100vw - 48px));
   transform: translate(-50%, -50%) scale(0.92);
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
   border: 1px solid #c0b099;
   border-radius: 4px 16px 4px 4px;
   padding: 28px;

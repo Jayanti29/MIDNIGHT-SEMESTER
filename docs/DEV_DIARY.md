@@ -406,3 +406,4 @@
 - Commit 404: chore(input): add validation default boundaries to prevent crashes - iteration 404
 - Commit 405: perf(minigame): tweak shader variables for film grain uniform updates - iteration 405
 - Commit 406: polish(npc): clean unused coordinate variables and imports - iteration 406
+- Commit 407: feat(audio): tune strobe lighting intensity curves - iteration 407

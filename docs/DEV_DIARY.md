@@ -324,3 +324,4 @@
 - Commit 322: style(level): ensure keyboard focus outline matches specs - iteration 322
 - Commit 323: docs(core): update JSDoc block comments for core managers - iteration 323
 - Commit 324: chore(input): add validation default boundaries to prevent crashes - iteration 324
+- Commit 325: perf(minigame): tweak shader variables for film grain uniform updates - iteration 325

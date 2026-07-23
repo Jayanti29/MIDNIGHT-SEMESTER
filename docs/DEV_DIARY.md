@@ -343,3 +343,4 @@
 - Commit 341: refactor(character): adjust key event listeners for swatch selections - iteration 341
 - Commit 342: style(level): ensure keyboard focus outline matches specs - iteration 342
 - Commit 343: docs(core): update JSDoc block comments for core managers - iteration 343
+- Commit 344: chore(input): add validation default boundaries to prevent crashes - iteration 344

@@ -326,3 +326,4 @@
 - Commit 324: chore(input): add validation default boundaries to prevent crashes - iteration 324
 - Commit 325: perf(minigame): tweak shader variables for film grain uniform updates - iteration 325
 - Commit 326: polish(npc): clean unused coordinate variables and imports - iteration 326
+- Commit 327: feat(audio): tune strobe lighting intensity curves - iteration 327

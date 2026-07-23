@@ -537,3 +537,4 @@
 - Commit 535: perf(minigame): tweak shader variables for film grain uniform updates - iteration 535
 - Commit 536: polish(npc): clean unused coordinate variables and imports - iteration 536
 - Commit 537: feat(audio): tune strobe lighting intensity curves - iteration 537
+- Commit 538: fix(ui): ensure proper visibility transitions - iteration 538

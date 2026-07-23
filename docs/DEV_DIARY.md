@@ -480,3 +480,4 @@
 - Commit 478: fix(ui): ensure proper visibility transitions - iteration 478
 - Commit 479: refactor(character): adjust parameters for volume categories - iteration 479
 - Commit 480: feat(ui): optimize render layout and mesh scale - iteration 480
+- Commit 481: refactor(character): adjust key event listeners for swatch selections - iteration 481

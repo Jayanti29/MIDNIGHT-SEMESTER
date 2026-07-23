@@ -495,3 +495,4 @@
 - Commit 493: docs(core): update JSDoc block comments for core managers - iteration 493
 - Commit 494: chore(input): add validation default boundaries to prevent crashes - iteration 494
 - Commit 495: perf(minigame): tweak shader variables for film grain uniform updates - iteration 495
+- Commit 496: polish(npc): clean unused coordinate variables and imports - iteration 496

@@ -564,3 +564,4 @@
 - Commit 562: style(level): ensure keyboard focus outline matches specs - iteration 562
 - Commit 563: docs(core): update JSDoc block comments for core managers - iteration 563
 - Commit 564: chore(input): add validation default boundaries to prevent crashes - iteration 564
+- Commit 565: perf(minigame): tweak shader variables for film grain uniform updates - iteration 565

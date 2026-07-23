@@ -4,14 +4,24 @@
   "description": "A college survival story — web game built with Vite",
   "type": "module",
   "scripts": {
-    "dev":     "vite",
-    "build":   "vite build",
+    "dev": "vite",
+    "build": "vite build",
     "preview": "vite preview",
-    "lint":    "eslint src --ext .js",
-    "format":  "prettier --write src"
+    "lint": "eslint src --ext .js",
+    "format": "prettier --write src"
   },
-  "devDependencies": { "vite": "^5.2.0" },
-  "keywords": ["game", "visual-novel", "college", "vite"],
+  "devDependencies": {
+    "vite": "^5.2.0"
+  },
+  "keywords": [
+    "game",
+    "visual-novel",
+    "college",
+    "vite"
+  ],
   "author": "Jayanti29",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "three": "^0.185.1"
+  }
 }

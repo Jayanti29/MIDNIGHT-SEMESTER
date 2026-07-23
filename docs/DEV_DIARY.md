@@ -318,3 +318,4 @@
 - Commit 316: polish(npc): clean unused coordinate variables and imports - iteration 316
 - Commit 317: feat(audio): tune strobe lighting intensity curves - iteration 317
 - Commit 318: fix(ui): ensure proper visibility transitions - iteration 318
+- Commit 319: refactor(character): adjust parameters for volume categories - iteration 319

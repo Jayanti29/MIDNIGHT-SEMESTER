@@ -335,3 +335,4 @@
 - Commit 333: docs(core): update JSDoc block comments for core managers - iteration 333
 - Commit 334: chore(input): add validation default boundaries to prevent crashes - iteration 334
 - Commit 335: perf(minigame): tweak shader variables for film grain uniform updates - iteration 335
+- Commit 336: polish(npc): clean unused coordinate variables and imports - iteration 336

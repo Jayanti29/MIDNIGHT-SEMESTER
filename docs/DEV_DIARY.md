@@ -399,3 +399,4 @@
 - Commit 397: feat(audio): tune strobe lighting intensity curves - iteration 397
 - Commit 398: fix(ui): ensure proper visibility transitions - iteration 398
 - Commit 399: refactor(character): adjust parameters for volume categories - iteration 399
+- Commit 400: feat(ui): optimize render layout and mesh scale - iteration 400

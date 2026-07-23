@@ -302,3 +302,4 @@
 - Commit 300: docs(core): adjust parameters for volume categories - iteration 300
 - Commit 301: refactor(character): adjust key event listeners for swatch selections - iteration 301
 - Commit 302: style(level): ensure keyboard focus outline matches specs - iteration 302
+- Commit 303: docs(core): update JSDoc block comments for core managers - iteration 303

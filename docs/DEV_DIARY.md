@@ -402,3 +402,4 @@
 - Commit 400: feat(ui): optimize render layout and mesh scale - iteration 400
 - Commit 401: refactor(character): adjust key event listeners for swatch selections - iteration 401
 - Commit 402: style(level): ensure keyboard focus outline matches specs - iteration 402
+- Commit 403: docs(core): update JSDoc block comments for core managers - iteration 403

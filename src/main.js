@@ -651,12 +651,12 @@ const PropFactory = {
     tube.rotation.z = Math.PI / 2;
     tube.position.y = -0.04;
     group.add(tube);
-    const light = new THREE.PointLight(0xfff9e6, 1.8, 12, 1.2);
+    const light = new THREE.PointLight(0xfff9e6, 38.0, 12, 1.2);
     light.position.y = -0.15;
     light.castShadow = false;
     group.add(light);
     if (flicker) {
-      flickerLights.push({ light, base: 1.8, phase: Math.random() * Math.PI * 2 });
+      flickerLights.push({ light, base: 38.0, phase: Math.random() * Math.PI * 2 });
     }
     addToActiveLevel(group);
     return group;
@@ -2633,7 +2633,7 @@ function buildCorridor() {
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 
   // Academic Wing Corridor Strobe Light
-  const strobeLight = new THREE.PointLight(0xff0000, 1.5, 8, 2.0);
+  const strobeLight = new THREE.PointLight(0xff0000, 30.0, 8, 2.0);
   strobeLight.position.set(3.5, 2.5, -15.0);
   addToActiveLevel(strobeLight);
   flickerLights.push({ light: strobeLight, base: strobeLight.intensity, phase: Math.random() * Math.PI * 2 });
@@ -2926,7 +2926,7 @@ function buildLevel2() {
   addToActiveLevel(libraryGroup);
 
   for (let z = 5; z > -36; z -= 12) {
-    const lamp = new THREE.PointLight(0x73d08a, 1.8, 14, 1.5);
+    const lamp = new THREE.PointLight(0x73d08a, 40.0, 14, 1.5);
     lamp.position.set(0, 2.65, z);
     lamp.castShadow = true;
     addToActiveLevel(lamp);
@@ -2939,7 +2939,7 @@ function buildLevel2() {
   scene.userData.meeraCharacter.visible = false;
 
   samCharacter = createCharacter({ name: "Sam", position: [1.2, 0, 7.5], color: 0xffffff, identity: "Sam" });
-  const samLight = new THREE.SpotLight(0xffecc2, 2.5, 14, Math.PI / 6, 0.45, 1.0);
+  const samLight = new THREE.SpotLight(0xffecc2, 100.0, 14, Math.PI / 6, 0.45, 1.0);
   samLight.castShadow = true;
   samLight.map = createFlashlightCookie();
   addToActiveLevel(samLight);
@@ -3181,7 +3181,7 @@ function buildDecryptorTerminalProp(position, parentGroup) {
   group.name = "decryptor_terminal_prop";
   group.position.set(...position);
 
-  const screenLight = new THREE.PointLight(0x00ff33, 0.4, 2.5, 2.0);
+  const screenLight = new THREE.PointLight(0x00ff33, 10.0, 2.5, 2.0);
   screenLight.position.set(0, 0.72, 0.4);
   group.add(screenLight);
   flickerLights.push({ light: screenLight, base: screenLight.intensity, phase: Math.random() * Math.PI * 2 });
@@ -3490,13 +3490,13 @@ function initLoreNotes() {
 }
 
 function addAtmosphere() {
-  scene.add(new THREE.HemisphereLight(0x8899aa, 0x302820, 0.65));
-  const moon = new THREE.DirectionalLight(0xb8d0ff, 0.95);
+  scene.add(new THREE.HemisphereLight(0x8899aa, 0x302820, 2.5));
+  const moon = new THREE.DirectionalLight(0xb8d0ff, 4.5);
   moon.position.set(-5, 9, 9);
   moon.castShadow = true;
   scene.add(moon);
 
-  const flashlight = new THREE.SpotLight(0xffe0a4, 8.0, 32, Math.PI / 6.0, 0.55, 1.0);
+  const flashlight = new THREE.SpotLight(0xffe0a4, 280.0, 32, Math.PI / 6.0, 0.55, 1.0);
   flashlight.position.set(0, 0, 0);
   flashlight.target.position.set(0, 0, -1);
   flashlight.map = createFlashlightCookie(); // Project realistic lens dust cookie
@@ -6431,10 +6431,10 @@ function initCharacterSelect() {
     window.location.reload();
   }, false);
 
-  selectAmbientLight = new THREE.AmbientLight(0xffecd9, 0.45);
+  selectAmbientLight = new THREE.AmbientLight(0xffecd9, 2.5);
   selectScene.add(selectAmbientLight);
 
-  selectPointLight = new THREE.PointLight(0xfff5d9, 1.8, 10);
+  selectPointLight = new THREE.PointLight(0xfff5d9, 45.0, 10);
   selectPointLight.position.set(0.6, 1.8, 1.2);
   selectPointLight.castShadow = true;
   selectScene.add(selectPointLight);
@@ -6574,7 +6574,7 @@ function setupPlayer2() {
     if (child.isMesh) child.layers.set(2);
   });
 
-  player2Flashlight = new THREE.SpotLight(0xffecc2, 5.5, 30, Math.PI / 6.5, 0.6, 1.0);
+  player2Flashlight = new THREE.SpotLight(0xffecc2, 280.0, 30, Math.PI / 6.5, 0.6, 1.0);
   player2Flashlight.castShadow = true;
   player2Flashlight.map = createFlashlightCookie();
   camera2.add(player2Flashlight);

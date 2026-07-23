@@ -566,3 +566,4 @@
 - Commit 564: chore(input): add validation default boundaries to prevent crashes - iteration 564
 - Commit 565: perf(minigame): tweak shader variables for film grain uniform updates - iteration 565
 - Commit 566: polish(npc): clean unused coordinate variables and imports - iteration 566
+- Commit 567: feat(audio): tune strobe lighting intensity curves - iteration 567

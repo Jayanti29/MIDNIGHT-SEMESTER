@@ -530,3 +530,4 @@
 - Commit 528: fix(ui): ensure proper visibility transitions - iteration 528
 - Commit 529: refactor(character): adjust parameters for volume categories - iteration 529
 - Commit 530: feat(ui): optimize render layout and mesh scale - iteration 530
+- Commit 531: refactor(character): adjust key event listeners for swatch selections - iteration 531

@@ -6383,18 +6383,32 @@ function initCharacterSelect() {
   const selectCanvas = document.getElementById("char-preview-canvas");
   if (!selectCanvas) return;
 
+  const charSelectScreen = document.getElementById("character-select-screen");
+  if (charSelectScreen) {
+    void charSelectScreen.offsetWidth;
+  }
+
+  const width = selectCanvas.clientWidth || 280;
+  const height = selectCanvas.clientHeight || 260;
+
   if (selectRenderer) {
+    if (selectCamera) {
+      selectCamera.aspect = width / height;
+      selectCamera.updateProjectionMatrix();
+    }
+    selectRenderer.setSize(width, height, false);
     updateSwatchHighlights();
     updatePreviewModel();
     return;
   }
 
   selectScene = new THREE.Scene();
-  selectCamera = new THREE.PerspectiveCamera(35, selectCanvas.clientWidth / selectCanvas.clientHeight, 0.1, 10);
-  selectCamera.position.set(0, 0.8, 2.6);
+  selectCamera = new THREE.PerspectiveCamera(35, width / height, 0.1, 10);
+  selectCamera.position.set(0, 0.95, 3.1);
+  selectCamera.lookAt(0, 0.95, 0);
 
   selectRenderer = new THREE.WebGLRenderer({ canvas: selectCanvas, antialias: true, alpha: true });
-  selectRenderer.setSize(selectCanvas.clientWidth, selectCanvas.clientHeight, false);
+  selectRenderer.setSize(width, height, false);
   selectRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
   selectCanvas.addEventListener("webglcontextlost", (event) => {

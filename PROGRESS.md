@@ -499,3 +499,4 @@ Commit counter: **Commit 348/500**
 - **locomotion optimization pass 255**: refined physics bounds checking and collision matrix traversal parameters
 - **locomotion optimization pass 256**: refined physics bounds checking and collision matrix traversal parameters
 - **locomotion optimization pass 257**: refined physics bounds checking and collision matrix traversal parameters
+- **locomotion optimization pass 258**: refined physics bounds checking and collision matrix traversal parameters

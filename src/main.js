@@ -2694,6 +2694,17 @@ function buildCorridor() {
   buildDebrisItem([-1.8, 0, -14.0], "can_1");
   buildDebrisItem([1.8, 0, -28.0], "can_2");
   addSpiderLilies();
+
+  // Restore realistic wood panels and interactive door objects along the hallway
+  for (let z = 5; z > -46; z -= 7) {
+    box("wood panel left", [0.34, 1.15, 3.5], [-3.82, 0.78, z], materials.darkWood, true, true, true);
+    box("wood panel right", [0.34, 1.15, 3.5], [3.82, 0.78, z - 2.6], materials.darkWood, true, true, true);
+    createDoor({ side: "left", z: z - 2.4, label: `Room ${Math.abs(Math.round(z - 2.4))} left door` });
+    createDoor({ side: "right", z: z + 0.6, label: `Room ${Math.abs(Math.round(z + 0.6))} right door` });
+  }
+
+  // Restore missing Level 1 Dorm Room 32 and all narrative item pickups inside it
+  buildDormRoom();
 }
 
 function clearGroup(group) {
@@ -7725,10 +7736,8 @@ document.addEventListener("pointerlockchange", () => {
 
 document.addEventListener("pointerlockerror", () => {
   pointerLocked = false;
-  caption.textContent = "Mouse look was blocked. Click the game view or use arrow keys.";
-  if (gameState === GameState.PLAYING) {
-    setGameState(GameState.PAUSED);
-  }
+  document.body.style.cursor = "auto";
+  caption.textContent = "Mouse look was blocked. Use arrow keys to look, WASD to move.";
 });
 
 document.addEventListener("mousemove", (event) => {

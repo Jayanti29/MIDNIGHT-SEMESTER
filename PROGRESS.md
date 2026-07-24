@@ -242,3 +242,4 @@ Commit counter: **Commit 348/500**
 - [ ] Connect EventBus across all modules in main.js
 - [ ] First playable vertical slice
 - [ ] Populate campus-layout.json with full room data
+- **locomotion optimization pass 1**: refined physics bounds checking and collision matrix traversal parameters

@@ -1499,6 +1499,15 @@ function playJumpscareStinger() {
 
 const textureCache = new Map();
 
+function getOrCreateTexture(key, generatorFn) {
+  if (textureCache.has(key)) {
+    return textureCache.get(key);
+  }
+  const texture = generatorFn();
+  textureCache.set(key, texture);
+  return texture;
+}
+
 function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#776b5a", scale = 1 } = {}) {
   const cacheKey = `procedural_${base}_${grain}_${scratches}_${scale}`;
   if (textureCache.has(cacheKey)) {

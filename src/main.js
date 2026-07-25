@@ -4,6 +4,26 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import campusLayoutData from "./campus-layout.json";
+
+const roomBounds = [];
+if (campusLayoutData && campusLayoutData.blocks) {
+  campusLayoutData.blocks.forEach(block => {
+    if (block.rooms) {
+      block.rooms.forEach(room => {
+        const xCenter = block.position[0] + room.offset[0];
+        const zCenter = block.position[2] + room.offset[2];
+        const w = room.size[0];
+        const d = room.size[2];
+        roomBounds.push({
+          xMin: xCenter - w / 2 - 0.2,
+          xMax: xCenter + w / 2 + 0.2,
+          zMin: zCenter - d / 2 - 0.2,
+          zMax: zCenter + d / 2 + 0.2
+        });
+      });
+    }
+  });
+}
 // gameState module (not used directly — main.js manages state internally)
 import {
   AudioManager,
@@ -677,16 +697,24 @@ const RoomBuilder = {
     const ceiling = new THREE.Mesh(new THREE.BoxGeometry(w, 0.1, d), materials.wall);
     ceiling.position.y = h + 0.05;
     group.add(ceiling);
-    const wallL = new THREE.Mesh(new THREE.BoxGeometry(0.1, h, d), materials.wall);
-    wallL.position.set(-w/2, h/2, 0);
-    wallL.castShadow = true;
-    wallL.receiveShadow = true;
-    group.add(wallL);
-    const wallR = new THREE.Mesh(new THREE.BoxGeometry(0.1, h, d), materials.wall);
-    wallR.position.set(w/2, h/2, 0);
-    wallR.castShadow = true;
-    wallR.receiveShadow = true;
-    group.add(wallR);
+
+    // Skip corridor-facing walls: left rooms (position[0] < 0) skip right wall (wallR),
+    // right rooms (position[0] > 0) skip left wall (wallL).
+    if (position[0] <= 0) {
+      const wallL = new THREE.Mesh(new THREE.BoxGeometry(0.1, h, d), materials.wall);
+      wallL.position.set(-w/2, h/2, 0);
+      wallL.castShadow = true;
+      wallL.receiveShadow = true;
+      group.add(wallL);
+    }
+    if (position[0] >= 0) {
+      const wallR = new THREE.Mesh(new THREE.BoxGeometry(0.1, h, d), materials.wall);
+      wallR.position.set(w/2, h/2, 0);
+      wallR.castShadow = true;
+      wallR.receiveShadow = true;
+      group.add(wallR);
+    }
+
     const wallB = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.1), materials.wall);
     wallB.position.set(0, h/2, -d/2);
     wallB.castShadow = true;
@@ -1525,6 +1553,23 @@ function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#
   return texture.clone();
 }
 
+function createFlashlightBeam() {
+  const geom = new THREE.CylinderGeometry(0.015, 1.3, 11.0, 20, 1, true);
+  geom.rotateX(-Math.PI / 2);
+  geom.translate(0, 0, -5.5);
+  const mat = new THREE.MeshBasicMaterial({
+    color: 0xffe0a4,
+    transparent: true,
+    opacity: 0.08,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide
+  });
+  const mesh = new THREE.Mesh(geom, mat);
+  mesh.name = "volumetric_beam";
+  return mesh;
+}
+
 function createFlashlightCookie() {
   const canvas = document.createElement("canvas");
   canvas.width = 256;
@@ -2208,32 +2253,39 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   let hasGlasses = false;
   let hasCap = false;
   let hasBackpack = false;
+  let isAarav = (identity === "Aarav" || name.includes("Aarav"));
+  let isPriya = (identity === "Priya" || name.includes("Priya"));
+  let isRohan = (identity === "Rohan" || name.includes("Rohan"));
+  let isSam = (identity === "Sam" || name.includes("Sam"));
+  let isKulkarni = (identity === "Kulkarni" || name.includes("Kulkarni"));
+
   if (isGhost) {
-    outfitColor = 0xc9d5cf;
+    outfitColor = 0xffffff;
     hairLength = "long";
+    skinColor = 0xe0eee9;
   } else {
-    if (identity === "Priya") {
-      outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0xd4af37;
+    if (isAarav) {
+      outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x1a1a1a;
+      skinColor = 0xe3a072;
+    } else if (isPriya) {
+      outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x1e2d4a; // Navy blazer (Image 1)
+      hairColor = 0x2e1a0c; // dark brown hair
       hairLength = "long";
-    } else if (identity === "Kulkarni") {
+      skinColor = 0xfac08f;
+    } else if (isRohan) {
+      outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x111111; // Black tank top (Image 4)
+      hairColor = 0xdadada; // silver/blonde hair
+      hairLength = "short";
+      skinColor = 0xfcd0a1;
+    } else if (isSam) {
+      outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x422b1c; // Leather jacket
+      hasCap = false;
+      skinColor = 0xa1683d;
+    } else if (isKulkarni) {
       outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x5a5a5a;
       hairColor = 0x8c8c8c;
       hasGlasses = true;
-    } else if (identity === "Sam") {
-      outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x56382a;
-      hasCap = true;
-    } else if (identity === "Rohan") {
-      outfitColor = outfitColorOverride ? new THREE.Color(outfitColorOverride) : 0x2f4c34;
     }
-  }
-
-  if (isGhost) {
-    skinColor = 0xc9d5cf;
-  } else {
-    if (identity === "Aarav") skinColor = 0xe3a072;
-    else if (identity === "Priya") skinColor = 0xfac08f;
-    else if (identity === "Rohan") skinColor = 0xfcd0a1;
-    else if (identity === "Sam") skinColor = 0xa1683d;
   }
 
   if (skinColorOverride) {
@@ -2311,6 +2363,20 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   shirt.receiveShadow = true;
   spine.add(shirt);
 
+  if (isPriya) {
+    const collar = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.05, 8), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.9 }));
+    collar.position.y = 0.54;
+    spine.add(collar);
+
+    const tie = new THREE.Mesh(new THREE.BoxGeometry(0.038, 0.14, 0.015), new THREE.MeshStandardMaterial({ color: 0x111111, roughness: 0.9 }));
+    tie.position.set(0, 0.43, 0.205);
+    spine.add(tie);
+  } else if (isGhost) {
+    const cyanBand = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, 0.04, 8), new THREE.MeshStandardMaterial({ color: 0x00f0ff, emissive: 0x00f0ff, emissiveIntensity: 1.0 }));
+    cyanBand.position.y = 0.54;
+    spine.add(cyanBand);
+  }
+
   const pants = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.22, 8), pantsMat);
   pants.name = "pants";
   pants.position.y = 0.115;
@@ -2329,6 +2395,29 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   headMesh.position.y = 0.12;
   headMesh.castShadow = true;
   head.add(headMesh);
+
+  if (isAarav) {
+    const hBand = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.03, 0.06), new THREE.MeshStandardMaterial({ color: 0xcc1111, roughness: 0.8 }));
+    hBand.position.set(0, 0.21, 0);
+    head.add(hBand);
+
+    const cupL = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.03, 12), new THREE.MeshStandardMaterial({ color: 0xcc1111, roughness: 0.8 }));
+    cupL.position.set(-0.19, 0.12, 0.01);
+    cupL.rotation.z = Math.PI / 2;
+    head.add(cupL);
+
+    const cupR = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.03, 12), new THREE.MeshStandardMaterial({ color: 0xcc1111, roughness: 0.8 }));
+    cupR.position.set(0.19, 0.12, 0.01);
+    cupR.rotation.z = Math.PI / 2;
+    head.add(cupR);
+  }
+
+  if (isPriya) {
+    const clip = new THREE.Mesh(new THREE.BoxGeometry(0.012, 0.022, 0.052), new THREE.MeshStandardMaterial({ color: 0x4a90e2, metalness: 0.5 }));
+    clip.position.set(0.16, 0.16, 0.08);
+    clip.rotation.y = Math.PI / 4;
+    head.add(clip);
+  }
 
   if (!isGhost) {
     const nose = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.032, 0.025), skinMat);
@@ -2360,11 +2449,19 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   rightEye.position.set(0.07, 0.14, 0.14);
   head.add(rightEye);
 
-  const armL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.06), outfitMat);
+  const armMat = isRohan ? skinMat : outfitMat;
+
+  const armL = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.06), armMat);
   armL.name = "left_arm";
   armL.position.y = -0.16;
   armL.castShadow = true;
   leftArm.add(armL);
+
+  if (isGhost) {
+    const bandL = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.03, 0.065), new THREE.MeshStandardMaterial({ color: 0x00f0ff, emissive: 0x00f0ff, emissiveIntensity: 1.0 }));
+    bandL.position.y = -0.12;
+    leftArm.add(bandL);
+  }
 
   const handL = new THREE.Mesh(new THREE.SphereGeometry(0.038, 8, 8), skinMat);
   handL.name = "left_hand";
@@ -2372,11 +2469,17 @@ function createProceduralHumanoidSkeleton({ name, position, isGhost = false, ide
   handL.castShadow = true;
   leftArm.add(handL);
 
-  const armR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.06), outfitMat);
+  const armR = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.32, 0.06), armMat);
   armR.name = "right_arm";
   armR.position.y = -0.16;
   armR.castShadow = true;
   rightArm.add(armR);
+
+  if (isGhost) {
+    const bandR = new THREE.Mesh(new THREE.BoxGeometry(0.065, 0.03, 0.065), new THREE.MeshStandardMaterial({ color: 0x00f0ff, emissive: 0x00f0ff, emissiveIntensity: 1.0 }));
+    bandR.position.y = -0.12;
+    rightArm.add(bandR);
+  }
 
   const handR = new THREE.Mesh(new THREE.SphereGeometry(0.038, 8, 8), skinMat);
   handR.name = "right_hand";
@@ -2628,8 +2731,12 @@ function buildCorridor() {
 
   // Load remaining primary narrative items (Emergency Terminal console, Win Gate, etc.)
   scene.userData.kulkarni = createCharacter({ name: "Professor Kulkarni", position: [-2.4, 0, -15.5], color: 0xffffff, identity: "Kulkarni" });
+  tagInteractable(scene.userData.kulkarni, "npc", "Talk to Professor Kulkarni");
   registerCollider(scene.userData.kulkarni);
+  addToActiveLevel(scene.userData.kulkarni);
+
   scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [2.6, 0, -34.5], color: 0xc9d5cf, ghostly: true, identity: "Meera" });
+  addToActiveLevel(scene.userData.meeraCharacter);
   addLabel("BLOCK A HOSTEL WING", [0, 2.55, -10.8], 0.42);
 
   // Academic Wing Corridor Strobe Light
@@ -2694,6 +2801,28 @@ function buildCorridor() {
   buildDebrisItem([-1.8, 0, -14.0], "can_1");
   buildDebrisItem([1.8, 0, -28.0], "can_2");
   addSpiderLilies();
+
+  // Build segmented walls for the hallway so that rooms have door openings
+  buildSegmentedWall(-3.76, "left");
+  buildSegmentedWall(3.76, "right");
+
+  // Spawn Priya Sharma NPC in Computer Lab
+  scene.userData.priyaNpc = createCharacter({ name: "Priya Sharma", position: [-5.0, 0, -28.0], color: 0xffffff, identity: "Priya" });
+  tagInteractable(scene.userData.priyaNpc, "npc", "Talk to Priya Sharma");
+  registerCollider(scene.userData.priyaNpc);
+  addToActiveLevel(scene.userData.priyaNpc);
+
+  // Spawn Rohan Verma NPC in Library
+  scene.userData.rohanNpc = createCharacter({ name: "Rohan Verma", position: [5.0, 0, -28.0], color: 0xffffff, identity: "Rohan" });
+  tagInteractable(scene.userData.rohanNpc, "npc", "Talk to Rohan Verma");
+  registerCollider(scene.userData.rohanNpc);
+  addToActiveLevel(scene.userData.rohanNpc);
+
+  // Spawn Sam Shekhar NPC in Dorm 201
+  scene.userData.samNpc = createCharacter({ name: "Sam Shekhar", position: [-5.0, 0, -70.0], color: 0xffffff, identity: "Sam" });
+  tagInteractable(scene.userData.samNpc, "npc", "Talk to Sam Shekhar");
+  registerCollider(scene.userData.samNpc);
+  addToActiveLevel(scene.userData.samNpc);
 
   // Restore realistic wood panels and interactive door objects along the hallway
   for (let z = 5; z > -46; z -= 7) {
@@ -2837,8 +2966,9 @@ function buildLevel2() {
   box("basement floor", [6, 0.18, 50], [0, -0.1, -15], materials.floor, false, true);
   box("basement ceiling", [6, 0.24, 50], [0, 3.0, -15], materials.wall, false, true);
   
-  box("basement left wall", [0.24, 3.0, 50], [-3.02, 1.41, -15], materials.wall, true, true, true);
-  box("basement right wall", [0.24, 3.0, 50], [3.02, 1.41, -15], materials.wall, true, true, true);
+  // Segmented left wall for Library Archive Room entrance at x = -3.02
+  box("library wall segment front", [0.24, 3.0, 14], [-3.02, 1.41, 3], materials.wall, true, true, true);
+  box("library wall segment back", [0.24, 3.0, 24], [-3.02, 1.41, -28], materials.wall, true, true, true);
   
   box("basement front wall", [6, 3.0, 0.24], [0, 1.41, 10.02], materials.wall, true, true, true);
   box("basement back wall", [6, 3.0, 0.24], [0, 1.41, -40.02], materials.wall, true, true, true);
@@ -2948,8 +3078,10 @@ function buildLevel2() {
   
   scene.userData.meeraCharacter = createCharacter({ name: "Meera", position: [0, 0, -32], color: 0xc9d5cf, ghostly: true, identity: "Meera" });
   scene.userData.meeraCharacter.visible = false;
+  addToActiveLevel(scene.userData.meeraCharacter);
 
   samCharacter = createCharacter({ name: "Sam", position: [1.2, 0, 7.5], color: 0xffffff, identity: "Sam" });
+  addToActiveLevel(samCharacter);
   const samLight = new THREE.SpotLight(0xffecc2, 100.0, 14, Math.PI / 6, 0.45, 1.0);
   samLight.castShadow = true;
   samLight.map = createFlashlightCookie();
@@ -3510,7 +3642,12 @@ function addAtmosphere() {
   const flashlight = new THREE.SpotLight(0xffe0a4, 280.0, 32, Math.PI / 6.0, 0.55, 1.0);
   flashlight.position.set(0, 0, 0);
   flashlight.target.position.set(0, 0, -1);
-  flashlight.map = createFlashlightCookie(); // Project realistic lens dust cookie
+  flashlight.map = createFlashlightCookie();
+
+  const beamMesh = createFlashlightBeam();
+  flashlight.add(beamMesh);
+  flashlight.userData.beamMesh = beamMesh;
+
   camera.add(flashlight);
   camera.add(flashlight.target);
   scene.add(camera);
@@ -3914,17 +4051,53 @@ function canOccupy(position) {
   const x = position.x;
   const z = position.z;
 
-  // Global corridor & dorm room Z limits
-  if (z > 8.5 || z < -47.5) return false;
+  // Check if player is in the corridor
+  let inCorridor = false;
+  if (Math.abs(x) <= 3.55) {
+    if (currentLevel === 1) {
+      if (z <= 25.5 && z >= -88.5) {
+        inCorridor = true;
+      }
+    } else {
+      if (z <= 10.5 && z >= -40.5) {
+        inCorridor = true;
+      }
+    }
+  }
 
-  // Max X limits based on whether we are in the dorm Z-span or not
-  const inDormZ = z <= -29 && z >= -41;
-  const maxX = inDormZ ? 6.15 : 3.55;
-  if (Math.abs(x) > maxX) return false;
+  // Check if player is inside any room
+  let inRoom = false;
+  if (currentLevel === 1) {
+    // Check hardcoded Level 1 Dorm room (Room 32)
+    const roomZ = -35;
+    if (x >= -6.5 && x <= 6.5 && z >= roomZ - 6 && z <= roomZ + 6) {
+      inRoom = true;
+    }
+
+    // Check all data-driven rooms
+    for (const r of roomBounds) {
+      if (x >= r.xMin && x <= r.xMax && z >= r.zMin && z <= r.zMax) {
+        inRoom = true;
+        break;
+      }
+    }
+  } else if (currentLevel === 2) {
+    // Generator Room
+    if (x >= -1.0 && x <= 9.2 && z >= -24.2 && z <= -15.8) {
+      inRoom = true;
+    }
+    // Library Archive Room
+    if (x >= -9.2 && x <= 1.0 && z >= -16.2 && z <= -3.8) {
+      inRoom = true;
+    }
+  }
+
+  if (!inCorridor && !inRoom) return false;
 
   // Check static colliders registered in the list
   for (let i = 0; i < colliders.length; i++) {
     const col = colliders[i];
+    if (col.name && (col.name.includes("floor") || col.name.includes("ceiling"))) continue;
     if (x >= col.xMin - playerRadius && x <= col.xMax + playerRadius &&
         z >= col.zMin - playerRadius && z <= col.zMax + playerRadius) {
       return false;
@@ -4509,15 +4682,22 @@ function updateState(delta) {
       camera2.remove(player2Flashlight);
       camera2.remove(player2Flashlight.target);
     }
-    let targetIntensity2 = 5.5 * (battery2 / 100 + 0.1);
+    let targetIntensity2 = 280.0 * (battery2 / 100 + 0.1);
     if (flashlightOn2) {
       if (battery2 < 35 && battery2 > 0) {
         const lowFlicker2 = Math.sin(clock.elapsedTime * 22) > 0.3 ? 1.0 : (Math.random() > 0.45 ? 0.18 : 0.02);
         targetIntensity2 *= lowFlicker2;
       }
       player2Flashlight.intensity = targetIntensity2;
+      if (player2Flashlight.userData.beamMesh) {
+        player2Flashlight.userData.beamMesh.material.opacity = 0.08 * (targetIntensity2 / 280.0);
+        player2Flashlight.userData.beamMesh.visible = true;
+      }
     } else {
       player2Flashlight.intensity = 0;
+      if (player2Flashlight.userData.beamMesh) {
+        player2Flashlight.userData.beamMesh.visible = false;
+      }
     }
 
     if (batteryText2) {
@@ -4540,7 +4720,7 @@ function updateState(delta) {
     camera.remove(flashlightLight);
     camera.remove(flashlightLight.target);
   }
-  let targetIntensity = 5.5 * (battery / 100 + 0.1);
+  let targetIntensity = 280.0 * (battery / 100 + 0.1);
   if (flashlightOn) {
     if (battery < 35 && battery > 0) {
       // Low battery flickering
@@ -4548,8 +4728,15 @@ function updateState(delta) {
       targetIntensity *= lowFlicker;
     }
     flashlightLight.intensity = targetIntensity;
+    if (flashlightLight.userData.beamMesh) {
+      flashlightLight.userData.beamMesh.material.opacity = 0.08 * (targetIntensity / 280.0);
+      flashlightLight.userData.beamMesh.visible = true;
+    }
   } else {
     flashlightLight.intensity = 0;
+    if (flashlightLight.userData.beamMesh) {
+      flashlightLight.userData.beamMesh.visible = false;
+    }
   }
   camera.userData.flashlightProp.visible = true;
   camera.userData.flashlightProp.userData.gauge.scale.x = Math.max(0.08, battery / 100);
@@ -5196,6 +5383,37 @@ function inspectObject(hit, isPlayer2 = false) {
     }
     addTaskLog("Picked up debris can.");
     if (audioManager) audioManager.playSound("ui_select", { volume: 0.3 });
+    return;
+  }
+
+  if (type === "npc") {
+    const name = hit.object.name || (hit.object.parent ? hit.object.parent.name : "") || "Professor Kulkarni";
+    if (name.includes("Kulkarni")) {
+      queueStory([
+        ["Professor Kulkarni", "Aarav! Thank goodness you're alright. The whole wing has gone into lockdown."],
+        ["Aarav", "Professor, what is this place? What were you doing in the basement in 2005?"],
+        ["Professor Kulkarni", "We were researching cognitive synchronization. Meera... she was our prime volunteer. But something went wrong. The frequency... it trapped her."],
+        ["Professor Kulkarni", "Find the three pieces of evidence: Verma's memo, the Watchman's logbook, and Meera's ID. That will unlock the basement gate. But be careful... Meera is wandering these halls!"]
+      ]);
+    } else if (name.includes("Priya")) {
+      queueStory([
+        ["Priya", "Aarav! The power grid in Block A is fluctuating wildly. 12Hz... it matches the 2004 incident records!"],
+        ["Aarav", "Priya, how do we get out? The main gate is locked."],
+        ["Priya", "We need to unlock the basement gate. Kulkarni has the overrides, but he's terrified of Meera. I'm trying to bypass the electrical sub-station from here."]
+      ]);
+    } else if (name.includes("Rohan")) {
+      queueStory([
+        ["Rohan", "Aarav, I'm finding documents about Meera's volunteer profile. She didn't sign up willingly. Kulkarni and the Dean forced her!"],
+        ["Aarav", "What? Why?"],
+        ["Rohan", "They wanted to achieve total neural synchronization. I'm gathering all the files I can find. We need to expose this!"]
+      ]);
+    } else if (name.includes("Sam")) {
+      queueStory([
+        ["Sam", "Aarav, keep your voice down! She's patrolling the dorm hallway. I saw her walk through the walls!"],
+        ["Aarav", "Meera? What does she want?"],
+        ["Sam", "She's searching for her lost ID card. It was left in one of the study tables. If you find it, do not let her see you with it!"]
+      ]);
+    }
     return;
   }
 
@@ -6588,6 +6806,11 @@ function setupPlayer2() {
   player2Flashlight = new THREE.SpotLight(0xffecc2, 280.0, 30, Math.PI / 6.5, 0.6, 1.0);
   player2Flashlight.castShadow = true;
   player2Flashlight.map = createFlashlightCookie();
+
+  const beamMesh2 = createFlashlightBeam();
+  player2Flashlight.add(beamMesh2);
+  player2Flashlight.userData.beamMesh = beamMesh2;
+
   camera2.add(player2Flashlight);
   camera2.add(player2Flashlight.target);
   

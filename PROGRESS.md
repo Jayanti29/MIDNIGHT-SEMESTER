@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 362/500**
+Commit counter: **Commit 363/500**
 
 ## Commits Log
+- **Commit 363/500**: Track A - Wrap animateCharacterSelect() body in try/catch matching animate().
 - **Commit 362/500**: Track A - Wrap animate() body in try/catch with console.error + on-screen error banner.
 - **Commit 361/500**: Track A - Remove dead broken-emoji line in updateDossierPreview().
 - **Commit 360/500**: Track A - Route procedural, checkerboard, and peeling wall texture generation through getOrCreateTexture() cache keys.

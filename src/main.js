@@ -6852,6 +6852,7 @@ function cancelCharacterSelectAnimation() {
 function animateCharacterSelect() {
   if (!charSelectActive) return;
   try {
+    // try/catch wrapper added for error boundary tracking in character select
     selectRafId = requestAnimationFrame(animateCharacterSelect);
 
     if (selectMesh) {

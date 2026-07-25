@@ -8593,6 +8593,7 @@ function updateDossierPreview() {
   } else if (p1Model === "Priya") {
     polaroidImagePlaceholder.textContent = "👩‍🎓";
   } else if (p1Model === "Kulkarni") {
+    // Note: dead broken-emoji textContent fallback was removed in a previous phase
     polaroidImagePlaceholder.innerHTML = "<span style='font-size: 2.2rem;'>👨‍🏫</span>";
   }
 }

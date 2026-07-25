@@ -2842,6 +2842,9 @@ function buildCorridor() {
 
   // Restore missing Level 1 Dorm Room 32 and all narrative item pickups inside it
   buildDormRoom();
+
+  // Spawn the progression evidence documents
+  buildDocuments();
 }
 
 function clearGroup(group) {
@@ -3505,12 +3508,12 @@ function buildDocuments() {
     {
       title: "Watchman's Logbook",
       body: "The old wing has lights after midnight again. I heard the metronome from the sealed basement and returned the keys.",
-      position: [1.4, 0.08, -25.4]
+      position: [0.45, 1.14, -39.45]
     },
     {
       title: "Meera Iyer ID Card",
       body: "Hostel record, 2004. Fee waiver attached to Applied Cognition Lab volunteer enrollment.",
-      position: [0.45, 1.14, -39.45]
+      position: [6.0, 0.8, -29.43]
     }
   ];
 
@@ -3935,17 +3938,11 @@ function updateMovement(delta) {
   const forward = Number(keys.has("KeyW")) - Number(keys.has("KeyS"));
   const strafe = Number(keys.has("KeyD")) - Number(keys.has("KeyA"));
   const wantsSprint = keys.has("ShiftLeft");
-  const moving = forward !== 0 || strafe !== 0;
-  const sprint = wantsSprint && moving && stamina > 0 && !sprintExhausted;
-  stamina = THREE.MathUtils.clamp(stamina + (sprint ? -28 : 24) * delta, 0, 100);
-  if (sprint) statStaminaDrained += 34 * delta;
-  if (stamina <= 0 && !sprintExhausted) {
-    sprintExhausted = true;
-    caption.textContent = "Aarav is winded. Release Shift to recover.";
-  }
-  if (!wantsSprint && stamina > 35) sprintExhausted = false;
-  const speed = sprint ? 5.8 : 3.2;
-  
+
+  let moveX = strafe;
+  let moveZ = -forward;
+  let wantsSprintP1 = wantsSprint;
+
   // Player 1 Mouse / Keyboard Look (if not using split-screen keyboard keys, P1 can look with mouse, but if shared keyboard let's allow arrow keys only if NOT co-op mode)
   let lookX = 0;
   let lookY = 0;
@@ -3953,11 +3950,44 @@ function updateMovement(delta) {
     lookX = Number(keys.has("ArrowRight")) - Number(keys.has("ArrowLeft"));
     lookY = Number(keys.has("ArrowDown")) - Number(keys.has("ArrowUp"));
   }
+
+  // Poll gamepad for Player 1 (uses pads[0])
+  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
+  const pad = pads[0];
+  if (pad) {
+    const lx = pad.axes[0] ?? 0;
+    const ly = pad.axes[1] ?? 0;
+    const rx = pad.axes[2] ?? 0;
+    const ry = pad.axes[3] ?? 0;
+    const dead = 0.18;
+
+    if (Math.abs(lx) > dead) moveX = lx;
+    if (Math.abs(ly) > dead) moveZ = ly;
+
+    if (Math.abs(rx) > dead) lookX = rx * 0.9;
+    if (Math.abs(ry) > dead) lookY = ry * 0.7;
+
+    if (pad.buttons[0]?.pressed) inspectNearest();
+    if (pad.buttons[2]?.pressed) toggleFlashlight();
+    if (pad.buttons[10]?.pressed) wantsSprintP1 = true;
+  }
+
+  const moving = moveX !== 0 || moveZ !== 0;
+  const sprint = wantsSprintP1 && moving && stamina > 0 && !sprintExhausted;
+  stamina = THREE.MathUtils.clamp(stamina + (sprint ? -28 : 24) * delta, 0, 100);
+  if (sprint) statStaminaDrained += 34 * delta;
+  if (stamina <= 0 && !sprintExhausted) {
+    sprintExhausted = true;
+    caption.textContent = "Aarav is winded. Release Shift to recover.";
+  }
+  if (!wantsSprintP1 && stamina > 35) sprintExhausted = false;
+  const speed = sprint ? 5.8 : 3.2;
+
   yaw -= lookX * delta * 1.7;
   pitch = THREE.MathUtils.clamp(pitch - lookY * delta * 1.25, -1.1, 1.1);
   camera.rotation.set(pitch, yaw, 0, "YXZ");
 
-  const direction = new THREE.Vector3(strafe, 0, -forward).normalize().multiplyScalar(speed * delta);
+  const direction = new THREE.Vector3(moveX, 0, moveZ).normalize().multiplyScalar(speed * delta);
   direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), yaw);
   moveDirection.copy(direction).normalize();
   const candidate = camera.position.clone().add(direction);
@@ -3999,20 +4029,20 @@ function updateMovement(delta) {
     let gpLookY = 0;
     let gpSprint = sprint2;
     
-    const pads = navigator.getGamepads ? navigator.getGamepads() : [];
-    if (pads[0]) {
-      const pad = pads[0];
-      const lx = pad.axes[0] ?? 0;
-      const ly = pad.axes[1] ?? 0;
-      const rx = pad.axes[2] ?? 0;
-      const ry = pad.axes[3] ?? 0;
+    // For Player 2, check pads[1] first if available, otherwise pads[0]
+    const pad2 = pads[1] || pads[0];
+    if (pad2 && pad2 !== pad) {
+      const lx = pad2.axes[0] ?? 0;
+      const ly = pad2.axes[1] ?? 0;
+      const rx = pad2.axes[2] ?? 0;
+      const ry = pad2.axes[3] ?? 0;
       const dead = 0.18;
       
       if (Math.abs(lx) > dead) gpStrafe = lx;
       if (Math.abs(ly) > dead) gpForward = -ly;
       if (Math.abs(rx) > dead) gpLookX = rx;
       if (Math.abs(ry) > dead) gpLookY = ry;
-      if (pad.buttons[10]?.pressed) gpSprint = true;
+      if (pad2.buttons[10]?.pressed) gpSprint = true;
     }
 
     // P2 keyboard rotate look using Period / Slash if no controller is attached
@@ -8728,37 +8758,8 @@ canvas.addEventListener("touchend", (e) => {
   }
 });
 
-// Gamepad polling — inject left stick into keys Set and right stick into yaw/pitch
-function pollGamepad() {
-  const pads = navigator.getGamepads ? navigator.getGamepads() : [];
-  for (const pad of pads) {
-    if (!pad) continue;
-    const lx = pad.axes[0] ?? 0;
-    const ly = pad.axes[1] ?? 0;
-    const rx = pad.axes[2] ?? 0;
-    const ry = pad.axes[3] ?? 0;
-    const dead = 0.18;
-
-    if (ly < -dead) keys.add("KeyW"); else keys.delete("KeyW");
-    if (ly >  dead) keys.add("KeyS"); else keys.delete("KeyS");
-    if (lx < -dead) keys.add("KeyA"); else keys.delete("KeyA");
-    if (lx >  dead) keys.add("KeyD"); else keys.delete("KeyD");
-
-    if (Math.abs(rx) > dead) yaw -= rx * 0.035;
-    if (Math.abs(ry) > dead) pitch = THREE.MathUtils.clamp(pitch + (invertMouseLook ? 1 : -1) * ry * 0.028, -1.1, 1.1);
-
-    if (pad.buttons[0]?.pressed) inspectNearest();
-    if (pad.buttons[2]?.pressed) toggleFlashlight();
-    if (pad.buttons[10]?.pressed) keys.add("ShiftLeft");
-    else keys.delete("ShiftLeft");
-  }
-}
-
-// Wrap animate to also poll gamepad each frame
-const _rawAnimate = animate;
 renderer.setAnimationLoop(() => {
-  if (gameState === GameState.PLAYING) pollGamepad();
-  _rawAnimate();
+  animate();
 });
 
 function checkBreathingMinigameHitP1() {

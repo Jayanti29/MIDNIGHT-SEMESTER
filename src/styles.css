@@ -694,6 +694,7 @@ body.started .quick-actions {
   left: 50%;
   bottom: 24px;
   max-width: min(720px, calc(100vw - 48px));
+  width: max-content;
   transform: translateX(-50%);
   border-radius: 6px;
   padding: 11px 16px;
@@ -703,6 +704,10 @@ body.started .quick-actions {
   text-align: center;
   z-index: 4;
   transition: opacity 240ms ease;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow: visible;
+  box-sizing: border-box;
 }
 
 .vr-toggle {

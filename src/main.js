@@ -6673,6 +6673,7 @@ composer.addPass(filmPass);
 
 // Character Selection State
 let charSelectActive = false;
+let characterSelectInitialized = false;
 let selectScene, selectCamera, selectRenderer, selectMesh;
 let selectRafId = null;
 let activeEditingPlayer = 1;
@@ -6745,7 +6746,7 @@ function initCharacterSelect() {
   const width = selectCanvas.clientWidth || 280;
   const height = selectCanvas.clientHeight || 260;
 
-  if (selectRenderer && selectScene && selectCamera) {
+  if (characterSelectInitialized && charSelectActive && selectRenderer && selectScene && selectCamera) {
     if (selectCamera) {
       selectCamera.aspect = width / height;
       selectCamera.updateProjectionMatrix();
@@ -6769,6 +6770,7 @@ function initCharacterSelect() {
   selectRenderer = new THREE.WebGLRenderer({ canvas: selectCanvas, antialias: true, alpha: true });
   selectRenderer.setSize(width, height, false);
   selectRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  characterSelectInitialized = true;
 
   selectCanvas.addEventListener("webglcontextlost", (event) => {
     event.preventDefault();

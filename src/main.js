@@ -440,10 +440,18 @@ function disposeObject3D(obj) {
 function disposeRenderer(renderer) {
   if (!renderer) return;
   renderer.dispose();
-  const gl = renderer.getContext();
-  if (gl) {
+  if (typeof renderer.forceContextLoss === "function") {
+    renderer.forceContextLoss();
+  } else if (typeof renderer.getContext === "function") {
+    const gl = renderer.getContext();
     const ext = gl.getExtension("WEBGL_lose_context");
     if (ext) ext.loseContext();
+  }
+  const canvas = renderer.domElement;
+  if (canvas) {
+    ["__webglContext", "_webglContext", "webglContext", "gl"].forEach((key) => {
+      if (key in canvas) canvas[key] = null;
+    });
   }
 }
 

@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 354/500**
+Commit counter: **Commit 355/500**
 
 ## Commits Log
+- **Commit 355/500**: Track A - Align character-select WebGL context lost/restored handling with main renderer reload prompt behavior.
 - **Commit 354/500**: Track A - Add main renderer WebGL context lost/restored handling that stops the render loop and prompts reload.
 - **Commit 353/500**: Track A - Dispose character-select preview mesh resources before removing the old mesh from the preview scene.
 - **Commit 352/500**: Track A - Centralize character-select RAF cancellation and call it immediately when the preview closes or errors.

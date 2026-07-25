@@ -6770,9 +6770,10 @@ function initCharacterSelect() {
   selectRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   characterSelectInitialized = true;
 
-  selectCanvas.addEventListener("webglcontextlost", (event) => {
+  selectRenderer.domElement.addEventListener("webglcontextlost", (event) => {
     event.preventDefault();
-    console.warn("WebGL Context Lost on character-select renderer.");
+    cancelCharacterSelectAnimation();
+    console.error("WebGL context lost on character-select renderer.");
     if (fatalError) {
       fatalError.innerHTML = `
         <h2>WebGL Context Lost</h2>
@@ -6786,7 +6787,8 @@ function initCharacterSelect() {
     }
   }, false);
 
-  selectCanvas.addEventListener("webglcontextrestored", () => {
+  selectRenderer.domElement.addEventListener("webglcontextrestored", () => {
+    console.warn("WebGL context restored on character-select renderer; reloading to rebuild preview.");
     window.location.reload();
   }, false);
 

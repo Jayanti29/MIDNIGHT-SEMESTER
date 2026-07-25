@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 349/500**
+Commit counter: **Commit 350/500**
 
 ## Commits Log
+- **Commit 350/500**: Track A - Dispose stale selectRenderer before initCharacterSelect() creates a replacement WebGLRenderer to prevent leaked preview contexts.
 - **Commit 349/500**: Phase 24 (Track A) - Add disposeRenderer() forceContextLoss and canvas WebGL reference cleanup for full renderer teardown.
 - **Commit 348/500**: Phase 24 (Track C) - chore: update PROGRESS.md and CHANGELOG.md with Track C audio module summary.
 - **Commit 347/500**: Phase 24 (Track C) - refactor: wire main.js audio calls through new audio module (remove duplicate AudioManager + buffer generators from main.js).

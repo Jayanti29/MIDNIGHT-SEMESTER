@@ -6745,7 +6745,7 @@ function initCharacterSelect() {
   const width = selectCanvas.clientWidth || 280;
   const height = selectCanvas.clientHeight || 260;
 
-  if (selectRenderer) {
+  if (selectRenderer && selectScene && selectCamera) {
     if (selectCamera) {
       selectCamera.aspect = width / height;
       selectCamera.updateProjectionMatrix();
@@ -6754,6 +6754,11 @@ function initCharacterSelect() {
     updateSwatchHighlights();
     updatePreviewModel();
     return;
+  }
+
+  if (selectRenderer) {
+    disposeRenderer(selectRenderer);
+    selectRenderer = null;
   }
 
   selectScene = new THREE.Scene();

@@ -461,19 +461,12 @@ function disposeRenderer(renderer) {
   }
 }
 
-function disposeLevel(group) {
+function disposeLevel(group = activeLevelGroup) {
   if (!group) return;
-  group.traverse((child) => {
-    if (child.geometry) {
-      child.geometry.dispose();
-    }
-    if (child.material) {
-      if (Array.isArray(child.material)) {
-        child.material.forEach(disposeMaterial);
-      } else {
-        disposeMaterial(child.material);
-      }
-    }
+  const trackedObjects = [...group.children];
+  trackedObjects.forEach((object) => {
+    disposeObject3D(object);
+    group.remove(object);
   });
   group.clear();
 }

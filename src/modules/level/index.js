@@ -7,3 +7,4 @@ export {
   box,
   tagInteractable
 } from './geometry-helpers.js';
+export { buildLocker, buildDebrisItem } from './props-basic.js';

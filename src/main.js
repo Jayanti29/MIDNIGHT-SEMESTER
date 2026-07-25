@@ -6438,6 +6438,7 @@ function updateMeeraAnimations(meera, state, time) {
 function animate() {
   if (mainRendererContextLost) return;
   try {
+    // try/catch wrapper added for error boundary tracking
     const delta = Math.min(clock.getDelta(), 0.05);
     updateMovement(delta);
     updateState(delta);

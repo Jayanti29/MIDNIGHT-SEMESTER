@@ -237,8 +237,13 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 2.0;
 renderer.xr.enabled = true;
 
-canvas.addEventListener("webglcontextlost", (event) => {
+let mainRendererContextLost = false;
+
+renderer.domElement.addEventListener("webglcontextlost", (event) => {
   event.preventDefault();
+  mainRendererContextLost = true;
+  renderer.setAnimationLoop(null);
+  console.error("WebGL context lost on main renderer.");
   if (fatalError) {
     fatalError.innerHTML = `
       <h2>WebGL Context Lost</h2>
@@ -252,7 +257,8 @@ canvas.addEventListener("webglcontextlost", (event) => {
   }
 }, false);
 
-canvas.addEventListener("webglcontextrestored", () => {
+renderer.domElement.addEventListener("webglcontextrestored", () => {
+  console.warn("WebGL context restored on main renderer; reloading to rebuild scene.");
   window.location.reload();
 }, false);
 
@@ -1070,15 +1076,6 @@ window.addEventListener("error", (event) => {
 window.addEventListener("unhandledrejection", (event) => {
   console.error("Unhandled promise rejection:", event.reason);
 });
-
-// Handle WebGL context loss safely
-canvas.addEventListener("webglcontextlost", (event) => {
-  event.preventDefault();
-  console.error("WebGL Context Lost!");
-  caption.textContent = "Fatal: Graphics context lost. Please reload the page.";
-  setGameState(GameState.MENU);
-}, false);
-
 
 function completeObjective(step) {
   document.querySelector(`[data-step="${step}"]`)?.classList.add("done");
@@ -6445,6 +6442,7 @@ function updateMeeraAnimations(meera, state, time) {
 }
 
 function animate() {
+  if (mainRendererContextLost) return;
   try {
     const delta = Math.min(clock.getDelta(), 0.05);
     updateMovement(delta);

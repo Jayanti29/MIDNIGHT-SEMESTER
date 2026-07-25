@@ -8,3 +8,4 @@ export {
   tagInteractable
 } from './geometry-helpers.js';
 export { buildLocker, buildDebrisItem } from './props-basic.js';
+export { createBookStack, createStudyTable, createBookshelf } from './props-furniture.js';

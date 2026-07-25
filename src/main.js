@@ -6807,8 +6807,8 @@ function updatePreviewModel() {
   if (!selectScene) return;
 
   if (selectMesh) {
-    selectScene.remove(selectMesh);
     disposeObject3D(selectMesh);
+    selectScene.remove(selectMesh);
     selectMesh = null;
   }
 

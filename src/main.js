@@ -1504,16 +1504,7 @@ function playJumpscareStinger() {
   }
 }
 
-const textureCache = new Map();
 
-export function getOrCreateTexture(key, generatorFn) {
-  if (textureCache.has(key)) {
-    return textureCache.get(key);
-  }
-  const texture = generatorFn();
-  textureCache.set(key, texture);
-  return texture;
-}
 
 function createFlashlightBeam() {
   const geom = new THREE.CylinderGeometry(0.015, 1.3, 11.0, 20, 1, true);

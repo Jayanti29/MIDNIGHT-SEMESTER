@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { getOrCreateTexture } from "../../main.js";
+import { getOrCreateTexture } from "./textureCache.js";
 
 export function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#776b5a", scale = 1 } = {}) {
   const cacheKey = `procedural_${base}_${grain}_${scratches}_${scale}`;

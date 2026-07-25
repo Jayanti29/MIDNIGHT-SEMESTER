@@ -5,3 +5,4 @@ export {
   createCheckerboardTexture,
   createPeelingWallTexture
 } from './proceduralTextures.js';
+export { textureCache, getOrCreateTexture } from './textureCache.js';

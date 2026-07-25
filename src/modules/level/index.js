@@ -12,3 +12,4 @@ export { createBookStack, createStudyTable, createBookshelf } from './props-furn
 export { buildDormRoom, buildFilingCabinetProp, buildDecryptorTerminalProp } from './props-rooms.js';
 export { buildTapeRecorder, buildMetronome, buildPillboxProp } from './props-interactive.js';
 export { buildBatteryMesh, buildCheckpointConsole, buildLoreNote } from './props-misc.js';
+export { buildCorridor, buildSegmentedWall, addSpiderLilies } from './level1-geometry.js';

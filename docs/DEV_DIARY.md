@@ -635,3 +635,4 @@
 - Commit 2298: fix(ui): ensure keyboard focus outline matches design specs - iteration 2298
 - Commit 2299: fix(ui): ensure keyboard focus outline matches design specs - iteration 2299
 - Commit 2300: fix(ui): ensure keyboard focus outline matches design specs - iteration 2300
+- Commit 2301: fix(ui): ensure keyboard focus outline matches design specs - iteration 2301

@@ -1510,55 +1510,52 @@ function getOrCreateTexture(key, generatorFn) {
 
 function proceduralTexture({ base = "#514b40", grain = "#2a241f", scratches = "#776b5a", scale = 1 } = {}) {
   const cacheKey = `procedural_${base}_${grain}_${scratches}_${scale}`;
-  if (textureCache.has(cacheKey)) {
-    return textureCache.get(cacheKey).clone();
-  }
+  return getOrCreateTexture(cacheKey, () => {
+    const textureCanvas = document.createElement("canvas");
+    textureCanvas.width = 512;
+    textureCanvas.height = 512;
+    const ctx = textureCanvas.getContext("2d");
+    ctx.fillStyle = base;
+    ctx.fillRect(0, 0, 512, 512);
 
-  const textureCanvas = document.createElement("canvas");
-  textureCanvas.width = 512;
-  textureCanvas.height = 512;
-  const ctx = textureCanvas.getContext("2d");
-  ctx.fillStyle = base;
-  ctx.fillRect(0, 0, 512, 512);
+    for (let i = 0; i < 420; i += 1) {
+      const alpha = Math.random() * 0.16;
+      ctx.strokeStyle = i % 4 === 0 ? `rgba(255,245,220,${alpha})` : `rgba(0,0,0,${alpha})`;
+      ctx.beginPath();
+      const x = Math.random() * 512;
+      const y = Math.random() * 512;
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + (Math.random() - 0.5) * 80 * scale, y + Math.random() * 13 * scale);
+      ctx.stroke();
+    }
 
-  for (let i = 0; i < 420; i += 1) {
-    const alpha = Math.random() * 0.16;
-    ctx.strokeStyle = i % 4 === 0 ? `rgba(255,245,220,${alpha})` : `rgba(0,0,0,${alpha})`;
-    ctx.beginPath();
-    const x = Math.random() * 512;
-    const y = Math.random() * 512;
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + (Math.random() - 0.5) * 80 * scale, y + Math.random() * 13 * scale);
-    ctx.stroke();
-  }
+    ctx.strokeStyle = grain;
+    ctx.lineWidth = 2;
+    for (let y = 0; y < 512; y += 48) {
+      ctx.beginPath();
+      ctx.moveTo(0, y + Math.random() * 9);
+      ctx.lineTo(512, y + Math.random() * 11);
+      ctx.stroke();
+    }
 
-  ctx.strokeStyle = grain;
-  ctx.lineWidth = 2;
-  for (let y = 0; y < 512; y += 48) {
-    ctx.beginPath();
-    ctx.moveTo(0, y + Math.random() * 9);
-    ctx.lineTo(512, y + Math.random() * 11);
-    ctx.stroke();
-  }
+    ctx.strokeStyle = scratches;
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 55; i += 1) {
+      ctx.beginPath();
+      const x = Math.random() * 512;
+      const y = Math.random() * 512;
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + Math.random() * 110 - 40, y + Math.random() * 45 - 22);
+      ctx.stroke();
+    }
 
-  ctx.strokeStyle = scratches;
-  ctx.lineWidth = 1;
-  for (let i = 0; i < 55; i += 1) {
-    ctx.beginPath();
-    const x = Math.random() * 512;
-    const y = Math.random() * 512;
-    ctx.moveTo(x, y);
-    ctx.lineTo(x + Math.random() * 110 - 40, y + Math.random() * 45 - 22);
-    ctx.stroke();
-  }
-
-  const texture = new THREE.CanvasTexture(textureCanvas);
-  texture.wrapS = THREE.RepeatWrapping;
-  texture.wrapT = THREE.RepeatWrapping;
-  texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  textureCache.set(cacheKey, texture);
-  return texture.clone();
+    const texture = new THREE.CanvasTexture(textureCanvas);
+    texture.wrapS = THREE.RepeatWrapping;
+    texture.wrapT = THREE.RepeatWrapping;
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    return texture;
+  });
 }
 
 function createFlashlightBeam() {
@@ -1631,11 +1628,8 @@ function createFlashlightCookie() {
 
 function createCheckerboardTexture() {
   const cacheKey = "checkerboard";
-  if (textureCache.has(cacheKey)) {
-    return textureCache.get(cacheKey).clone();
-  }
-
-  const canvas = document.createElement("canvas");
+  return getOrCreateTexture(cacheKey, () => {
+    const canvas = document.createElement("canvas");
   canvas.width = 512;
   canvas.height = 512;
   const ctx = canvas.getContext("2d");
@@ -1694,17 +1688,14 @@ function createCheckerboardTexture() {
   texture.wrapT = THREE.RepeatWrapping;
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  textureCache.set(cacheKey, texture);
-  return texture.clone();
+    return texture;
+  });
 }
 
 function createPeelingWallTexture() {
   const cacheKey = "peelingWall";
-  if (textureCache.has(cacheKey)) {
-    return textureCache.get(cacheKey).clone();
-  }
-
-  const canvas = document.createElement("canvas");
+  return getOrCreateTexture(cacheKey, () => {
+    const canvas = document.createElement("canvas");
   canvas.width = 512;
   canvas.height = 512;
   const ctx = canvas.getContext("2d");
@@ -1766,8 +1757,8 @@ function createPeelingWallTexture() {
   texture.wrapT = THREE.RepeatWrapping;
   texture.colorSpace = THREE.SRGBColorSpace;
   texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
-  textureCache.set(cacheKey, texture);
-  return texture.clone();
+    return texture;
+  });
 }
 
 const floorTexture = createCheckerboardTexture();

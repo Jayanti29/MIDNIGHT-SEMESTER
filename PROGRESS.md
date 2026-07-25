@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 359/500**
+Commit counter: **Commit 360/500**
 
 ## Commits Log
+- **Commit 360/500**: Track A - Route procedural, checkerboard, and peeling wall texture generation through getOrCreateTexture() cache keys.
 - **Commit 359/500**: Track A - Add getOrCreateTexture() helper around the texture cache for reusable procedural texture allocation.
 - **Commit 358/500**: Track A - Call disposeLevel() in resetGame() before checkpoint or fresh-start level geometry is rebuilt.
 - **Commit 357/500**: Track A - Call disposeLevel() at the start of loadLevel2() before switching active level groups and rebuilding basement geometry.

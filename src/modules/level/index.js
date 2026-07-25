@@ -13,3 +13,4 @@ export { buildDormRoom, buildFilingCabinetProp, buildDecryptorTerminalProp } fro
 export { buildTapeRecorder, buildMetronome, buildPillboxProp } from './props-interactive.js';
 export { buildBatteryMesh, buildCheckpointConsole, buildLoreNote } from './props-misc.js';
 export { buildCorridor, buildSegmentedWall, addSpiderLilies } from './level1-geometry.js';
+export { loadLevel2, buildLevel2, buildValveMesh, buildConfessionTapeMesh, buildExitTerminalMesh, buildBookshelfProp } from './level2.js';

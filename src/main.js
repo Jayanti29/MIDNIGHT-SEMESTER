@@ -2925,6 +2925,7 @@ function clearGroup(group) {
 }
 
 function loadLevel2() {
+  disposeLevel();
   currentLevel = 2;
   level1Group.visible = false;
   level2Group.visible = true;

@@ -6847,6 +6847,13 @@ function updatePreviewModel() {
   selectScene.add(selectMesh);
 }
 
+function cancelCharacterSelectAnimation() {
+  if (selectRafId) {
+    cancelAnimationFrame(selectRafId);
+    selectRafId = null;
+  }
+}
+
 function animateCharacterSelect() {
   if (!charSelectActive) return;
   try {
@@ -6877,10 +6884,7 @@ function animateCharacterSelect() {
         window.location.reload();
       });
     }
-    if (selectRafId) {
-      cancelAnimationFrame(selectRafId);
-      selectRafId = null;
-    }
+    cancelCharacterSelectAnimation();
     charSelectActive = false;
   }
 }
@@ -7837,10 +7841,7 @@ btnCharConfirm?.addEventListener("click", () => {
   }
 
   charSelectActive = false;
-  if (selectRafId) {
-    cancelAnimationFrame(selectRafId);
-    selectRafId = null;
-  }
+  cancelCharacterSelectAnimation();
   if (charSelectScreen) {
     charSelectScreen.style.display = "none";
     charSelectScreen.classList.remove("open");

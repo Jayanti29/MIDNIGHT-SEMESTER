@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 351/500**
+Commit counter: **Commit 352/500**
 
 ## Commits Log
+- **Commit 352/500**: Track A - Centralize character-select RAF cancellation and call it immediately when the preview closes or errors.
 - **Commit 351/500**: Track A - Add characterSelectInitialized guard so active character-select previews reuse existing renderer state instead of rebuilding contexts.
 - **Commit 350/500**: Track A - Dispose stale selectRenderer before initCharacterSelect() creates a replacement WebGLRenderer to prevent leaked preview contexts.
 - **Commit 349/500**: Phase 24 (Track A) - Add disposeRenderer() forceContextLoss and canvas WebGL reference cleanup for full renderer teardown.

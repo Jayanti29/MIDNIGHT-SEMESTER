@@ -7341,6 +7341,8 @@ function resetGame() {
     interactionPromptP2.style.display = "none";
   }
 
+  disposeLevel();
+
   if (activeCheckpoint) {
     fear = 0;
     battery = activeCheckpoint.battery;

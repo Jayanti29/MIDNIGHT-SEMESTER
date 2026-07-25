@@ -1,8 +1,9 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 357/500**
+Commit counter: **Commit 358/500**
 
 ## Commits Log
+- **Commit 358/500**: Track A - Call disposeLevel() in resetGame() before checkpoint or fresh-start level geometry is rebuilt.
 - **Commit 357/500**: Track A - Call disposeLevel() at the start of loadLevel2() before switching active level groups and rebuilding basement geometry.
 - **Commit 356/500**: Track A - Update disposeLevel() to walk addToActiveLevel-tracked group children, dispose each object, remove it, and clear the group.
 - **Commit 355/500**: Track A - Align character-select WebGL context lost/restored handling with main renderer reload prompt behavior.

@@ -5,6 +5,10 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
+## [0.2.8-advanced] — 2026-07-26
+### Added
+- Completed Track A (Stability Fixes) re-run on top of modern refactoring branch.
+
 ## [0.2.7-advanced] — 2026-07-16
 ### Refactored
 - Introduced `src/modules/` directory structure with subdirectories for `audio`, `textures`, `level`, `character`, `player`, `interaction`, `minigames`, `npc`, `ui`, `flow`, `input`, and `core`.

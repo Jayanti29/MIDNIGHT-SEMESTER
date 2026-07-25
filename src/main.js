@@ -725,12 +725,13 @@ const RoomBuilder = {
     wallF.castShadow = true;
     wallF.receiveShadow = true;
     group.add(wallF);
+    addToActiveLevel(group);
+    group.updateMatrixWorld(true);
     group.traverse(child => {
       if (child.isMesh && child !== ceiling && child !== floor) {
         registerCollider(child);
       }
     });
-    addToActiveLevel(group);
     return group;
   }
 };

@@ -4,11 +4,13 @@ import {
   materials,
   interactables,
   flickerLights,
-  buildMetronome,
-  buildTapeRecorder,
-  buildPillboxProp,
   buildEcgSensorsProp
 } from "../../main.js";
+import {
+  buildMetronome,
+  buildTapeRecorder,
+  buildPillboxProp
+} from "./props-interactive.js";
 import { box, addToActiveLevel, tagInteractable, registerCollider } from "./geometry-helpers.js";
 import { createBookStack, createBookshelf } from "./props-furniture.js";
 

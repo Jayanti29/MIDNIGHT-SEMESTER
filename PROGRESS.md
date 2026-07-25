@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 370/500**
+Commit counter: **Commit 371/500**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 371/500**: Track C - refactor: extract buildTapeRecorder/buildMetronome/buildPillbox to modules/level/props-interactive.js.
 - **Commit 370/500**: Track C - refactor: extract buildDormRoom/buildFilingCabinet/buildDecryptorTerminal to modules/level/props-rooms.js.
 - **Commit 369/500**: Track C - refactor: extract buildBookshelf/buildStudyTable/buildBookStack to modules/level/props-furniture.js.
 - **Commit 368/500**: Track C - refactor: extract buildLocker/buildDebrisItem to modules/level/props-basic.js.

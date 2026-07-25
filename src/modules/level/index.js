@@ -1,3 +1,9 @@
 export { LevelManager } from './LevelManager.js';
 export { Room }         from './Room.js';
 export { CollisionMap } from './CollisionMap.js';
+export {
+  registerCollider,
+  addToActiveLevel,
+  box,
+  tagInteractable
+} from './geometry-helpers.js';

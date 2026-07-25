@@ -72,6 +72,12 @@ import {
   createCheckerboardTexture,
   createPeelingWallTexture
 } from "./modules/textures/index.js";
+import {
+  registerCollider,
+  addToActiveLevel,
+  box,
+  tagInteractable
+} from "./modules/level/index.js";
 
 const canvas = document.querySelector("#game");
 const startScreen = document.querySelector("#start-screen");
@@ -216,7 +222,7 @@ loadingManager.onError = (url) => {
   }, 90);
 })();
 
-const scene = new THREE.Scene();
+export const scene = new THREE.Scene();
 scene.background = new THREE.Color(0x020303);
 scene.fog = new THREE.FogExp2(0x070706, 0.012);
 
@@ -845,7 +851,7 @@ scene.add(level1Group);
 let level2Group = new THREE.Group();
 scene.add(level2Group);
 let currentLevel = 1;
-let activeLevelGroup = level1Group;
+export let activeLevelGroup = level1Group;
 const valvesActivated = new Set();
 let generatorPressure = 0;
 let generatorActive = false;
@@ -1545,48 +1551,7 @@ const materials = {
   emission: new THREE.MeshStandardMaterial({ color: 0xffd9a1, emissive: 0xffb25a, emissiveIntensity: 0.9 })
 };
 
-const colliders = [];
-
-function registerCollider(object) {
-  if (!object) return;
-  object.updateMatrixWorld(true);
-  const box3 = new THREE.Box3().setFromObject(object);
-  colliders.push({
-    xMin: box3.min.x,
-    xMax: box3.max.x,
-    zMin: box3.min.z,
-    zMax: box3.max.z,
-    name: object.name || "obstacle"
-  });
-}
-
-function addToActiveLevel(object) {
-  if (activeLevelGroup) {
-    activeLevelGroup.add(object);
-  } else {
-    scene.add(object);
-  }
-}
-
-function box(name, size, position, material, cast = true, receive = true, isCollider = false) {
-  const mesh = new THREE.Mesh(new THREE.BoxGeometry(...size), material);
-  mesh.name = name;
-  mesh.position.set(...position);
-  mesh.castShadow = cast;
-  mesh.receiveShadow = receive;
-  addToActiveLevel(mesh);
-  if (isCollider) {
-    registerCollider(mesh);
-  }
-  return mesh;
-}
-
-function tagInteractable(object, type, label) {
-  object.userData.interactable = true;
-  object.userData.interactionType = type;
-  object.userData.interactionLabel = label;
-  return object;
-}
+export const colliders = [];
 
 function buildLocker(position, label) {
   const group = new THREE.Group();

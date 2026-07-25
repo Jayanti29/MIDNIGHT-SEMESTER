@@ -9,3 +9,4 @@ export {
 } from './geometry-helpers.js';
 export { buildLocker, buildDebrisItem } from './props-basic.js';
 export { createBookStack, createStudyTable, createBookshelf } from './props-furniture.js';
+export { buildDormRoom, buildFilingCabinetProp, buildDecryptorTerminalProp } from './props-rooms.js';

@@ -1788,6 +1788,7 @@ const colliders = [];
 
 function registerCollider(object) {
   if (!object) return;
+  object.updateMatrixWorld(true);
   const box3 = new THREE.Box3().setFromObject(object);
   colliders.push({
     xMin: box3.min.x,
@@ -2038,7 +2039,7 @@ function addLabel(text, position, size = 0.34) {
   const texture = new THREE.CanvasTexture(canvasLabel);
   const mesh = new THREE.Mesh(
     new THREE.PlaneGeometry(size * 4, size),
-    new THREE.MeshStandardMaterial({ map: texture, roughness: 0.88 })
+    new THREE.MeshStandardMaterial({ map: texture, roughness: 0.88, side: THREE.DoubleSide })
   );
   mesh.position.set(...position);
   mesh.rotation.y = Math.PI;
@@ -2118,8 +2119,15 @@ function createDoor({ side, z, label }) {
   tagInteractable(handleLever, "door", label);
   group.add(handleLever);
 
-  const sign = addLabel(label.replace(" door", "").toUpperCase(), [direction * 3.48, 1.92, z], 0.16);
+  const sign = addLabel(label.replace(" door", "").toUpperCase(), [0, 0, 0], 0.16);
+  if (activeLevelGroup) {
+    activeLevelGroup.remove(sign);
+  } else {
+    scene.remove(sign);
+  }
+  sign.position.set(-direction * 0.08, 0.74, 0);
   sign.rotation.y = direction < 0 ? Math.PI / 2 : -Math.PI / 2;
+  group.add(sign);
 
   addToActiveLevel(group);
   doors.push(group);

@@ -2733,6 +2733,68 @@ function buildSegmentedWall(x, side) {
   }
 }
 
+function isDoorCovered(side, doorZ) {
+  if (campusLayoutData && campusLayoutData.blocks) {
+    for (const block of campusLayoutData.blocks) {
+      if (block.rooms) {
+        for (const room of block.rooms) {
+          const xCenter = block.position[0] + room.offset[0];
+          const zCenter = block.position[2] + room.offset[2];
+          const d = room.size[2];
+          
+          const isLeftRoom = xCenter < 0;
+          const isLeftDoor = side === "left";
+          if (isLeftRoom === isLeftDoor) {
+            // Check if doorZ is inside the room's z bounds (with a safety margin)
+            if (doorZ >= zCenter - d/2 - 0.5 && doorZ <= zCenter + d/2 + 0.5) {
+              return true;
+            }
+          }
+        }
+      }
+    }
+  }
+  // Check Room 32 (hardcoded at z = -35, left side)
+  if (side === "left" && doorZ >= -41.5 && doorZ <= -28.5) {
+    return true;
+  }
+  return false;
+}
+
+function buildProceduralRoom(side, doorZ, roomName) {
+  const direction = side === "left" ? -1 : 1;
+  const xCenter = direction * 6.0;
+  const zCenter = doorZ;
+  const w = 4.5;
+  const h = 3.5;
+  const d = 5.0;
+
+  // Build the room geometry using RoomBuilder
+  RoomBuilder.buildRoom(roomName, "dorm", [xCenter, 0, zCenter], [w, h, d]);
+
+  // Add room bounds to roomBounds array so player can occupy it
+  roomBounds.push({
+    xMin: xCenter - w / 2 - 0.2,
+    xMax: xCenter + w / 2 + 0.2,
+    zMin: zCenter - d / 2 - 0.2,
+    zMax: zCenter + d / 2 + 0.2
+  });
+
+  // Spawn simple furniture inside the room
+  const deskPos = [xCenter - direction * 0.8, 0, zCenter - 1.2];
+  PropFactory.createDesk(deskPos, side === "left" ? Math.PI / 2 : -Math.PI / 2);
+  PropFactory.createChair([deskPos[0] + direction * 0.5, 0, deskPos[2]], side === "left" ? -Math.PI / 2 : Math.PI / 2);
+
+  // Bed
+  PropFactory.createBed([xCenter + direction * 0.8, 0, zCenter + 0.8], 0);
+
+  // Locker
+  PropFactory.createLocker([xCenter - direction * 1.2, 0, zCenter + 1.2], side === "left" ? Math.PI / 2 : -Math.PI / 2);
+
+  // Add a tubelight to keep it looking great
+  PropFactory.createTubeLight([xCenter, h - 0.1, zCenter], false);
+}
+
 function buildCorridor() {
   // Call data-driven campus layout builder! Loads gate, academic, dorm, canteens, and restricted basement
   CampusLayoutBuilder.buildCampus(campusLayoutData);
@@ -2836,8 +2898,19 @@ function buildCorridor() {
   for (let z = 5; z > -46; z -= 7) {
     box("wood panel left", [0.34, 1.15, 3.5], [-3.82, 0.78, z], materials.darkWood, true, true, true);
     box("wood panel right", [0.34, 1.15, 3.5], [3.82, 0.78, z - 2.6], materials.darkWood, true, true, true);
-    createDoor({ side: "left", z: z - 2.4, label: `Room ${Math.abs(Math.round(z - 2.4))} left door` });
-    createDoor({ side: "right", z: z + 0.6, label: `Room ${Math.abs(Math.round(z + 0.6))} right door` });
+    
+    const leftZ = z - 2.4;
+    const rightZ = z + 0.6;
+    
+    createDoor({ side: "left", z: leftZ, label: `Room ${Math.abs(Math.round(leftZ))} left door` });
+    createDoor({ side: "right", z: rightZ, label: `Room ${Math.abs(Math.round(rightZ))} right door` });
+
+    if (!isDoorCovered("left", leftZ)) {
+      buildProceduralRoom("left", leftZ, `Room ${Math.abs(Math.round(leftZ))} Left`);
+    }
+    if (!isDoorCovered("right", rightZ)) {
+      buildProceduralRoom("right", rightZ, `Room ${Math.abs(Math.round(rightZ))} Right`);
+    }
   }
 
   // Restore missing Level 1 Dorm Room 32 and all narrative item pickups inside it
@@ -5461,33 +5534,38 @@ function inspectObject(hit, isPlayer2 = false) {
       if (door.userData.locked) {
         if (door.userData.label.includes("Room 32 left") && inspected >= 1) {
           door.userData.locked = false;
-          caption.textContent = "You unlock Room 32 using the credentials from Dr. Verma's memo.";
+          door.userData.open = true;
+          caption.textContent = "You unlock and open Room 32 using the credentials from Dr. Verma's memo.";
           addTaskLog("Unlocked Room 32 Left Door.");
           sayLine(playerName, "Okay, it's open. Let's see what's in here.");
           if (audioManager) audioManager.playSound("door_latch", { volume: 0.35 });
+          playDoorCreak(door, true);
         } else if (door.userData.label.includes("Room 29 right") && inspected >= 2) {
           door.userData.locked = false;
-          caption.textContent = "You unlock Room 29 using the access card from the Watchman's Logbook.";
+          door.userData.open = true;
+          caption.textContent = "You unlock and open Room 29 using the access card from the Watchman's Logbook.";
           addTaskLog("Unlocked Room 29 Right Door.");
           sayLine(playerName, "The right wing dorm is unlocked. I should check the study tables.");
           if (audioManager) audioManager.playSound("door_latch", { volume: 0.35 });
+          playDoorCreak(door, true);
         } else {
           caption.textContent = "The door is locked from the inside. Find more documents first.";
           sayLine(playerName, "Locked tight. I must have missed something down the hall.");
           if (audioManager) audioManager.playSound("door_latch", { volume: 0.35 });
+          return;
         }
-        return;
+      } else {
+        door.userData.open = !door.userData.open;
+        if (isPlayer2) {
+          fear2 = Math.min(100, fear2 + 4);
+        } else {
+          fear = Math.min(100, fear + 4);
+        }
+        playDoorCreak(door, door.userData.open);
+        caption.textContent = door.userData.open ? "The door groans open." : "The latch clicks shut.";
+        addTaskLog(`${door.userData.open ? "Opened" : "Closed"} ${door.userData.label}.`);
       }
 
-      door.userData.open = !door.userData.open;
-      if (isPlayer2) {
-        fear2 = Math.min(100, fear2 + 4);
-      } else {
-        fear = Math.min(100, fear + 4);
-      }
-      playDoorCreak(door, door.userData.open);
-      caption.textContent = door.userData.open ? "The door groans open." : "The latch clicks shut.";
-      addTaskLog(`${door.userData.open ? "Opened" : "Closed"} ${door.userData.label}.`);
       if (door.userData.open && (camera.position.z < -12 || (camera2 && camera2.position.z < -12))) {
         sayLine("Professor Kulkarni", "Some rooms were sealed after 2005. If a door opens by itself, step back.");
       }

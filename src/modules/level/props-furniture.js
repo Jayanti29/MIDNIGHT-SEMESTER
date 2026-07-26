@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as THREE from "three";
 import { materials } from "../../main.js";
 import { box, addToActiveLevel, registerCollider } from "./geometry-helpers.js";

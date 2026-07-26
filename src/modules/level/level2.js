@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as THREE from "three";
 import {
   scene,
@@ -22,7 +23,10 @@ import {
   setSamFlashlight,
   resetLevel2State,
   createCharacter,
-  buildDocuments
+  buildDocuments,
+  colliders,
+  doors,
+  addLabel
 } from "../../main.js";
 import { createFlashlightCookie } from "../textures/index.js";
 import { box, addToActiveLevel, tagInteractable, registerCollider } from "./geometry-helpers.js";

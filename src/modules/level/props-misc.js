@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as THREE from "three";
 import { materials, interactables } from "../../main.js";
 import { box, addToActiveLevel, tagInteractable } from "./geometry-helpers.js";

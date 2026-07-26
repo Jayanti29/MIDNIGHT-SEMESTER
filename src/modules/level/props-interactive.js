@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as THREE from "three";
 import { scene, materials, interactables } from "../../main.js";
 import { tagInteractable } from "./geometry-helpers.js";

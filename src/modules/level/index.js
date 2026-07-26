@@ -14,4 +14,4 @@ export { buildTapeRecorder, buildMetronome, buildPillboxProp } from './props-int
 export { buildBatteryMesh, buildCheckpointConsole, buildLoreNote } from './props-misc.js';
 export { buildCorridor, buildSegmentedWall, addSpiderLilies } from './level1-geometry.js';
 export { loadLevel2, buildLevel2, buildValveMesh, buildConfessionTapeMesh, buildExitTerminalMesh, buildBookshelfProp } from './level2.js';
-export { addAtmosphere, buildFlashlightProp, buildEmfProp, buildEmfPropForP2 } from './atmosphere.js';
+export { addAtmosphere, buildFlashlightProp, buildEmfProp, buildEmfPropForP2, buildRainSystem, updateRain, updateThunder } from './atmosphere.js';

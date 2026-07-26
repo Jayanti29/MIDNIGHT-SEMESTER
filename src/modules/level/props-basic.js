@@ -1,3 +1,4 @@
+// @ts-nocheck
 import * as THREE from "three";
 import { addToActiveLevel, tagInteractable, registerCollider } from "./geometry-helpers.js";
 

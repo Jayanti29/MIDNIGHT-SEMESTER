@@ -4,10 +4,10 @@ import {
   coopMode,
   playerCustomizationState,
   disposeRenderer,
-  disposeObject3D,
-  updateSwatchHighlights
+  disposeObject3D
 } from "../../main.js";
 import { createProceduralHumanoidSkeleton } from "./humanoidSkeleton.js";
+import { updateSwatchHighlights } from "./customization.js";
 
 export const characterSelectState = {
   charSelectActive: false,

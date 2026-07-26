@@ -7,3 +7,4 @@ export {
   cancelCharacterSelectAnimation,
   animateCharacterSelect
 } from './characterSelect.js';
+export { initCustomizationListeners } from './customization.js';

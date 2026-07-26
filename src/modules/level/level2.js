@@ -22,12 +22,12 @@ import {
   setSamCharacter,
   setSamFlashlight,
   resetLevel2State,
-  createCharacter,
   buildDocuments,
   colliders,
   doors,
   addLabel
 } from "../../main.js";
+import { createCharacter } from "../character/index.js";
 import { createFlashlightCookie } from "../textures/index.js";
 import { box, addToActiveLevel, tagInteractable, registerCollider } from "./geometry-helpers.js";
 import { buildLocker, buildDebrisItem } from "./props-basic.js";

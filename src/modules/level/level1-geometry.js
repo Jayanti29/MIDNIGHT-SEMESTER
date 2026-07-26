@@ -9,12 +9,12 @@ import {
   level1Group,
   roomBounds,
   createDoor,
-  createCharacter,
   addLabel,
   initBatteries,
   initLoreNotes,
   buildDocuments
 } from "../../main.js";
+import { createCharacter } from "../character/index.js";
 import { box, addToActiveLevel, tagInteractable, registerCollider } from "./geometry-helpers.js";
 import { buildLocker, buildDebrisItem } from "./props-basic.js";
 import { buildCheckpointConsole } from "./props-misc.js";

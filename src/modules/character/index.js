@@ -1,2 +1,9 @@
-export { CharacterController } from './CharacterController.js';
-export { CharacterAnimator }   from './CharacterAnimator.js';
+export { createProceduralHumanoidSkeleton } from './humanoidSkeleton.js';
+export { updateHumanoidAnimations, createCharacter } from './character.js';
+export {
+  characterSelectState,
+  initCharacterSelect,
+  updatePreviewModel,
+  cancelCharacterSelectAnimation,
+  animateCharacterSelect
+} from './characterSelect.js';

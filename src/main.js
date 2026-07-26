@@ -72,7 +72,16 @@ import {
   createCheckerboardTexture,
   createPeelingWallTexture
 } from "./modules/textures/index.js";
-import { createProceduralHumanoidSkeleton } from "./modules/character/humanoidSkeleton.js";
+import {
+  createProceduralHumanoidSkeleton,
+  createCharacter,
+  updateHumanoidAnimations,
+  characterSelectState,
+  initCharacterSelect,
+  updatePreviewModel,
+  cancelCharacterSelectAnimation,
+  animateCharacterSelect
+} from "./modules/character/index.js";
 import {
   registerCollider,
   addToActiveLevel,
@@ -410,15 +419,7 @@ try {
   console.error("Failed to parse P1 character customization setting", e);
 }
 
-let p1Model = p1Customization.model;
-let p1OutfitColor = p1Customization.outfitColor;
-let p1HairStyle = p1Customization.hairStyle;
-let p1BodyScale = p1Customization.bodyScale;
-let p1HasGlasses = p1Customization.hasGlasses;
-let p1HasBackpack = p1Customization.hasBackpack;
-let p1SkinTone = p1Customization.skinTone;
-
-let p2Name = localStorage.getItem("setting-p2-name") || "Rohan";
+export let p2Name = localStorage.getItem("setting-p2-name") || "Rohan";
 let p2Customization = sanitizeCustomization(null, "Rohan");
 
 try {
@@ -437,13 +438,39 @@ try {
   console.error("Failed to parse P2 character customization setting", e);
 }
 
-let p2Model = p2Customization.model;
-let p2OutfitColor = p2Customization.outfitColor;
-let p2HairStyle = p2Customization.hairStyle;
-let p2BodyScale = p2Customization.bodyScale;
-let p2HasGlasses = p2Customization.hasGlasses;
-let p2HasBackpack = p2Customization.hasBackpack;
-let p2SkinTone = p2Customization.skinTone;
+export const playerCustomizationState = {
+  p1Model: p1Customization.model,
+  p1OutfitColor: p1Customization.outfitColor,
+  p1HairStyle: p1Customization.hairStyle,
+  p1BodyScale: p1Customization.bodyScale,
+  p1HasGlasses: p1Customization.hasGlasses,
+  p1HasBackpack: p1Customization.hasBackpack,
+  p1SkinTone: p1Customization.skinTone,
+
+  p2Model: p2Customization.model,
+  p2OutfitColor: p2Customization.outfitColor,
+  p2HairStyle: p2Customization.hairStyle,
+  p2BodyScale: p2Customization.bodyScale,
+  p2HasGlasses: p2Customization.hasGlasses,
+  p2HasBackpack: p2Customization.hasBackpack,
+  p2SkinTone: p2Customization.skinTone
+};
+
+let p1Model = playerCustomizationState.p1Model;
+let p1OutfitColor = playerCustomizationState.p1OutfitColor;
+let p1HairStyle = playerCustomizationState.p1HairStyle;
+let p1BodyScale = playerCustomizationState.p1BodyScale;
+let p1HasGlasses = playerCustomizationState.p1HasGlasses;
+let p1HasBackpack = playerCustomizationState.p1HasBackpack;
+let p1SkinTone = playerCustomizationState.p1SkinTone;
+
+let p2Model = playerCustomizationState.p2Model;
+let p2OutfitColor = playerCustomizationState.p2OutfitColor;
+let p2HairStyle = playerCustomizationState.p2HairStyle;
+let p2BodyScale = playerCustomizationState.p2BodyScale;
+let p2HasGlasses = playerCustomizationState.p2HasGlasses;
+let p2HasBackpack = playerCustomizationState.p2HasBackpack;
+let p2SkinTone = playerCustomizationState.p2SkinTone;
 let screenBrightness = parseFloat(localStorage.getItem("setting-brightness") || "2.0");
 let xrSession = null;
 let activeLineTimer = 0;
@@ -467,7 +494,7 @@ function disposeMaterial(mat) {
   mat.dispose();
 }
 
-function disposeObject3D(obj) {
+export function disposeObject3D(obj) {
   if (!obj) return;
   obj.traverse((child) => {
     if (child.geometry) {
@@ -483,7 +510,7 @@ function disposeObject3D(obj) {
   });
 }
 
-function disposeRenderer(renderer) {
+export function disposeRenderer(renderer) {
   if (!renderer) return;
   renderer.dispose();
   if (typeof renderer.forceContextLoss === "function") {
@@ -898,7 +925,7 @@ export function resetLevel2State() {
   player2Yaw = 0;
   player2Pitch = 0;
 }
-let coopMode = false;
+export let coopMode = false;
 let battery2 = 100;
 let fear2 = 0;
 let stamina2 = 100;
@@ -1705,47 +1732,7 @@ export function createDoor({ side, z, label }) {
   return group;
 }
 
-function updateHumanoidAnimations(humanoid, speed, time) {
-  const hips = humanoid.userData.hips;
-  const leftLeg = humanoid.userData.leftLeg;
-  const rightLeg = humanoid.userData.rightLeg;
-  const leftArm = humanoid.userData.leftArm;
-  const rightArm = humanoid.userData.rightArm;
-  if (!hips || !leftLeg || !rightLeg) return;
-  if (speed > 0.05) {
-    const cycle = time * speed * 7.5;
-    leftLeg.rotation.x = Math.sin(cycle) * 0.42;
-    rightLeg.rotation.x = -Math.sin(cycle) * 0.42;
-    if (leftArm && rightArm) {
-      leftArm.rotation.x = -Math.sin(cycle) * 0.28;
-      rightArm.rotation.x = Math.sin(cycle) * 0.28;
-    }
-    hips.position.y = 0.9 + Math.abs(Math.sin(cycle * 2)) * 0.04;
-  } else {
-    hips.position.y = 0.9 + Math.sin(time * 1.5) * 0.015;
-    leftLeg.rotation.x = 0;
-    rightLeg.rotation.x = 0;
-    if (leftArm && rightArm) {
-      leftArm.rotation.z = 0.08 + Math.sin(time * 1.5) * 0.02;
-      rightArm.rotation.z = -0.08 - Math.sin(time * 1.5) * 0.02;
-    }
-  }
-}
 
-export function createCharacter({ name, position, color, ghostly = false, identity = "", outfitColorOverride = null, hairStyleOverride = null, hasGlassesOverride = null, hasBackpackOverride = null, skinColorOverride = null }) {
-  const group = createProceduralHumanoidSkeleton({ 
-    name, 
-    position, 
-    isGhost: ghostly, 
-    identity, 
-    outfitColorOverride, 
-    hairStyleOverride,
-    hasGlassesOverride,
-    hasBackpackOverride,
-    skinColorOverride
-  });
-  return group;
-}
 
 
 
@@ -4665,226 +4652,7 @@ composer.addPass(new RenderPass(scene, camera));
 const filmPass = new ShaderPass(filmGrainShader);
 composer.addPass(filmPass);
 
-// Character Selection State
-let charSelectActive = false;
-let characterSelectInitialized = false;
-let selectScene, selectCamera, selectRenderer, selectMesh;
-let selectRafId = null;
-let activeEditingPlayer = 1;
-let selectAmbientLight, selectPointLight;
-let selectLightingMode = "night";
 
-let selectedVariant = "Aarav";
-let selectedOutfitColor = "#243f5e";
-let selectedHairStyle = "short";
-let selectedBodyScale = "average";
-let selectedHasGlasses = false;
-let selectedHasBackpack = false;
-let selectedSkinTone = "#e3a072";
-
-let selectedVariant2 = "Rohan";
-let selectedOutfitColor2 = "#2f4c34";
-let selectedHairStyle2 = "short";
-let selectedBodyScale2 = "average";
-let selectedHasGlasses2 = false;
-let selectedHasBackpack2 = false;
-let selectedSkinTone2 = "#fcd0a1";
-
-function initCharacterSelect() {
-  activeEditingPlayer = 1;
-  const coopPlayerTabs = document.getElementById("coop-player-tabs");
-  if (coopPlayerTabs) {
-    coopPlayerTabs.style.display = coopMode ? "flex" : "none";
-  }
-  const tabP1 = document.getElementById("btn-tab-p1");
-  const tabP2 = document.getElementById("btn-tab-p2");
-  if (tabP1) tabP1.classList.add("active");
-  if (tabP2) tabP2.classList.remove("active");
-
-  selectLightingMode = "night";
-  const btnCharLight = document.getElementById("btn-char-light");
-  if (btnCharLight) btnCharLight.textContent = "☀️ DAYLIGHT MODE";
-  if (selectAmbientLight) {
-    selectAmbientLight.intensity = 0.45;
-    selectAmbientLight.color.setHex(0xffecd9);
-  }
-  if (selectPointLight) {
-    selectPointLight.intensity = 1.8;
-    selectPointLight.color.setHex(0xfff5d9);
-  }
-
-  selectedVariant = p1Model;
-  selectedOutfitColor = p1OutfitColor;
-  selectedHairStyle = p1HairStyle;
-  selectedBodyScale = p1BodyScale;
-  selectedHasGlasses = p1HasGlasses;
-  selectedHasBackpack = p1HasBackpack;
-  selectedSkinTone = p1SkinTone;
-
-  selectedVariant2 = p2Model;
-  selectedOutfitColor2 = p2OutfitColor;
-  selectedHairStyle2 = p2HairStyle;
-  selectedBodyScale2 = p2BodyScale;
-  selectedHasGlasses2 = p2HasGlasses;
-  selectedHasBackpack2 = p2HasBackpack;
-  selectedSkinTone2 = p2SkinTone;
-
-  const selectCanvas = document.getElementById("char-preview-canvas");
-  if (!selectCanvas) return;
-
-  const charSelectScreen = document.getElementById("character-select-screen");
-  if (charSelectScreen) {
-    void charSelectScreen.offsetWidth;
-  }
-
-  const width = selectCanvas.clientWidth || 280;
-  const height = selectCanvas.clientHeight || 260;
-
-  if (characterSelectInitialized && charSelectActive && selectRenderer && selectScene && selectCamera) {
-    if (selectCamera) {
-      selectCamera.aspect = width / height;
-      selectCamera.updateProjectionMatrix();
-    }
-    selectRenderer.setSize(width, height, false);
-    updateSwatchHighlights();
-    updatePreviewModel();
-    return;
-  }
-
-  if (selectRenderer) {
-    disposeRenderer(selectRenderer);
-    selectRenderer = null;
-  }
-
-  selectScene = new THREE.Scene();
-  selectCamera = new THREE.PerspectiveCamera(35, width / height, 0.1, 10);
-  selectCamera.position.set(0, 0.95, 3.1);
-  selectCamera.lookAt(0, 0.95, 0);
-
-  selectRenderer = new THREE.WebGLRenderer({ canvas: selectCanvas, antialias: true, alpha: true });
-  selectRenderer.setSize(width, height, false);
-  selectRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  characterSelectInitialized = true;
-
-  selectRenderer.domElement.addEventListener("webglcontextlost", (event) => {
-    event.preventDefault();
-    cancelCharacterSelectAnimation();
-    console.error("WebGL context lost on character-select renderer.");
-    if (fatalError) {
-      fatalError.innerHTML = `
-        <h2>WebGL Context Lost</h2>
-        <p>The graphics context was lost on character selection. Please reload the page.</p>
-        <button id="reload-btn" style="margin-top: 15px; padding: 8px 16px; background: #c9a56d; color: #080706; border: none; cursor: pointer; font-weight: bold; border-radius: 4px;">Reload Game</button>
-      `;
-      fatalError.hidden = false;
-      document.getElementById("reload-btn")?.addEventListener("click", () => {
-        window.location.reload();
-      });
-    }
-  }, false);
-
-  selectRenderer.domElement.addEventListener("webglcontextrestored", () => {
-    console.warn("WebGL context restored on character-select renderer; reloading to rebuild preview.");
-    window.location.reload();
-  }, false);
-
-  selectAmbientLight = new THREE.AmbientLight(0xffecd9, 2.5);
-  selectScene.add(selectAmbientLight);
-
-  selectPointLight = new THREE.PointLight(0xfff5d9, 45.0, 10);
-  selectPointLight.position.set(0.6, 1.8, 1.2);
-  selectPointLight.castShadow = true;
-  selectScene.add(selectPointLight);
-
-  updatePreviewModel();
-}
-
-function updatePreviewModel() {
-  if (!selectScene) return;
-
-  if (selectMesh) {
-    disposeObject3D(selectMesh);
-    selectScene.remove(selectMesh);
-    selectMesh = null;
-  }
-
-  const currentVar = activeEditingPlayer === 1 ? selectedVariant : selectedVariant2;
-  const currentColor = activeEditingPlayer === 1 ? selectedOutfitColor : selectedOutfitColor2;
-  const currentHair = activeEditingPlayer === 1 ? selectedHairStyle : selectedHairStyle2;
-  const currentGlasses = activeEditingPlayer === 1 ? selectedHasGlasses : selectedHasGlasses2;
-  const currentBackpack = activeEditingPlayer === 1 ? selectedHasBackpack : selectedHasBackpack2;
-  const currentSkin = activeEditingPlayer === 1 ? selectedSkinTone : selectedSkinTone2;
-  const currentScale = activeEditingPlayer === 1 ? selectedBodyScale : selectedBodyScale2;
-
-  selectMesh = createProceduralHumanoidSkeleton({
-    name: "previewModel",
-    position: [0, 0, 0],
-    isGhost: false,
-    identity: currentVar,
-    outfitColorOverride: currentColor,
-    hairStyleOverride: currentHair,
-    hasGlassesOverride: currentGlasses,
-    hasBackpackOverride: currentBackpack,
-    skinColorOverride: currentSkin
-  });
-
-  let scaleMult = 1.0;
-  if (currentScale === "short") scaleMult = 0.88;
-  else if (currentScale === "tall") scaleMult = 1.12;
-
-  if (currentVar === "Sam") {
-    selectMesh.scale.set(1.08 * scaleMult, 1.08 * scaleMult, 1.08 * scaleMult);
-  } else if (currentVar === "Priya") {
-    selectMesh.scale.set(0.92 * scaleMult, 0.94 * scaleMult, 0.92 * scaleMult);
-  } else {
-    selectMesh.scale.set(1.0 * scaleMult, 1.0 * scaleMult, 1.0 * scaleMult);
-  }
-
-  selectScene.add(selectMesh);
-}
-
-function cancelCharacterSelectAnimation() {
-  if (selectRafId) {
-    cancelAnimationFrame(selectRafId);
-    selectRafId = null;
-  }
-}
-
-function animateCharacterSelect() {
-  if (!charSelectActive) return;
-  try {
-    // try/catch wrapper added for error boundary tracking in character select
-    selectRafId = requestAnimationFrame(animateCharacterSelect);
-
-    if (selectMesh) {
-      selectMesh.rotation.y += 0.012;
-      const time = performance.now() * 0.0018;
-      const hips = selectMesh.userData.hips;
-      if (hips) {
-        hips.position.y = 0.9 + Math.sin(time) * 0.015;
-      }
-    }
-
-    if (selectRenderer && selectScene && selectCamera) {
-      selectRenderer.render(selectScene, selectCamera);
-    }
-  } catch (error) {
-    console.error("Error in character select loop:", error);
-    if (fatalError) {
-      fatalError.innerHTML = `
-        <h2>An Error Occurred</h2>
-        <p>A fatal error occurred in the character select loop. Please check the console for details, or reload the page.</p>
-        <button id="reload-btn" style="margin-top: 15px; padding: 8px 16px; background: #c9a56d; color: #080706; border: none; cursor: pointer; font-weight: bold; border-radius: 4px;">Reload Game</button>
-      `;
-      fatalError.hidden = false;
-      document.getElementById("reload-btn")?.addEventListener("click", () => {
-        window.location.reload();
-      });
-    }
-    cancelCharacterSelectAnimation();
-    charSelectActive = false;
-  }
-}
 
 function setupPlayer2() {
   if (!coopMode) return;
@@ -5618,10 +5386,10 @@ const swatchBtns = document.querySelectorAll("#outfit-swatches .swatch-btn");
 swatchBtns.forEach(btn => {
   btn.addEventListener("click", (e) => {
     const col = e.target.getAttribute("data-color");
-    if (activeEditingPlayer === 1) {
-      selectedOutfitColor = col;
+    if (characterSelectState.activeEditingPlayer === 1) {
+      characterSelectState.selectedOutfitColor = col;
     } else {
-      selectedOutfitColor2 = col;
+      characterSelectState.selectedOutfitColor2 = col;
     }
     swatchBtns.forEach(b => b.classList.remove("active"));
     e.target.classList.add("active");
@@ -5633,10 +5401,10 @@ const hairBtns = document.querySelectorAll("#hair-swatches .hair-style-btn");
 hairBtns.forEach(btn => {
   btn.addEventListener("click", (e) => {
     const style = e.target.getAttribute("data-style");
-    if (activeEditingPlayer === 1) {
-      selectedHairStyle = style;
+    if (characterSelectState.activeEditingPlayer === 1) {
+      characterSelectState.selectedHairStyle = style;
     } else {
-      selectedHairStyle2 = style;
+      characterSelectState.selectedHairStyle2 = style;
     }
     hairBtns.forEach(b => b.classList.remove("active"));
     e.target.classList.add("active");
@@ -5648,10 +5416,10 @@ const skinBtns = document.querySelectorAll("#skin-swatches .skin-btn");
 skinBtns.forEach(btn => {
   btn.addEventListener("click", (e) => {
     const col = e.currentTarget.getAttribute("data-color");
-    if (activeEditingPlayer === 1) {
-      selectedSkinTone = col;
+    if (characterSelectState.activeEditingPlayer === 1) {
+      characterSelectState.selectedSkinTone = col;
     } else {
-      selectedSkinTone2 = col;
+      characterSelectState.selectedSkinTone2 = col;
     }
     skinBtns.forEach(b => b.classList.remove("active"));
     e.currentTarget.classList.add("active");
@@ -5659,14 +5427,15 @@ skinBtns.forEach(btn => {
   });
 });
 
-function updateSwatchHighlights() {
-  const currentOutfitColor = activeEditingPlayer === 1 ? selectedOutfitColor : selectedOutfitColor2;
-  const currentHairStyle = activeEditingPlayer === 1 ? selectedHairStyle : selectedHairStyle2;
-  const currentSkinTone = activeEditingPlayer === 1 ? selectedSkinTone : selectedSkinTone2;
-  const currentBodyScale = activeEditingPlayer === 1 ? selectedBodyScale : selectedBodyScale2;
-  const currentHasGlasses = activeEditingPlayer === 1 ? selectedHasGlasses : selectedHasGlasses2;
-  const currentHasBackpack = activeEditingPlayer === 1 ? selectedHasBackpack : selectedHasBackpack2;
-  const currentVariant = activeEditingPlayer === 1 ? selectedVariant : selectedVariant2;
+export function updateSwatchHighlights() {
+  const activeEditingPlayer = characterSelectState.activeEditingPlayer;
+  const currentOutfitColor = activeEditingPlayer === 1 ? characterSelectState.selectedOutfitColor : characterSelectState.selectedOutfitColor2;
+  const currentHairStyle = activeEditingPlayer === 1 ? characterSelectState.selectedHairStyle : characterSelectState.selectedHairStyle2;
+  const currentSkinTone = activeEditingPlayer === 1 ? characterSelectState.selectedSkinTone : characterSelectState.selectedSkinTone2;
+  const currentBodyScale = activeEditingPlayer === 1 ? characterSelectState.selectedBodyScale : characterSelectState.selectedBodyScale2;
+  const currentHasGlasses = activeEditingPlayer === 1 ? characterSelectState.selectedHasGlasses : characterSelectState.selectedHasGlasses2;
+  const currentHasBackpack = activeEditingPlayer === 1 ? characterSelectState.selectedHasBackpack : characterSelectState.selectedHasBackpack2;
+  const currentVariant = activeEditingPlayer === 1 ? characterSelectState.selectedVariant : characterSelectState.selectedVariant2;
 
   const mapping = { Aarav: btnCharAarav, Priya: btnCharPriya, Rohan: btnCharRohan, Sam: btnCharSam };
   [btnCharAarav, btnCharPriya, btnCharRohan, btnCharSam].forEach(btn => btn?.classList.remove("active"));
@@ -5711,7 +5480,7 @@ function updateSwatchHighlights() {
 }
 
 btnCharReset?.addEventListener("click", () => {
-  const currentVar = activeEditingPlayer === 1 ? selectedVariant : selectedVariant2;
+  const currentVar = characterSelectState.activeEditingPlayer === 1 ? characterSelectState.selectedVariant : characterSelectState.selectedVariant2;
   let defOutfit = "#243f5e";
   let defHair = "short";
   let defSkin = "#e3a072";
@@ -5730,20 +5499,20 @@ btnCharReset?.addEventListener("click", () => {
     defSkin = "#a1683d";
   }
 
-  if (activeEditingPlayer === 1) {
-    selectedOutfitColor = defOutfit;
-    selectedHairStyle = defHair;
-    selectedSkinTone = defSkin;
-    selectedBodyScale = "average";
-    selectedHasGlasses = false;
-    selectedHasBackpack = false;
+  if (characterSelectState.activeEditingPlayer === 1) {
+    characterSelectState.selectedOutfitColor = defOutfit;
+    characterSelectState.selectedHairStyle = defHair;
+    characterSelectState.selectedSkinTone = defSkin;
+    characterSelectState.selectedBodyScale = "average";
+    characterSelectState.selectedHasGlasses = false;
+    characterSelectState.selectedHasBackpack = false;
   } else {
-    selectedOutfitColor2 = defOutfit;
-    selectedHairStyle2 = defHair;
-    selectedSkinTone2 = defSkin;
-    selectedBodyScale2 = "average";
-    selectedHasGlasses2 = false;
-    selectedHasBackpack2 = false;
+    characterSelectState.selectedOutfitColor2 = defOutfit;
+    characterSelectState.selectedHairStyle2 = defHair;
+    characterSelectState.selectedSkinTone2 = defSkin;
+    characterSelectState.selectedBodyScale2 = "average";
+    characterSelectState.selectedHasGlasses2 = false;
+    characterSelectState.selectedHasBackpack2 = false;
   }
 
   updateSwatchHighlights();
@@ -5752,20 +5521,20 @@ btnCharReset?.addEventListener("click", () => {
 
 const chkCharGlasses = document.getElementById("chk-char-glasses");
 chkCharGlasses?.addEventListener("change", (e) => {
-  if (activeEditingPlayer === 1) {
-    selectedHasGlasses = e.target.checked;
+  if (characterSelectState.activeEditingPlayer === 1) {
+    characterSelectState.selectedHasGlasses = e.target.checked;
   } else {
-    selectedHasGlasses2 = e.target.checked;
+    characterSelectState.selectedHasGlasses2 = e.target.checked;
   }
   updatePreviewModel();
 });
 
 const chkCharBackpack = document.getElementById("chk-char-backpack");
 chkCharBackpack?.addEventListener("change", (e) => {
-  if (activeEditingPlayer === 1) {
-    selectedHasBackpack = e.target.checked;
+  if (characterSelectState.activeEditingPlayer === 1) {
+    characterSelectState.selectedHasBackpack = e.target.checked;
   } else {
-    selectedHasBackpack2 = e.target.checked;
+    characterSelectState.selectedHasBackpack2 = e.target.checked;
   }
   updatePreviewModel();
 });
@@ -5779,10 +5548,10 @@ bodyScaleSlider?.addEventListener("input", (e) => {
   if (val === 0) scaleStr = "short";
   else if (val === 2) scaleStr = "tall";
 
-  if (activeEditingPlayer === 1) {
-    selectedBodyScale = scaleStr;
+  if (characterSelectState.activeEditingPlayer === 1) {
+    characterSelectState.selectedBodyScale = scaleStr;
   } else {
-    selectedBodyScale2 = scaleStr;
+    characterSelectState.selectedBodyScale2 = scaleStr;
   }
 
   if (bodyScaleLabel) bodyScaleLabel.textContent = scaleStr.toUpperCase();
@@ -5805,22 +5574,22 @@ btnCharRandomize?.addEventListener("click", () => {
   const skinTones = ["#fcd0a1", "#fac08f", "#e3a072", "#a1683d", "#5c3818"];
   const randSkin = skinTones[Math.floor(Math.random() * skinTones.length)];
 
-  if (activeEditingPlayer === 1) {
-    selectedVariant = randVar;
-    selectedOutfitColor = randColor;
-    selectedHairStyle = randStyle;
-    selectedBodyScale = randScale;
-    selectedHasGlasses = randGlasses;
-    selectedHasBackpack = randBackpack;
-    selectedSkinTone = randSkin;
+  if (characterSelectState.activeEditingPlayer === 1) {
+    characterSelectState.selectedVariant = randVar;
+    characterSelectState.selectedOutfitColor = randColor;
+    characterSelectState.selectedHairStyle = randStyle;
+    characterSelectState.selectedBodyScale = randScale;
+    characterSelectState.selectedHasGlasses = randGlasses;
+    characterSelectState.selectedHasBackpack = randBackpack;
+    characterSelectState.selectedSkinTone = randSkin;
   } else {
-    selectedVariant2 = randVar;
-    selectedOutfitColor2 = randColor;
-    selectedHairStyle2 = randStyle;
-    selectedBodyScale2 = randScale;
-    selectedHasGlasses2 = randGlasses;
-    selectedHasBackpack2 = randBackpack;
-    selectedSkinTone2 = randSkin;
+    characterSelectState.selectedVariant2 = randVar;
+    characterSelectState.selectedOutfitColor2 = randColor;
+    characterSelectState.selectedHairStyle2 = randStyle;
+    characterSelectState.selectedBodyScale2 = randScale;
+    characterSelectState.selectedHasGlasses2 = randGlasses;
+    characterSelectState.selectedHasBackpack2 = randBackpack;
+    characterSelectState.selectedSkinTone2 = randSkin;
   }
 
   updateSwatchHighlights();
@@ -5828,8 +5597,8 @@ btnCharRandomize?.addEventListener("click", () => {
 });
 
 btnCharConfirm?.addEventListener("click", () => {
-  if (coopMode && activeEditingPlayer === 1) {
-    activeEditingPlayer = 2;
+  if (coopMode && characterSelectState.activeEditingPlayer === 1) {
+    characterSelectState.activeEditingPlayer = 2;
     const tabP1 = document.getElementById("btn-tab-p1");
     const tabP2 = document.getElementById("btn-tab-p2");
     tabP1?.classList.remove("active");
@@ -5839,20 +5608,28 @@ btnCharConfirm?.addEventListener("click", () => {
     return;
   }
 
-  charSelectActive = false;
+  characterSelectState.charSelectActive = false;
   cancelCharacterSelectAnimation();
   if (charSelectScreen) {
     charSelectScreen.style.display = "none";
     charSelectScreen.classList.remove("open");
   }
 
-  p1Model = selectedVariant;
-  p1OutfitColor = selectedOutfitColor;
-  p1HairStyle = selectedHairStyle;
-  p1BodyScale = selectedBodyScale;
-  p1HasGlasses = selectedHasGlasses;
-  p1HasBackpack = selectedHasBackpack;
-  p1SkinTone = selectedSkinTone;
+  p1Model = characterSelectState.selectedVariant;
+  p1OutfitColor = characterSelectState.selectedOutfitColor;
+  p1HairStyle = characterSelectState.selectedHairStyle;
+  p1BodyScale = characterSelectState.selectedBodyScale;
+  p1HasGlasses = characterSelectState.selectedHasGlasses;
+  p1HasBackpack = characterSelectState.selectedHasBackpack;
+  p1SkinTone = characterSelectState.selectedSkinTone;
+
+  playerCustomizationState.p1Model = p1Model;
+  playerCustomizationState.p1OutfitColor = p1OutfitColor;
+  playerCustomizationState.p1HairStyle = p1HairStyle;
+  playerCustomizationState.p1BodyScale = p1BodyScale;
+  playerCustomizationState.p1HasGlasses = p1HasGlasses;
+  playerCustomizationState.p1HasBackpack = p1HasBackpack;
+  playerCustomizationState.p1SkinTone = p1SkinTone;
 
   p1Customization = {
     model: p1Model,
@@ -5870,13 +5647,21 @@ btnCharConfirm?.addEventListener("click", () => {
   localStorage.setItem("setting-p1-hair-style", p1HairStyle);
 
   if (coopMode) {
-    p2Model = selectedVariant2;
-    p2OutfitColor = selectedOutfitColor2;
-    p2HairStyle = selectedHairStyle2;
-    p2BodyScale = selectedBodyScale2;
-    p2HasGlasses = selectedHasGlasses2;
-    p2HasBackpack = selectedHasBackpack2;
-    p2SkinTone = selectedSkinTone2;
+    p2Model = characterSelectState.selectedVariant2;
+    p2OutfitColor = characterSelectState.selectedOutfitColor2;
+    p2HairStyle = characterSelectState.selectedHairStyle2;
+    p2BodyScale = characterSelectState.selectedBodyScale2;
+    p2HasGlasses = characterSelectState.selectedHasGlasses2;
+    p2HasBackpack = characterSelectState.selectedHasBackpack2;
+    p2SkinTone = characterSelectState.selectedSkinTone2;
+
+    playerCustomizationState.p2Model = p2Model;
+    playerCustomizationState.p2OutfitColor = p2OutfitColor;
+    playerCustomizationState.p2HairStyle = p2HairStyle;
+    playerCustomizationState.p2BodyScale = p2BodyScale;
+    playerCustomizationState.p2HasGlasses = p2HasGlasses;
+    playerCustomizationState.p2HasBackpack = p2HasBackpack;
+    playerCustomizationState.p2SkinTone = p2SkinTone;
 
     p2Customization = {
       model: p2Model,
@@ -5907,7 +5692,7 @@ startButton.addEventListener("click", () => {
     charSelectScreen.style.display = "block";
     charSelectScreen.classList.add("open");
   }
-  charSelectActive = true;
+  characterSelectState.charSelectActive = true;
   initCharacterSelect();
   animateCharacterSelect();
 });
@@ -5922,7 +5707,7 @@ startPlusButton?.addEventListener("click", () => {
     charSelectScreen.style.display = "block";
     charSelectScreen.classList.add("open");
   }
-  charSelectActive = true;
+  characterSelectState.charSelectActive = true;
   initCharacterSelect();
   animateCharacterSelect();
 });
@@ -5937,7 +5722,7 @@ coopButton.addEventListener("click", () => {
     charSelectScreen.style.display = "block";
     charSelectScreen.classList.add("open");
   }
-  charSelectActive = true;
+  characterSelectState.charSelectActive = true;
   initCharacterSelect();
   animateCharacterSelect();
 });
@@ -5946,8 +5731,8 @@ const tabP1 = document.getElementById("btn-tab-p1");
 const tabP2 = document.getElementById("btn-tab-p2");
 
 tabP1?.addEventListener("click", () => {
-  if (activeEditingPlayer === 1) return;
-  activeEditingPlayer = 1;
+  if (characterSelectState.activeEditingPlayer === 1) return;
+  characterSelectState.activeEditingPlayer = 1;
   tabP2?.classList.remove("active");
   tabP1?.classList.add("active");
   updateSwatchHighlights();
@@ -5955,8 +5740,8 @@ tabP1?.addEventListener("click", () => {
 });
 
 tabP2?.addEventListener("click", () => {
-  if (activeEditingPlayer === 2) return;
-  activeEditingPlayer = 2;
+  if (characterSelectState.activeEditingPlayer === 2) return;
+  characterSelectState.activeEditingPlayer = 2;
   tabP1?.classList.remove("active");
   tabP2?.classList.add("active");
   updateSwatchHighlights();
@@ -5965,27 +5750,27 @@ tabP2?.addEventListener("click", () => {
 
 const btnCharLight = document.getElementById("btn-char-light");
 btnCharLight?.addEventListener("click", () => {
-  if (selectLightingMode === "night") {
-    selectLightingMode = "day";
+  if (characterSelectState.selectLightingMode === "night") {
+    characterSelectState.selectLightingMode = "day";
     if (btnCharLight) btnCharLight.textContent = "🌙 NIGHTLIGHT MODE";
-    if (selectAmbientLight) {
-      selectAmbientLight.intensity = 1.1;
-      selectAmbientLight.color.setHex(0xffffff);
+    if (characterSelectState.selectAmbientLight) {
+      characterSelectState.selectAmbientLight.intensity = 1.1;
+      characterSelectState.selectAmbientLight.color.setHex(0xffffff);
     }
-    if (selectPointLight) {
-      selectPointLight.intensity = 2.5;
-      selectPointLight.color.setHex(0xffffff);
+    if (characterSelectState.selectPointLight) {
+      characterSelectState.selectPointLight.intensity = 2.5;
+      characterSelectState.selectPointLight.color.setHex(0xffffff);
     }
   } else {
-    selectLightingMode = "night";
+    characterSelectState.selectLightingMode = "night";
     if (btnCharLight) btnCharLight.textContent = "☀️ DAYLIGHT MODE";
-    if (selectAmbientLight) {
-      selectAmbientLight.intensity = 0.45;
-      selectAmbientLight.color.setHex(0xffecd9);
+    if (characterSelectState.selectAmbientLight) {
+      characterSelectState.selectAmbientLight.intensity = 0.45;
+      characterSelectState.selectAmbientLight.color.setHex(0xffecd9);
     }
-    if (selectPointLight) {
-      selectPointLight.intensity = 1.8;
-      selectPointLight.color.setHex(0xfff5d9);
+    if (characterSelectState.selectPointLight) {
+      characterSelectState.selectPointLight.intensity = 1.8;
+      characterSelectState.selectPointLight.color.setHex(0xfff5d9);
     }
   }
 });

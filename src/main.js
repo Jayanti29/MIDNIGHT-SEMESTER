@@ -84,6 +84,8 @@ import {
   initCustomizationListeners
 } from "./modules/character/index.js";
 import { updateMovement, canOccupy } from "./modules/player/movement.js";
+import { updateState } from "./modules/player/state.js";
+import { initCoopKeyHandlers } from "./modules/player/multiplayer.js";
 import {
   registerCollider,
   addToActiveLevel,
@@ -313,7 +315,7 @@ renderer.domElement.addEventListener("webglcontextrestored", () => {
   window.location.reload();
 }, false);
 
-const clock = new THREE.Clock();
+export const clock = new THREE.Clock();
 export const keys = new Set();
 export const interactables = [];
 export const doors = [];
@@ -331,45 +333,66 @@ export const gameplayState = {
   stamina2: 100,
   sprintExhausted: false,
   sprintExhausted2: false,
-  footstepTimer: 0.35
+  footstepTimer: 0.35,
+  fear: 0,
+  fear2: 0,
+  p1Sanity: 100,
+  p2Sanity: 100,
+  p1HeartRate: 70,
+  p2HeartRate: 70,
+  isPlayerHidden: false,
+  isPlayer2Hidden: false,
+  isHoldingBreath: false,
+  isHoldingBreath2: false,
+  p1BreathStamina: 100,
+  p2BreathStamina: 100,
+  activeNoiseEventZ: null,
+  noiseInvestigateTimer: 0,
+  battery: 100,
+  battery2: 100,
+  flashlightOn: true,
+  flashlightOn2: true,
+  emfActive: false,
+  emfActive2: false,
+  emfLevel: 1,
+  emfLevel2: 1,
+  emfTickTimer: 0,
+  emfTickTimer2: 0,
+  p1LockerMinigameActive: false,
+  p2LockerMinigameActive: false,
+  p1LockerMinigameProgress: 0,
+  p2LockerMinigameProgress: 0,
+  p1PrevBreathDir: 1,
+  p2PrevBreathDir: 1,
+  p1BreathState: "in",
+  p2BreathState: "in",
+  meeraState: "inactive",
+  meeraPatrolDir: -1,
+  activeApparitionWalk: false,
+  apparitionGhost: null,
+  apparitionFadeTimer: 0,
+  meeraFirstWhisperPlayed: false,
+  meeraSecondEventPlayed: false,
+  meeraFinalEventPlayed: false,
+  activeCountdownFlicker: false,
+  isBlackoutActive: false,
+  blackoutTriggered: false,
+  lockerAlertState: false,
+  lockerTargetToInspect: null,
+  statFearPeak: 0,
+  p1HeartbeatSlowNode: null,
+  p1HeartbeatFastNode: null,
+  p2HeartbeatSlowNode: null,
+  p2HeartbeatFastNode: null
 };
 
-Object.defineProperty(window, "yaw", {
-  get() { return gameplayState.yaw; },
-  set(val) { gameplayState.yaw = val; }
-});
-Object.defineProperty(window, "pitch", {
-  get() { return gameplayState.pitch; },
-  set(val) { gameplayState.pitch = val; }
-});
-Object.defineProperty(window, "player2Yaw", {
-  get() { return gameplayState.player2Yaw; },
-  set(val) { gameplayState.player2Yaw = val; }
-});
-Object.defineProperty(window, "player2Pitch", {
-  get() { return gameplayState.player2Pitch; },
-  set(val) { gameplayState.player2Pitch = val; }
-});
-Object.defineProperty(window, "stamina", {
-  get() { return gameplayState.stamina; },
-  set(val) { gameplayState.stamina = val; }
-});
-Object.defineProperty(window, "stamina2", {
-  get() { return gameplayState.stamina2; },
-  set(val) { gameplayState.stamina2 = val; }
-});
-Object.defineProperty(window, "sprintExhausted", {
-  get() { return gameplayState.sprintExhausted; },
-  set(val) { gameplayState.sprintExhausted = val; }
-});
-Object.defineProperty(window, "sprintExhausted2", {
-  get() { return gameplayState.sprintExhausted2; },
-  set(val) { gameplayState.sprintExhausted2 = val; }
-});
-Object.defineProperty(window, "footstepTimer", {
-  get() { return gameplayState.footstepTimer; },
-  set(val) { gameplayState.footstepTimer = val; }
-});
+for (const key of Object.keys(gameplayState)) {
+  Object.defineProperty(window, key, {
+    get() { return gameplayState[key]; },
+    set(val) { gameplayState[key] = val; },
+    configurable: true
+  });
+}
 
 let mouseSensitivity = parseFloat(localStorage.getItem("setting-mouse-sensitivity") || "1.0");
 let vignetteScale = 1.0;
@@ -377,10 +400,6 @@ let screenContrast = 1.0;
 let masterVolume = parseFloat(localStorage.getItem("setting-master-volume") || "0.8");
 let sfxVolume = parseFloat(localStorage.getItem("setting-sfx-volume") || "0.8");
 let ambientVolume = parseFloat(localStorage.getItem("setting-ambient-volume") || "0.8");
-let battery = 100;
-// Sanity & Fear metrics
-let fear = 0;
-let flashlightOn = true;
 let inspected = 0;
 const collectedEvidence = new Set();
 const collectedBatteries = new Set();
@@ -897,39 +916,14 @@ const CampusLayoutBuilder = {
     });
   }
 };
-let meeraFirstWhisperPlayed = false;
 let kulkarniCallPlayed = false;
-let meeraSecondEventPlayed = false;
-let activeCountdownFlicker = false;
 let meeraDiaryReacted = false;
 let hardcoreMode = false;
 let tapeRecorderPlaying = false;
 let tapeSoundInstance = null;
-let emfActive = false;
-let emfActive2 = false;
-let emfLevel = 1;
-let emfLevel2 = 1;
-let emfTickTimer = 0;
-let emfTickTimer2 = 0;
-let p1Sanity = 100;
-let p2Sanity = 100;
 let p1Pills = 0;
 let p2Pills = 0;
-let p1HeartRate = 72;
-let p2HeartRate = 72;
-let p1LockerMinigameActive = false;
-let p2LockerMinigameActive = false;
-let p1LockerMinigameProgress = 0;
-let p2LockerMinigameProgress = 0;
-let p1BreathState = "hold";
-let p2BreathState = "hold";
-let p1PrevBreathDir = 1;
-let p2PrevBreathDir = 1;
 let ecgSensorsCollected = false;
-let p1HeartbeatSlowNode = null;
-let p1HeartbeatFastNode = null;
-let p2HeartbeatSlowNode = null;
-let p2HeartbeatFastNode = null;
 let shadowSpawnTimer = 0;
 let creepyWhisperTimer = 0;
 let shadowFigures = [];
@@ -973,27 +967,16 @@ export function resetLevel2State() {
   player2Pitch = 0;
 }
 export let coopMode = false;
-let battery2 = 100;
-let fear2 = 0;
-let stamina2 = 100;
-let sprintExhausted2 = false;
-let flashlightOn2 = true;
 export let camera2 = null;
 export let player2Character = null;
-let player2Yaw = 0;
-let player2Pitch = 0;
 let godModeActive = false;
 let infiniteBatteryActive = false;
 let debugConsoleOpen = false;
 let meeraSpeedMultiplier = 1.0;
-let isPlayerHidden = false;
-let isPlayer2Hidden = false;
 let player1PreLockerPos = null;
 let player2PreLockerPos = null;
 let p1DebrisCount = 0;
 let p2DebrisCount = 0;
-let activeNoiseEventZ = null;
-let noiseInvestigateTimer = 0;
 // --- Library Level Specific Global States ---
 // === LIBRARY ANNEX GLOBAL STATE ABSTRACTIONS === // Verified Flow - Phase 21 - Overrides
 let libraryFoldersCollected = new Set();
@@ -1006,24 +989,15 @@ let activeDecryptionTerminal = null;
 let decryptProgress = 0;
 let p2DecryptingActive = false;
 let decryptTargetPos = 50;
-let decryptIndicatorPos = 0;
-let decryptOscillationDir = 1;
 let decryptSpeedMultiplier = 1.0;
-let isHoldingBreath = false;
-let isHoldingBreath2 = false;
-let p1BreathStamina = 100;
-let p2BreathStamina = 100;
 let lastPlayer1LockerInspected = null;
 let lastPlayer2LockerInspected = null;
-let lockerAlertState = false;
-let lockerTargetToInspect = null;
 let meeraLockerSearchTimer = 0;
 let runStartTime = 0;
 let runEndTime = 0;
 let statStaminaDrained = 0;
 let statTimesHidden = 0;
 let statCansThrown = 0;
-let statFearPeak = 0;
 
 let subtitlesEnabled = true;
 let camShakeMultiplier = 0.7;
@@ -1032,18 +1006,14 @@ let vrController1 = null;
 let vrController2 = null;
 let vrControllerGrip1 = null;
 let vrControllerGrip2 = null;
-let player2Flashlight = null;
+export let player2Flashlight = null;
+export function setPlayer2Flashlight(val) { player2Flashlight = val; }
 export const player2Keys = new Set();
-let blackoutTriggered = false;
-let isBlackoutActive = false;
-const AiState = {
+export const AiState = {
   INACTIVE: "inactive",
   PATROL: "patrol",
   CHASE: "chase"
 };
-let meeraState = AiState.INACTIVE;
-let meeraPatrolDir = -1;
-let meeraSpeed = 0.9;
 let activeCheckpoint = null;
 try {
   const savedCP = localStorage.getItem("ms_active_checkpoint");
@@ -1062,7 +1032,7 @@ let storyQueue = [];
 let pointerLocked = false;
 export let flashlightLight = null;
 export function setFlashlightLight(val) { flashlightLight = val; }
-const GameState = Object.freeze({
+export const GameState = Object.freeze({
   MENU: "menu",
   PLAYING: "playing",
   PAUSED: "paused",
@@ -1179,8 +1149,12 @@ class GameStateManager {
 
 const stateManager = new GameStateManager();
 
-function setGameState(nextState) {
+export function setGameState(nextState) {
   stateManager.transitionTo(nextState);
+}
+
+export function getGameState() {
+  return gameState;
 }
 
 window.addEventListener("error", (event) => {
@@ -1329,7 +1303,7 @@ function inspectNearestVR(controller) {
   }
 }
 
-function triggerBlackoutSequence() {
+export function triggerBlackoutSequence() {
   isBlackoutActive = true;
   if (audioManager) {
     audioManager.playSound("blackout_cue", { volume: 1.0 });
@@ -1370,7 +1344,7 @@ function setupUiSounds() {
   });
 }
 
-function setFlashlight(state) {
+export function setFlashlight(state) {
   const previous = flashlightOn;
   flashlightOn = state && battery > 0;
   if (previous !== flashlightOn) {
@@ -1384,7 +1358,7 @@ export function toggleFlashlight() {
   setFlashlight(!flashlightOn);
 }
 
-function setFlashlight2(state) {
+export function setFlashlight2(state) {
   const previous = flashlightOn2;
   flashlightOn2 = state && battery2 > 0;
   if (previous !== flashlightOn2) {
@@ -1592,7 +1566,7 @@ function playTone(frequency, duration = 0.3, volume = 0.08, type = "sine") {
   oscillator.stop(audioCtx.currentTime + duration + 0.03);
 }
 
-function playDoorCreak(targetMesh, isOpen) {
+export function playDoorCreak(targetMesh, isOpen) {
   if (audioManager && targetMesh) {
     const soundName = isOpen ? "door_creak" : "door_latch";
     audioManager.playSound(soundName, {
@@ -1607,7 +1581,7 @@ function playDoorCreak(targetMesh, isOpen) {
 
 
 
-function playWhisper() {
+export function playWhisper() {
   if (audioManager) {
     audioManager.playSound("evidence_whisper", { volume: 0.58 });
   }
@@ -1615,7 +1589,7 @@ function playWhisper() {
 
 
 
-function playJumpscareStinger() {
+export function playJumpscareStinger() {
   if (audioManager) {
     audioManager.playSound("jumpscare_stinger", { volume: 1.0 });
     audioManager.duckAmbient(3200, 0.15);
@@ -1926,7 +1900,7 @@ export function initLoreNotes() {
 
 
 
-function setEmfActive(active) {
+export function setEmfActive(active) {
   emfActive = active;
   if (camera.userData.emfProp) {
     camera.userData.emfProp.visible = active;
@@ -1936,7 +1910,7 @@ function setEmfActive(active) {
   addTaskLog(active ? "Equipped EMF Detector Gear." : "Holstered EMF Detector Gear.");
 }
 
-function setEmfActive2(active) {
+export function setEmfActive2(active) {
   emfActive2 = active;
   if (camera2 && camera2.userData.emfProp) {
     camera2.userData.emfProp.visible = active;
@@ -2002,984 +1976,10 @@ function consumePill2() {
 }
 
 
+// updateState is now handled by modules/player/state.js — imported above as updateState.
 
-function updateState(delta) {
-  camera.position.sub(shakeOffset);
-  shakeOffset.set(0, 0, 0);
 
-  if (gameState === GameState.MENU) return;
-  
-  if (gameState === GameState.PLAYING && !blackoutTriggered && camera.position.z < -24) {
-    blackoutTriggered = true;
-    triggerBlackoutSequence();
-  }
-
-  // Phase 12 - Hiding Spot Breath Simulation & Noise Level Calculations
-  if (gameState === GameState.PLAYING) {
-    if (isPlayerHidden) {
-      if (breathP1Panel) breathP1Panel.style.display = "flex";
-      if (keys.has("Space")) {
-        isHoldingBreath = true;
-        p1BreathStamina = Math.max(0, p1BreathStamina - delta * 24);
-        fear = Math.max(0, fear - delta * 4);
-      } else {
-        isHoldingBreath = false;
-        p1BreathStamina = Math.min(100, p1BreathStamina + delta * 18);
-        if (scene.userData.meeraCharacter && !godModeActive) {
-          const distToMeera = camera.position.distanceTo(scene.userData.meeraCharacter.position);
-          if (distToMeera < 8.0) {
-            fear = Math.min(100, fear + delta * 8.5);
-          }
-        }
-      }
-      
-      if (p1BreathStamina <= 0) {
-        isHoldingBreath = false;
-        activeNoiseEventZ = camera.position.z;
-        noiseInvestigateTimer = 6.0;
-        caption.textContent = "Aarav gasped for air! The ghost heard you!";
-        addTaskLog("Gasp for air gave away hiding spot!");
-        p1BreathStamina = 20;
-        if (audioManager) audioManager.playSound("jumpscare_stinger", { volume: 0.5 });
-      }
-    } else {
-      if (breathP1Panel) breathP1Panel.style.display = "none";
-      isHoldingBreath = false;
-      p1BreathStamina = 100;
-    }
-    if (breathP1Text) breathP1Text.textContent = `${Math.round(p1BreathStamina)}%`;
-    if (breathP1Meter) breathP1Meter.value = p1BreathStamina;
-
-    if (coopMode && camera2) {
-      if (isPlayer2Hidden) {
-        if (breathP2Panel) breathP2Panel.style.display = "flex";
-        if (player2Keys.has("Period")) {
-          isHoldingBreath2 = true;
-          p2BreathStamina = Math.max(0, p2BreathStamina - delta * 24);
-          fear2 = Math.max(0, fear2 - delta * 4);
-        } else {
-          isHoldingBreath2 = false;
-          p2BreathStamina = Math.min(100, p2BreathStamina + delta * 18);
-          if (scene.userData.meeraCharacter && !godModeActive) {
-            const distToMeera2 = camera2.position.distanceTo(scene.userData.meeraCharacter.position);
-            if (distToMeera2 < 8.0) {
-              fear2 = Math.min(100, fear2 + delta * 8.5);
-            }
-          }
-        }
-        
-        if (p2BreathStamina <= 0) {
-          isHoldingBreath2 = false;
-          activeNoiseEventZ = camera2.position.z;
-          noiseInvestigateTimer = 6.0;
-          caption.textContent = "Rohan gasped for air! The ghost heard you!";
-          addTaskLog("Player 2 gasped for air!");
-          p2BreathStamina = 20;
-          if (audioManager) audioManager.playSound("jumpscare_stinger", { volume: 0.5 });
-        }
-      } else {
-        if (breathP2Panel) breathP2Panel.style.display = "none";
-        isHoldingBreath2 = false;
-        p2BreathStamina = 100;
-      }
-      if (breathP2Text) breathP2Text.textContent = `${Math.round(p2BreathStamina)}%`;
-      if (breathP2Meter) breathP2Meter.value = p2BreathStamina;
-    }
-
-    let p1Noise = 6;
-    if (isPlayerHidden) {
-      p1Noise = isHoldingBreath ? 2 : 12;
-    } else {
-      const isP1Moving = Number(keys.has("KeyW")) - Number(keys.has("KeyS")) !== 0 || Number(keys.has("KeyD")) - Number(keys.has("KeyA")) !== 0;
-      const isP1Sprinting = keys.has("ShiftLeft") && isP1Moving && stamina > 0 && !sprintExhausted;
-      p1Noise = isP1Sprinting ? 85 : (isP1Moving ? 35 : 6);
-    }
-    if (noiseP1Text) noiseP1Text.textContent = `${Math.round(p1Noise)}%`;
-    if (noiseP1Meter) noiseP1Meter.value = p1Noise;
-
-    if (coopMode) {
-      let p2Noise = 6;
-      if (isPlayer2Hidden) {
-        p2Noise = isHoldingBreath2 ? 2 : 12;
-      } else {
-        const isP2Moving = Number(player2Keys.has("ArrowUp")) - Number(player2Keys.has("ArrowDown")) !== 0 || Number(player2Keys.has("ArrowLeft")) - Number(player2Keys.has("ArrowRight")) !== 0;
-        const isP2Sprinting = player2Keys.has("ShiftRight") && isP2Moving && stamina2 > 0 && !sprintExhausted2;
-        p2Noise = isP2Sprinting ? 85 : (isP2Moving ? 35 : 6);
-      }
-      if (noiseP2Text) noiseP2Text.textContent = `${Math.round(p2Noise)}%`;
-      if (noiseP2Meter) noiseP2Meter.value = p2Noise;
-    }
-  }
-
-  const batteryMultiplier = hardcoreMode ? 1.6 : 1.0;
-  if (flashlightOn && !infiniteBatteryActive) battery = Math.max(0, battery - delta * 0.85 * batteryMultiplier);
-  if (battery <= 0 && flashlightOn) setFlashlight(false);
-
-  if (emfActive && !infiniteBatteryActive) {
-    battery = Math.max(0, battery - delta * 0.46 * batteryMultiplier);
-    if (battery <= 0) setEmfActive(false);
-  }
-
-  // Player 1 EMF Reader calculation & update
-  if (emfActive) {
-    let val = 1.0;
-    if (scene.userData.meeraCharacter && scene.userData.meeraCharacter.visible) {
-      const dist = camera.position.distanceTo(scene.userData.meeraCharacter.position);
-      if (dist <= 25) {
-        const ratio = Math.max(0, 1 - (dist - 1) / 24);
-        val = 1.0 + ratio * 4.0;
-        val += (Math.random() - 0.5) * 0.15;
-        val = THREE.MathUtils.clamp(val, 1.0, 5.0);
-      } else {
-        val = 1.0 + (Math.random() - 0.5) * 0.05;
-      }
-    } else {
-      val = 1.0 + (Math.random() - 0.5) * 0.05;
-    }
-    
-    emfLevel = Math.floor(val);
-    const p1ValEl = document.getElementById("emf-p1-val");
-    const p1MeterEl = document.getElementById("emf-p1-meter");
-    const p1PanelEl = document.getElementById("emf-p1-panel");
-    if (p1ValEl) p1ValEl.textContent = val.toFixed(1);
-    if (p1MeterEl) p1MeterEl.value = val;
-    if (p1PanelEl) {
-      if (emfLevel === 5) p1PanelEl.classList.add("danger-emf");
-      else p1PanelEl.classList.remove("danger-emf");
-    }
-
-    // Handheld LEDs update
-    if (camera.userData.emfProp && camera.userData.emfProp.userData.leds) {
-      camera.userData.emfProp.userData.leds.forEach((led, idx) => {
-        led.material.opacity = idx < emfLevel ? 1.0 : 0.18;
-      });
-    }
-
-    // Sound ticking Geiger
-    emfTickTimer -= delta;
-    if (emfTickTimer <= 0) {
-      const intervals = [1.2, 0.8, 0.5, 0.24, 0.08];
-      emfTickTimer = intervals[Math.min(emfLevel - 1, 4)];
-      if (audioManager) {
-        audioManager.playSound("emf_tick", { volume: 0.18 * (emfLevel / 5) });
-      }
-    }
-  }
-
-  // Player 2 EMF Reader calculation & update
-  if (coopMode && emfActive2) {
-    let val2 = 1.0;
-    if (scene.userData.meeraCharacter && scene.userData.meeraCharacter.visible && camera2) {
-      const dist2 = camera2.position.distanceTo(scene.userData.meeraCharacter.position);
-      if (dist2 <= 25) {
-        const ratio2 = Math.max(0, 1 - (dist2 - 1) / 24);
-        val2 = 1.0 + ratio2 * 4.0;
-        val2 += (Math.random() - 0.5) * 0.15;
-        val2 = THREE.MathUtils.clamp(val2, 1.0, 5.0);
-      } else {
-        val2 = 1.0 + (Math.random() - 0.5) * 0.05;
-      }
-    } else {
-      val2 = 1.0 + (Math.random() - 0.5) * 0.05;
-    }
-
-    emfLevel2 = Math.floor(val2);
-    const p2ValEl = document.getElementById("emf-p2-val");
-    const p2MeterEl = document.getElementById("emf-p2-meter");
-    const p2PanelEl = document.getElementById("emf-p2-panel");
-    if (p2ValEl) p2ValEl.textContent = val2.toFixed(1);
-    if (p2MeterEl) p2MeterEl.value = val2;
-    if (p2PanelEl) {
-      if (emfLevel2 === 5) p2PanelEl.classList.add("danger-emf");
-      else p2PanelEl.classList.remove("danger-emf");
-    }
-
-    // Handheld LEDs update
-    if (camera2 && camera2.userData.emfProp && camera2.userData.emfProp.userData.leds) {
-      camera2.userData.emfProp.userData.leds.forEach((led, idx) => {
-        led.material.opacity = idx < emfLevel2 ? 1.0 : 0.18;
-      });
-    }
-
-    // Sound ticking Geiger
-    emfTickTimer2 -= delta;
-    if (emfTickTimer2 <= 0) {
-      const intervals2 = [1.2, 0.8, 0.5, 0.24, 0.08];
-      emfTickTimer2 = intervals2[Math.min(emfLevel2 - 1, 4)];
-      if (audioManager) {
-        audioManager.playSound("emf_tick", { volume: 0.18 * (emfLevel2 / 5) });
-      }
-    }
-  }
-  
-  if (godModeActive) {
-    fear = 0;
-    p1Sanity = 100;
-  } else {
-    const depthFear = THREE.MathUtils.clamp((-camera.position.z - 6) * 1.7, 0, 58);
-    const darknessFear = flashlightOn ? 0 : 18;
-    fear = THREE.MathUtils.lerp(fear, depthFear + darknessFear + inspected * 5, delta * 0.9);
-    if (fear >= 100 && gameState === GameState.PLAYING) {
-      triggerGameOver("Aarav's heart could not take the terror. The dark claimed him.");
-    }
-
-    let sanityDrain = 0;
-    if (!flashlightOn) {
-      sanityDrain += 1.5;
-    }
-    if (scene.userData.meeraCharacter && scene.userData.meeraCharacter.visible) {
-      const distToMeera = camera.position.distanceTo(scene.userData.meeraCharacter.position);
-      if (distToMeera < 12.0) {
-        sanityDrain += 4.5 * (1.0 - (distToMeera / 12.0));
-      }
-    }
-    if (hardcoreMode) {
-      sanityDrain *= 1.45;
-    }
-    const p1HrMultiplier = 1.0 + Math.max(0.0, (p1HeartRate - 70) / 100) * 1.5;
-    sanityDrain *= p1HrMultiplier;
-
-    if (sanityDrain > 0) {
-      p1Sanity = Math.max(0, p1Sanity - delta * sanityDrain);
-    } else {
-      if (currentLevel === 1 && camera.position.z > -12) {
-        p1Sanity = Math.min(100, p1Sanity + delta * 2.0);
-      }
-    }
-  }
-
-  // Heart rate calculation P1
-  const targetHR1 = 70 + (fear / 100) * 70 + ((100 - stamina) / 100) * 30;
-  p1HeartRate = THREE.MathUtils.lerp(p1HeartRate, targetHR1 + Math.sin(clock.getElapsedTime() * 3) * 1.5, delta * 2.0);
-
-  const heart1ValEl = document.getElementById("heart-p1-val");
-  if (heart1ValEl) heart1ValEl.textContent = `${Math.round(p1HeartRate)} BPM`;
-  const ecgPath1 = document.querySelector("#ecg-p1-svg .ecg-path");
-  if (ecgPath1) {
-    ecgPath1.style.animationDuration = `${60 / p1HeartRate}s`;
-  }
-
-  const panicOverlay1 = document.getElementById("panic-overlay-p1");
-  if (panicOverlay1) {
-    if (p1HeartRate > 115) {
-      panicOverlay1.classList.add("panic-active");
-    } else {
-      panicOverlay1.classList.remove("panic-active");
-    }
-  }
-
-  if (gameState === GameState.PLAYING && audioCtx && audioManager && audioManager.buffers.has("heart_beat_slow")) {
-    if (!p1HeartbeatSlowNode) {
-      p1HeartbeatSlowNode = new THREE.Audio(audioManager.listener);
-      p1HeartbeatSlowNode.setBuffer(audioManager.buffers.get("heart_beat_slow"));
-      p1HeartbeatSlowNode.setLoop(true);
-      p1HeartbeatSlowNode.setVolume(0);
-      p1HeartbeatSlowNode.play();
-    }
-    if (!p1HeartbeatFastNode) {
-      p1HeartbeatFastNode = new THREE.Audio(audioManager.listener);
-      p1HeartbeatFastNode.setBuffer(audioManager.buffers.get("heart_beat_fast"));
-      p1HeartbeatFastNode.setLoop(true);
-      p1HeartbeatFastNode.setVolume(0);
-      p1HeartbeatFastNode.play();
-    }
-
-    let p1HeartRateMult = 1.0;
-    if (p1Model === "Kulkarni") p1HeartRateMult = 0.82;
-    else if (p1Model === "Priya") p1HeartRateMult = 1.15;
-
-    const sfxVolFactor = sfxVolume;
-    if (p1HeartRate > 95) {
-      const fastVol = Math.min(1.0, (p1HeartRate - 95) / 45) * 0.9 * sfxVolFactor;
-      p1HeartbeatFastNode.setVolume(fastVol);
-      p1HeartbeatSlowNode.setVolume(0);
-      p1HeartbeatFastNode.setPlaybackRate((p1HeartRate / 120) * p1HeartRateMult);
-    } else {
-      const slowVol = Math.max(0.0, (p1HeartRate - 65) / 30) * 0.5 * sfxVolFactor;
-      p1HeartbeatSlowNode.setVolume(slowVol);
-      p1HeartbeatFastNode.setVolume(0);
-      p1HeartbeatSlowNode.setPlaybackRate((p1HeartRate / 70) * p1HeartRateMult);
-    }
-  } else {
-    if (p1HeartbeatSlowNode) p1HeartbeatSlowNode.setVolume(0);
-    if (p1HeartbeatFastNode) p1HeartbeatFastNode.setVolume(0);
-  }
-
-  const sanity1Val = document.getElementById("sanity-p1-val");
-  const sanity1Meter = document.getElementById("sanity-p1-meter");
-  const sanity1Panel = document.getElementById("sanity-p1-panel");
-  if (sanity1Val) sanity1Val.textContent = `${Math.round(p1Sanity)}%`;
-  if (sanity1Meter) sanity1Meter.value = p1Sanity;
-  if (sanity1Panel) {
-    if (p1Sanity <= 30) sanity1Panel.classList.add("critical-sanity");
-    else sanity1Panel.classList.remove("critical-sanity");
-  }
-
-  const minigamePanel1 = document.getElementById("breath-minigame-p1");
-  if (minigamePanel1) {
-    minigamePanel1.style.display = p1LockerMinigameActive ? "flex" : "none";
-  }
-
-  // Strobe sound hum effect
-  if (audioManager && Math.random() < 0.05) {
-    audioManager.playSound("strobe_buzz", { volume: 0.15 });
-  }
-
-  const feedNoise = document.getElementById("cctv-feed-noise");
-  if (feedNoise && document.getElementById("security-terminal-modal")?.style.display === "block") {
-    const meeraChar = scene.userData.meeraCharacter;
-    const distToGhost = meeraChar ? camera.position.distanceTo(meeraChar.position) : 9999;
-    if (distToGhost < 8.0) {
-      feedNoise.style.background = `rgba(0, 255, 51, ${0.08 + Math.random() * 0.15})`;
-    } else {
-      feedNoise.style.background = "rgba(0, 255, 51, 0.08)";
-    }
-  }
-
-  if (document.getElementById("map-overlay")?.style.display === "block") {
-    updateMapMarkers();
-    if (keys.has("ShiftLeft") || keys.has("ShiftRight")) {
-      const mapModal = document.getElementById("map-overlay");
-      if (mapModal) mapModal.style.display = "none";
-      setGameState(GameState.PLAYING);
-      requestPointerLock();
-    }
-  }
-
-  if (gameState === GameState.DECRYPTING) {
-    decryptIndicatorPos += decryptOscillationDir * delta * 80 * decryptSpeedMultiplier;
-    if (decryptIndicatorPos >= 95) {
-      decryptIndicatorPos = 95;
-      decryptOscillationDir = -1;
-    } else if (decryptIndicatorPos <= 5) {
-      decryptIndicatorPos = 5;
-      decryptOscillationDir = 1;
-    }
-    const indicatorEl = document.getElementById("decrypt-indicator");
-    if (indicatorEl) indicatorEl.style.left = `${decryptIndicatorPos}%`;
-    const targetEl = document.getElementById("decrypt-target");
-    if (targetEl) targetEl.style.left = `${decryptTargetPos - 10}%`;
-  }
-
-  if (p1LockerMinigameActive) {
-    const cycleSpeed = 2.4 + (p1HeartRate - 70) * 0.02;
-    const breathTime = clock.getElapsedTime() * cycleSpeed;
-    const indicatorPos = 50 + Math.sin(breathTime) * 45;
-    
-    const indicatorEl = document.getElementById("breath-indicator-p1");
-    if (indicatorEl) indicatorEl.style.left = `${indicatorPos}%`;
-
-    const dir = Math.cos(breathTime) >= 0 ? 1 : -1;
-    if (dir !== p1PrevBreathDir) {
-      p1PrevBreathDir = dir;
-      p1BreathState = dir === 1 ? "in" : "out";
-      if (audioManager && gameState === GameState.PLAYING) {
-        audioManager.playSound(dir === 1 ? "breath_in" : "breath_out", { volume: 0.35 * sfxVolume });
-      }
-    }
-
-    p1LockerMinigameProgress = Math.max(-50, p1LockerMinigameProgress - delta * 4);
-    const progressMeter = document.getElementById("breath-progress-meter-p1");
-    if (progressMeter) progressMeter.value = p1LockerMinigameProgress;
-
-    if (p1LockerMinigameProgress <= -50) {
-      p1LockerMinigameActive = false;
-      fear = 100;
-      caption.textContent = "You panicked! The ghost heard your hyperventilation!";
-      if (audioManager) {
-        audioManager.playSound("creepy_whisper", { volume: 0.85 });
-      }
-      activeNoiseEventZ = camera.position.z;
-      noiseInvestigateTimer = 10.0;
-      if (scene.userData.meeraCharacter) {
-        meeraState = AiState.CHASE;
-        lockerAlertState = true;
-      }
-    }
-  }
-
-  // Player 2 Flashlight, Battery, and Fear updates
-  if (coopMode && camera2 && player2Flashlight) {
-    if (flashlightOn2 && !infiniteBatteryActive) battery2 = Math.max(0, battery2 - delta * 0.85 * batteryMultiplier);
-    if (battery2 <= 0 && flashlightOn2) setFlashlight2(false);
-
-    if (emfActive2 && !infiniteBatteryActive) {
-      battery2 = Math.max(0, battery2 - delta * 0.46 * batteryMultiplier);
-      if (battery2 <= 0) setEmfActive2(false);
-    }
-
-    if (godModeActive) {
-      fear2 = 0;
-      p2Sanity = 100;
-    } else {
-      const depthFear2 = THREE.MathUtils.clamp((-camera2.position.z - 6) * 1.7, 0, 58);
-      const darknessFear2 = flashlightOn2 ? 0 : 24;
-      fear2 = THREE.MathUtils.lerp(fear2, depthFear2 + darknessFear2 + inspected * 5, delta * 0.9);
-      if (fear2 >= 100 && gameState === GameState.PLAYING) {
-        triggerGameOver("Rohan's heart could not take the terror. The dark claimed him.");
-      }
-
-      let sanityDrain2 = 0;
-      if (!flashlightOn2) {
-        sanityDrain2 += 1.5;
-      }
-      if (scene.userData.meeraCharacter && scene.userData.meeraCharacter.visible) {
-        const distToMeera2 = camera2.position.distanceTo(scene.userData.meeraCharacter.position);
-        if (distToMeera2 < 12.0) {
-          sanityDrain2 += 4.5 * (1.0 - (distToMeera2 / 12.0));
-        }
-      }
-      if (hardcoreMode) {
-        sanityDrain2 *= 1.45;
-      }
-      const p2HrMultiplier = 1.0 + Math.max(0.0, (p2HeartRate - 70) / 100) * 1.5;
-      sanityDrain2 *= p2HrMultiplier;
-
-      if (sanityDrain2 > 0) {
-        p2Sanity = Math.max(0, p2Sanity - delta * sanityDrain2);
-      } else {
-        if (currentLevel === 1 && camera2.position.z > -12) {
-          p2Sanity = Math.min(100, p2Sanity + delta * 2.0);
-        }
-      }
-    }
-
-    // Heart rate calculation P2
-    const targetHR2 = 70 + (fear2 / 100) * 70 + ((100 - stamina2) / 100) * 30;
-    p2HeartRate = THREE.MathUtils.lerp(p2HeartRate, targetHR2 + Math.sin(clock.getElapsedTime() * 3) * 1.5, delta * 2.0);
-
-    const heart2ValEl = document.getElementById("heart-p2-val");
-    if (heart2ValEl) heart2ValEl.textContent = `${Math.round(p2HeartRate)} BPM`;
-    const ecgPath2 = document.querySelector("#ecg-p2-svg .ecg-path");
-    if (ecgPath2) {
-      ecgPath2.style.animationDuration = `${60 / p2HeartRate}s`;
-    }
-
-    const panicOverlay2 = document.getElementById("panic-overlay-p2");
-    if (panicOverlay2) {
-      if (p2HeartRate > 115) {
-        panicOverlay2.classList.add("panic-active");
-      } else {
-        panicOverlay2.classList.remove("panic-active");
-      }
-    }
-
-    if (gameState === GameState.PLAYING && audioCtx && audioManager && audioManager.buffers.has("heart_beat_slow")) {
-      if (!p2HeartbeatSlowNode) {
-        p2HeartbeatSlowNode = new THREE.Audio(audioManager.listener);
-        p2HeartbeatSlowNode.setBuffer(audioManager.buffers.get("heart_beat_slow"));
-        p2HeartbeatSlowNode.setLoop(true);
-        p2HeartbeatSlowNode.setVolume(0);
-        p2HeartbeatSlowNode.play();
-      }
-      if (!p2HeartbeatFastNode) {
-        p2HeartbeatFastNode = new THREE.Audio(audioManager.listener);
-        p2HeartbeatFastNode.setBuffer(audioManager.buffers.get("heart_beat_fast"));
-        p2HeartbeatFastNode.setLoop(true);
-        p2HeartbeatFastNode.setVolume(0);
-        p2HeartbeatFastNode.play();
-      }
-
-      let p2HeartRateMult = 1.0;
-      if (p2Model === "Kulkarni") p2HeartRateMult = 0.82;
-      else if (p2Model === "Priya" || p2Model === "Priya Sharma") p2HeartRateMult = 1.15;
-
-      const sfxVolFactor = sfxVolume;
-      if (p2HeartRate > 95) {
-        const fastVol2 = Math.min(1.0, (p2HeartRate - 95) / 45) * 0.9 * sfxVolFactor;
-        p2HeartbeatFastNode.setVolume(fastVol2);
-        p2HeartbeatSlowNode.setVolume(0);
-        p2HeartbeatFastNode.setPlaybackRate((p2HeartRate / 120) * p2HeartRateMult);
-      } else {
-        const slowVol2 = Math.max(0.0, (p2HeartRate - 65) / 30) * 0.5 * sfxVolFactor;
-        p2HeartbeatSlowNode.setVolume(slowVol2);
-        p2HeartbeatFastNode.setVolume(0);
-        p2HeartbeatSlowNode.setPlaybackRate((p2HeartRate / 70) * p2HeartRateMult);
-      }
-    } else {
-      if (p2HeartbeatSlowNode) p2HeartbeatSlowNode.setVolume(0);
-      if (p2HeartbeatFastNode) p2HeartbeatFastNode.setVolume(0);
-    }
-
-    const sanity2Val = document.getElementById("sanity-p2-val");
-    const sanity2Meter = document.getElementById("sanity-p2-meter");
-    const sanity2Panel = document.getElementById("sanity-p2-panel");
-    if (sanity2Val) sanity2Val.textContent = `${Math.round(p2Sanity)}%`;
-    if (sanity2Meter) sanity2Meter.value = p2Sanity;
-    if (sanity2Panel) {
-      if (p2Sanity <= 30) sanity2Panel.classList.add("critical-sanity");
-      else sanity2Panel.classList.remove("critical-sanity");
-    }
-
-    const minigamePanel2 = document.getElementById("breath-minigame-p2");
-    if (minigamePanel2) {
-      minigamePanel2.style.display = p2LockerMinigameActive ? "flex" : "none";
-    }
-
-    if (p2LockerMinigameActive) {
-      const cycleSpeed2 = 2.4 + (p2HeartRate - 70) * 0.02;
-      const breathTime2 = clock.getElapsedTime() * cycleSpeed2;
-      const indicatorPos2 = 50 + Math.sin(breathTime2) * 45;
-      
-      const indicatorEl2 = document.getElementById("breath-indicator-p2");
-      if (indicatorEl2) indicatorEl2.style.left = `${indicatorPos2}%`;
-
-      const dir2 = Math.cos(breathTime2) >= 0 ? 1 : -1;
-      if (dir2 !== p2PrevBreathDir) {
-        p2PrevBreathDir = dir2;
-        p2BreathState = dir2 === 1 ? "in" : "out";
-        if (audioManager && gameState === GameState.PLAYING) {
-          audioManager.playSound(dir2 === 1 ? "breath_in" : "breath_out", { volume: 0.35 * sfxVolume });
-        }
-      }
-
-      p2LockerMinigameProgress = Math.max(-50, p2LockerMinigameProgress - delta * 4);
-      const progressMeter2 = document.getElementById("breath-progress-meter-p2");
-      if (progressMeter2) progressMeter2.value = p2LockerMinigameProgress;
-
-      if (p2LockerMinigameProgress <= -50) {
-        p2LockerMinigameActive = false;
-        fear2 = 100;
-        caption.textContent = "Player 2 panicked! The ghost heard hyperventilation!";
-        if (audioManager) {
-          audioManager.playSound("creepy_whisper", { volume: 0.85 });
-        }
-        activeNoiseEventZ = camera2.position.z;
-        noiseInvestigateTimer = 10.0;
-        if (scene.userData.meeraCharacter) {
-          meeraState = AiState.CHASE;
-          lockerAlertState = true;
-        }
-      }
-    }
-
-    if (flashlightOn2 && player2Flashlight.parent !== camera2) {
-      camera2.add(player2Flashlight);
-      camera2.add(player2Flashlight.target);
-    }
-    if (!flashlightOn2 && player2Flashlight.parent === camera2) {
-      camera2.remove(player2Flashlight);
-      camera2.remove(player2Flashlight.target);
-    }
-    let targetIntensity2 = 280.0 * (battery2 / 100 + 0.1);
-    if (flashlightOn2) {
-      if (battery2 < 35 && battery2 > 0) {
-        const lowFlicker2 = Math.sin(clock.elapsedTime * 22) > 0.3 ? 1.0 : (Math.random() > 0.45 ? 0.18 : 0.02);
-        targetIntensity2 *= lowFlicker2;
-      }
-      player2Flashlight.intensity = targetIntensity2;
-      if (player2Flashlight.userData.beamMesh) {
-        player2Flashlight.userData.beamMesh.material.opacity = 0.08 * (targetIntensity2 / 280.0);
-        player2Flashlight.userData.beamMesh.visible = true;
-      }
-    } else {
-      player2Flashlight.intensity = 0;
-      if (player2Flashlight.userData.beamMesh) {
-        player2Flashlight.userData.beamMesh.visible = false;
-      }
-    }
-
-    if (batteryText2) {
-      batteryText2.textContent = `${Math.round(battery2)}%`;
-      batteryText2.style.color = battery2 > 50 ? "#73d08a" : (battery2 > 20 ? "#ffc87a" : "#ff5555");
-    }
-    if (batteryMeter2) batteryMeter2.value = battery2;
-    if (batteryPanelP2) {
-      batteryPanelP2.classList.toggle("battery-low", battery2 < 20);
-    }
-    if (fearText2) fearText2.textContent = `${Math.round(fear2)}%`;
-    if (fearMeter2) fearMeter2.value = fear2;
-  }
-
-  if (flashlightOn && flashlightLight.parent !== camera) {
-    camera.add(flashlightLight);
-    camera.add(flashlightLight.target);
-  }
-  if (!flashlightOn && flashlightLight.parent === camera) {
-    camera.remove(flashlightLight);
-    camera.remove(flashlightLight.target);
-  }
-  let targetIntensity = 280.0 * (battery / 100 + 0.1);
-  if (flashlightOn) {
-    if (battery < 35 && battery > 0) {
-      // Low battery flickering
-      const lowFlicker = Math.sin(clock.elapsedTime * 22) > 0.3 ? 1.0 : (Math.random() > 0.45 ? 0.18 : 0.02);
-      targetIntensity *= lowFlicker;
-    }
-    flashlightLight.intensity = targetIntensity;
-    if (flashlightLight.userData.beamMesh) {
-      flashlightLight.userData.beamMesh.material.opacity = 0.08 * (targetIntensity / 280.0);
-      flashlightLight.userData.beamMesh.visible = true;
-    }
-  } else {
-    flashlightLight.intensity = 0;
-    if (flashlightLight.userData.beamMesh) {
-      flashlightLight.userData.beamMesh.visible = false;
-    }
-  }
-  camera.userData.flashlightProp.visible = true;
-  camera.userData.flashlightProp.userData.gauge.scale.x = Math.max(0.08, battery / 100);
-  camera.userData.flashlightProp.userData.gauge.material.color.set(battery > 35 ? 0x73d08a : 0xc9493c);
-  if (batteryText) {
-    batteryText.textContent = `${Math.round(battery)}%`;
-    batteryText.style.color = battery > 50 ? "#73d08a" : (battery > 20 ? "#ffc87a" : "#ff5555");
-  }
-  if (batteryMeter) batteryMeter.value = battery;
-  if (batteryPanelP1) {
-    batteryPanelP1.classList.toggle("battery-low", battery < 20);
-  }
-  if (fearText) fearText.textContent = `${Math.round(fear)}%`;
-  if (fearMeter) fearMeter.value = fear;
-  
-  const activeFear = coopMode ? Math.max(fear, fear2) : fear;
-  if (activeFear > statFearPeak) statFearPeak = activeFear;
-  vignette.style.opacity = String(0.35 + activeFear / 145);
-
-  // Drive post-processing shader uniforms from fear level
-  if (filmPass) {
-    filmPass.uniforms.vignetteAmount.value = 0.55 + activeFear * 0.004;
-    filmPass.uniforms.aberrationAmount.value = 0.0018 + activeFear * 0.000055;
-    filmPass.uniforms.grainAmount.value = 0.09 + activeFear * 0.0008;
-  }
-
-  const ghost = scene.userData.ghost;
-  ghost.lookAt(camera.position);
-  ghost.material.opacity = Math.max(0, Math.sin(clock.elapsedTime * 1.7) * 0.16 + (fear - 42) / 210);
-  scene.userData.kulkarni?.lookAt(camera.position.x, 1.2, camera.position.z);
-  if (scene.userData.meeraCharacter) {
-    const meera = scene.userData.meeraCharacter;
-    
-    // Choose nearest player target, checking if they are hidden
-    // Choose nearest player target, prioritizing players with lower sanity
-    let targetCamera = null;
-    let targetDist = Infinity;
-    let targetFear = 0;
-    let targetIsP2 = false;
-    let bestScore = Infinity;
-
-    if (!isPlayerHidden) {
-      const dist1 = meera.position.distanceTo(camera.position);
-      const score1 = dist1 * (0.35 + 0.65 * (p1Sanity / 100));
-      targetCamera = camera;
-      targetDist = dist1;
-      targetFear = fear;
-      bestScore = score1;
-    }
-
-    if (coopMode && camera2 && !isPlayer2Hidden) {
-      const dist2 = meera.position.distanceTo(camera2.position);
-      const score2 = dist2 * (0.35 + 0.65 * (p2Sanity / 100));
-      if (score2 < bestScore) {
-        targetCamera = camera2;
-        targetDist = dist2;
-        targetFear = fear2;
-        targetIsP2 = true;
-        bestScore = score2;
-      }
-    }
-    
-    if (meeraState === AiState.INACTIVE) {
-      if (currentLevel === 1) {
-        if (hardcoreMode || camera.position.z < -16 || fear > 28 || (coopMode && (camera2.position.z < -16 || fear2 > 28))) {
-          meeraState = AiState.PATROL;
-          meera.position.set(0, 0, -35);
-          meera.visible = true;
-        } else {
-          meera.visible = false;
-        }
-      } else {
-        if (generatorActive) {
-          meeraState = AiState.CHASE;
-          meera.position.set(0, 0, -32);
-          meera.visible = true;
-        } else {
-          meera.visible = false;
-        }
-      }
-    }
-    
-    // Kulkarni Library Radio Trigger Check (Verified Flow)
-    if (currentLevel === 2 && !kulkarniLibraryEventPlayed && camera.position.x < -3.5 && camera.position.z < -6.0 && camera.position.z > -14.0) {
-      kulkarniLibraryEventPlayed = true;
-      triggerKulkarniLibraryDialogue();
-    }
-
-    // Ghost search checks for hidden players
-    if (meeraState === AiState.PATROL && (isPlayerHidden || isPlayer2Hidden) && !lockerAlertState && Math.random() < 0.005) {
-      const lockerGroup = scene.getObjectByName("locker_group") || scene.getObjectByName("locker_prop");
-      if (lockerGroup) {
-        lockerAlertState = true;
-        lockerTargetToInspect = lockerGroup;
-      }
-    }
-
-    if (meeraState !== AiState.INACTIVE) {
-      if (lockerAlertState && lockerTargetToInspect) {
-        meeraSpeed = 1.65 * meeraSpeedMultiplier;
-        meera.lookAt(lockerTargetToInspect.position.x, meera.position.y, lockerTargetToInspect.position.z);
-        const toLocker = new THREE.Vector3().subVectors(lockerTargetToInspect.position, meera.position);
-        toLocker.y = 0;
-        const distToLocker = toLocker.length();
-        toLocker.normalize();
-        meera.position.addScaledVector(toLocker, meeraSpeed * delta);
-        
-        if (distToLocker < 1.45 && gameState === GameState.PLAYING && !godModeActive) {
-          // Rattles locker door!
-          if (audioManager) {
-            audioManager.playSound("creepy_whisper", { volume: 0.8 });
-          }
-          lockerAlertState = false;
-          lockerTargetToInspect = null;
-          if (audioManager) audioManager.playSound("jumpscare_stinger", { volume: 1.0 });
-          triggerGameOver(coopMode ? "A player was caught by Meera inside the locker." : "Meera ripped open the locker door. Hiding could not save Aarav.");
-        }
-      } else {
-        // Revert to patrol if all players hide during a chase
-        if (!targetCamera && meeraState === AiState.CHASE) {
-          meeraState = AiState.PATROL;
-          addTaskLog("Threat lost visual track of targets.");
-        }
-
-        if (targetCamera) {
-          meera.lookAt(targetCamera.position.x, meera.position.y, targetCamera.position.z);
-        }
-        
-        const targetFlashlightOn = targetCamera ? (targetIsP2 ? flashlightOn2 : flashlightOn) : false;
-        const targetWantsSprint = targetCamera ? (targetIsP2 ? player2Keys.has("ShiftRight") : keys.has("ShiftLeft")) : false;
-        const targetSprintExhausted = targetCamera ? (targetIsP2 ? sprintExhausted2 : sprintExhausted) : false;
-        const targetEmfActive = targetCamera ? (targetIsP2 ? emfActive2 : emfActive) : false;
-        const detectionMultiplier = targetEmfActive ? 1.5 : 1.0;
-        const playerDetected = targetCamera && (
-          (targetFlashlightOn && targetDist < 15 * detectionMultiplier) || 
-          (targetDist < 7 * detectionMultiplier) || 
-          (targetSprintExhausted === false && targetWantsSprint && targetDist < 11 * detectionMultiplier) ||
-          (targetEmfActive && targetDist < 16)
-        );
-        
-        if (playerDetected && meeraState === AiState.PATROL) {
-          meeraState = AiState.CHASE;
-          playJumpscareStinger();
-          addTaskLog("Warning: Threat is pursuing you!");
-        }
-        
-        if (meeraState === AiState.PATROL) {
-          meeraSpeed = 1.2 * meeraSpeedMultiplier;
-          if (activeNoiseEventZ !== null) {
-            const investigateDir = Math.sign(activeNoiseEventZ - meera.position.z);
-            meera.position.z += investigateDir * meeraSpeed * delta;
-            meera.lookAt(0, meera.position.y, activeNoiseEventZ);
-            
-            noiseInvestigateTimer -= delta;
-            if (noiseInvestigateTimer <= 0 || Math.abs(meera.position.z - activeNoiseEventZ) < 0.5) {
-              activeNoiseEventZ = null;
-            }
-          } else {
-            let targetX = 0; // default: hallway center
-            if (currentLevel === 2 && Math.abs(meera.position.z - (-10)) < 1.0 && Math.random() < 0.01) {
-              targetX = -3.0; // patrols library occasionally
-            }
-            // Smoothly lerp toward target X rather than snapping to 0 instantly
-            meera.position.x = THREE.MathUtils.lerp(meera.position.x, targetX, delta * 2.5);
-            meera.position.z += meeraPatrolDir * meeraSpeed * delta;
-            const zMin = currentLevel === 1 ? -45 : -35;
-            const zMax = currentLevel === 1 ? -16 : 8;
-            if (meera.position.z < zMin) {
-              meeraPatrolDir = 1;
-            } else if (meera.position.z > zMax) {
-              meeraPatrolDir = -1;
-            }
-          }
-        } else if (meeraState === AiState.CHASE && targetCamera) {
-          meeraSpeed = ((currentLevel === 2 ? 1.48 : 1.6) + (targetFear / 160)) * meeraSpeedMultiplier;
-          const toPlayer = new THREE.Vector3().subVectors(targetCamera.position, meera.position);
-          toPlayer.y = 0;
-          toPlayer.normalize();
-          meera.position.addScaledVector(toPlayer, meeraSpeed * delta);
-          
-          if (targetIsP2) {
-            if (!godModeActive) fear2 = Math.min(100, fear2 + delta * 3.6);
-          } else {
-            if (!godModeActive) fear = Math.min(100, fear + delta * 3.6);
-          }
-          
-          if (targetDist > 18 && currentLevel === 1) {
-            meeraState = AiState.PATROL;
-            addTaskLog("Lost the ghost threat.");
-          }
-        }
-        
-        doors.forEach((door) => {
-          if (!door.userData.open) {
-            const dx = meera.position.x - door.position.x;
-            const dz = meera.position.z - door.position.z;
-            const dist2D = Math.sqrt(dx * dx + dz * dz);
-            if (dist2D < 1.6) {
-              door.userData.open = true;
-              door.userData.locked = false;
-              playDoorCreak(door, true);
-              caption.textContent = "A door creaks open behind the ghost's cold wind...";
-              addTaskLog(`Ghost opened closed door: ${door.userData.label}.`);
-            }
-          }
-        });
-        
-        if (targetCamera && targetDist < 4.5 && meeraState === AiState.CHASE) {
-          if (targetIsP2) {
-            if (!godModeActive) fear2 = Math.min(100, fear2 + delta * 24);
-          } else {
-            if (!godModeActive) fear = Math.min(100, fear + delta * 24);
-          }
-          shakeOffset.x = (Math.random() - 0.5) * 0.045 * camShakeMultiplier;
-          shakeOffset.y = (Math.random() - 0.5) * 0.045 * camShakeMultiplier;
-        }
-        
-        if (targetCamera && targetDist < 1.15 && gameState === GameState.PLAYING && !godModeActive) {
-          triggerGameOver(targetIsP2 ? "Rohan was caught by Meera's presence." : "Aarav was caught by Meera's presence.");
-        }
-      }
-    }
-  }
-  scene.userData.dust.rotation.y += delta * 0.018;
-
-  // Distance-gate LOD: hide dorm room geometry when player is far away
-  if (scene.userData.dormGroup) {
-    scene.userData.dormGroup.visible = camera.position.z < -22;
-  }
-
-  // Task 62: Meera's first ghost whisper — one-time, triggers on first approach to dorm wing
-  if (!meeraFirstWhisperPlayed && inspected === 0 && camera.position.z < -24.5 && gameState === GameState.PLAYING) {
-    meeraFirstWhisperPlayed = true;
-    playWhisper();
-    window.setTimeout(() => {
-      sayLine("Meera", "You look just like the ones who used to watch.", 7000);
-    }, 800);
-    caption.textContent = "Something cold passes through the air near Room 29.";
-    addTaskLog("Heard something near Room 29.");
-  }
-
-  // Task 64: Meera's second ghost event — countdown sound + shadow flicker near Room 29
-  if (!meeraSecondEventPlayed && inspected >= 1 && camera.position.z < -16 && gameState === GameState.PLAYING) {
-    meeraSecondEventPlayed = true;
-    activeCountdownFlicker = true;
-    playWhisper();
-    if (audioManager) {
-      audioManager.playSound("blackout_cue", { volume: 0.5 });
-    }
-    window.setTimeout(() => {
-      queueStory([
-        ["Meera", "Three..."],
-        ["Meera", "Two..."],
-        ["Meera", "One..."],
-        ["Meera", "Ready or not."]
-      ]);
-    }, 600);
-    window.setTimeout(() => {
-      activeCountdownFlicker = false;
-    }, 11000);
-    caption.textContent = "The overhead light buzzes violently. A shadow stretches from Room 29...";
-    addTaskLog("Experienced an electrical anomaly near Room 29.");
-  }
-
-  // Task 71: Meera's final ghost event — full apparition walk across corridor at z=-30 when evidence=3
-  if (!meeraFinalEventPlayed && inspected === 3 && camera.position.z < -24.0 && gameState === GameState.PLAYING) {
-    meeraFinalEventPlayed = true;
-    activeApparitionWalk = true;
-    apparitionGhost = createCharacter({ name: "MeeraApparition", position: [-3.2, 0, -31.5], color: 0x9ed2c2, ghostly: true, identity: "Meera" });
-    scene.add(apparitionGhost);
-    apparitionGhost.rotation.y = Math.PI / 2; // looking right
-    playWhisper();
-    if (audioManager) {
-      audioManager.playSound("blackout_cue", { volume: 0.4 });
-    }
-    queueStory([
-      ["Aarav", "Meera... I can see you. You're trying to show me the way down..."]
-    ]);
-    caption.textContent = "A cold, pale figure drifts slowly across the hallway ahead...";
-    addTaskLog("Witnessed a non-hostile apparition near the basement gate.");
-  }
-
-  if (activeApparitionWalk && apparitionGhost) {
-    apparitionGhost.position.x += delta * 0.72;
-    apparitionGhost.position.y = Math.sin(clock.elapsedTime * 3) * 0.04;
-    if (apparitionGhost.position.x > 3.2) {
-      activeApparitionWalk = false;
-      apparitionFadeTimer = 0;
-    }
-  } else if (apparitionGhost) {
-    apparitionFadeTimer += delta;
-    apparitionGhost.children.forEach(c => {
-      if (c.material) {
-        c.material.transparent = true;
-        c.material.opacity = Math.max(0, 0.42 * (1.0 - apparitionFadeTimer / 2.0));
-      }
-    });
-    if (apparitionFadeTimer >= 2.0) {
-      scene.remove(apparitionGhost);
-      apparitionGhost = null;
-    }
-  }
-
-  flickerLights.forEach(({ light, base, phase }) => {
-    if (isBlackoutActive) {
-      light.intensity = THREE.MathUtils.lerp(light.intensity, 0, delta * 12);
-    } else if (activeCountdownFlicker && Math.abs(light.position.z - (-26)) < 1.0) {
-      // Override: violent flickering for lamp at z = -26
-      light.intensity = Math.random() > 0.45 ? base * 1.85 : 0.05;
-    } else {
-      const pulse = Math.sin(clock.elapsedTime * 7.5 + phase) > 0.92 ? 0.26 : 1;
-      light.intensity = THREE.MathUtils.lerp(light.intensity, base * pulse, delta * 8);
-    }
-  });
-
-  doors.forEach((door) => {
-    const target = door.userData.open ? (door.userData.side === "left" ? -1.18 : 1.18) : 0;
-    door.rotation.y = THREE.MathUtils.lerp(door.rotation.y, target, delta * 6);
-  });
-
-  if (currentLevel === 2 && samCharacter && samFlashlight) {
-    const distToSam = samCharacter.position.distanceTo(camera.position);
-    if (distToSam > 2.8) {
-      const toPlayer = new THREE.Vector3().subVectors(camera.position, samCharacter.position);
-      toPlayer.y = 0;
-      toPlayer.normalize();
-      samCharacter.position.addScaledVector(toPlayer, 1.48 * delta);
-      samCharacter.lookAt(camera.position.x, samCharacter.position.y, camera.position.z);
-    }
-    samFlashlight.position.copy(samCharacter.position).add(new THREE.Vector3(0, 1.3, 0));
-    const dir = new THREE.Vector3(0, 0, -1).applyQuaternion(samCharacter.quaternion);
-    samFlashlight.target.position.copy(samFlashlight.position).add(dir);
-  }
-
-  if (p1Sanity < 50) {
-    const sanityIntensity = (50 - p1Sanity) / 50;
-    shakeOffset.x += (Math.random() - 0.5) * 0.03 * sanityIntensity * camShakeMultiplier;
-    shakeOffset.y += (Math.random() - 0.5) * 0.03 * sanityIntensity * camShakeMultiplier;
-    camera.rotation.z += Math.sin(clock.elapsedTime * 6) * 0.02 * sanityIntensity * camShakeMultiplier;
-  }
-  if (p1HeartRate > 80) {
-    const hrIntensity = (p1HeartRate - 90) / 80;
-    const pulseSpeed = (p1HeartRate / 60) * Math.PI * 2;
-    camera.rotation.z += Math.sin(clock.elapsedTime * pulseSpeed) * 0.03 * hrIntensity * camShakeMultiplier;
-    camera.rotation.y += Math.cos(clock.elapsedTime * pulseSpeed * 0.5) * 0.005 * hrIntensity * camShakeMultiplier;
-  }
-  if (coopMode && camera2 && p2Sanity < 50) {
-    const sanityIntensity2 = (50 - p2Sanity) / 50;
-    camera2.position.x += (Math.random() - 0.5) * 0.02 * sanityIntensity2 * camShakeMultiplier;
-    camera2.position.y += (Math.random() - 0.5) * 0.02 * sanityIntensity2 * camShakeMultiplier;
-    camera2.rotation.z += Math.sin(clock.elapsedTime * 6) * 0.02 * sanityIntensity2 * camShakeMultiplier;
-  }
-  if (coopMode && camera2 && p2HeartRate > 90) {
-    const hrIntensity2 = (p2HeartRate - 90) / 80;
-    const pulseSpeed2 = (p2HeartRate / 60) * Math.PI * 2;
-    camera2.rotation.z += Math.sin(clock.elapsedTime * pulseSpeed2) * 0.03 * hrIntensity2 * camShakeMultiplier;
-    camera2.rotation.y += Math.cos(clock.elapsedTime * pulseSpeed2 * 0.5) * 0.005 * hrIntensity2 * camShakeMultiplier;
-  }
-
-  updateInteractionPrompt();
-  camera.position.add(shakeOffset);
-}
-
-function getFocusedInteractable(maxDistance = 4) {
+export function getFocusedInteractable(maxDistance = 4) {
   const raycaster = new THREE.Raycaster();
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera);
   const hits = raycaster.intersectObjects(scene.children, true);
@@ -3002,7 +2002,7 @@ function getFocusedInteractable(maxDistance = 4) {
   return null;
 }
 
-function updateInteractionPrompt() {
+export function updateInteractionPrompt() {
   if (!document.body.classList.contains("started")) return;
 
   // Player 1 Prompt
@@ -3070,7 +2070,7 @@ function updateInteractionPrompt() {
   }
 }
 
-function translateSpeakerName(name) {
+export function translateSpeakerName(name) {
   if (name === "Aarav") return p1Name;
   if (name === "Rohan") return p2Name;
   return name;
@@ -3106,7 +2106,7 @@ export function queueStory(lines) {
   showNextStoryLine();
 }
 
-function showNextStoryLine() {
+export function showNextStoryLine() {
   const next = storyQueue.shift();
   if (!next) {
     dialogue.classList.remove("open");
@@ -3117,7 +2117,7 @@ function showNextStoryLine() {
   sayLine(next[0], next[1], delay);
 }
 
-function playIntroDialogue() {
+export function playIntroDialogue() {
   if (introPlayed) return;
   introPlayed = true;
   queueStory([
@@ -3130,7 +2130,7 @@ function playIntroDialogue() {
   ]);
 }
 
-function getFocusedInteractable2(maxDistance = 4) {
+export function getFocusedInteractable2(maxDistance = 4) {
   if (!camera2) return null;
   const raycaster = new THREE.Raycaster();
   raycaster.setFromCamera(new THREE.Vector2(0, 0), camera2);
@@ -3172,7 +2172,7 @@ export function inspectNearest2() {
   inspectObject(hit, true);
 }
 
-function inspectObject(hit, isPlayer2 = false) {
+export function inspectObject(hit, isPlayer2 = false) {
   const type = hit.object.userData.interactionType;
   const playerName = isPlayer2 ? "Rohan" : "Aarav";
 
@@ -4434,7 +3434,7 @@ composer.addPass(filmPass);
 
 
 
-function setupPlayer2() {
+export function setupPlayer2() {
   if (!coopMode) return;
   
   camera2 = new THREE.PerspectiveCamera(camera.fov, (window.innerWidth / 2) / window.innerHeight, 0.1, 100);
@@ -4524,6 +3524,7 @@ function setupPlayer2() {
 export function startGame({ lockPointer = true } = {}) {
   initAudio();
   setupPlayer2();
+  initCoopKeyHandlers();
   document.body.classList.toggle("coop-active", coopMode);
   setupUiSounds();
   buildRainSystem();
@@ -4599,7 +3600,7 @@ export function startGame({ lockPointer = true } = {}) {
   playIntroDialogue();
 }
 
-function requestPointerLock() {
+export function requestPointerLock() {
   if (document.pointerLockElement === canvas) return;
   try {
     const request = canvas.requestPointerLock?.();
@@ -4664,7 +3665,7 @@ function populateInventory() {
   setupUiSounds();
 }
 
-function triggerGameOver(reason) {
+export function triggerGameOver(reason) {
   setGameState(GameState.GAMEOVER);
   document.exitPointerLock?.();
   if (gameoverReason) gameoverReason.textContent = reason;
@@ -5450,7 +4451,7 @@ function checkDecryptionAlignment() { // Sync minigame status
   }
 }
 
-function updateMapMarkers() {
+export function updateMapMarkers() {
   const p1Marker = document.getElementById("map-player-marker");
   if (p1Marker) {
     p1Marker.style.display = "block";

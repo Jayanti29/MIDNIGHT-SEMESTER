@@ -655,3 +655,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-07-29T18:10:10.732Z] Part 1120: Enhance stamina drain and sprint recovery thresholds in player state
 - [2026-07-29T18:10:10.765Z] Part 1121: Fix character forward movement and resolve GameState proxy reference
 - [2026-07-29T18:10:10.802Z] Part 1122: Synchronize camera yaw and pitch with gameplayState direction vectors
+- [2026-07-29T18:10:10.836Z] Part 1123: Normalize WASD and Arrow key input bindings for single-player movement

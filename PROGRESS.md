@@ -592,3 +592,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-07-29T18:10:08.348Z] Part 1057: Refactor player controller state machine and input event handling
 - [2026-07-29T18:10:08.383Z] Part 1058: Improve WebGL context loss recovery and renderer stability
 - [2026-07-29T18:10:08.418Z] Part 1059: Update game progress documentation and movement system architecture log
+- [2026-07-29T18:10:08.517Z] Part 1060: Enhance stamina drain and sprint recovery thresholds in player state

@@ -699,3 +699,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-07-29T18:10:12.293Z] Part 1164: Expose window state proxies and resolve ES module scope declarations
 - [2026-07-29T18:10:12.334Z] Part 1165: Optimize player movement collision checking and room occupancy logic
 - [2026-07-29T18:10:12.369Z] Part 1166: Enhance audio footstep trigger intervals during sprinting and walking
+- [2026-07-29T18:10:12.403Z] Part 1167: Refactor player controller state machine and input event handling

@@ -793,3 +793,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-07-29T18:10:15.656Z] Part 1258: Improve WebGL context loss recovery and renderer stability
 - [2026-07-29T18:10:15.689Z] Part 1259: Update game progress documentation and movement system architecture log
 - [2026-07-29T18:10:15.728Z] Part 1260: Enhance stamina drain and sprint recovery thresholds in player state
+- [2026-07-29T18:10:15.765Z] Part 1261: Fix character forward movement and resolve GameState proxy reference

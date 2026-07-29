@@ -697,3 +697,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-07-29T18:10:12.224Z] Part 1162: Synchronize camera yaw and pitch with gameplayState direction vectors
 - [2026-07-29T18:10:12.259Z] Part 1163: Normalize WASD and Arrow key input bindings for single-player movement
 - [2026-07-29T18:10:12.293Z] Part 1164: Expose window state proxies and resolve ES module scope declarations
+- [2026-07-29T18:10:12.334Z] Part 1165: Optimize player movement collision checking and room occupancy logic

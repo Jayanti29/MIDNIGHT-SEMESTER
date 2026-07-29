@@ -165,7 +165,7 @@ const pauseMenu = document.querySelector("#pause-menu");
 const resumeButton = document.querySelector("#resume-button");
 const pauseSettings = document.querySelector("#pause-settings");
 const quitToMenu = document.querySelector("#quit-to-menu");
-const caption = document.querySelector("#caption");
+export const caption = document.querySelector("#caption");
 const vignette = document.querySelector("#vignette");
 const vrToggle = document.querySelector("#vr-toggle");
 const dialogue = document.querySelector("#dialogue");
@@ -274,7 +274,7 @@ camera.add(audioListener);
 
 export const audioManager = new AudioManager(audioListener, loadingManager);
 
-let renderer;
+export let renderer;
 try {
   renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
   window.renderer = renderer;
@@ -966,12 +966,16 @@ export function resetLevel2State() {
   player2Yaw = 0;
   player2Pitch = 0;
 }
+export let yaw = 0;
+export let pitch = 0;
+export let player2Yaw = 0;
+export let player2Pitch = 0;
 export let coopMode = false;
 export let camera2 = null;
 export let player2Character = null;
 let godModeActive = false;
 let infiniteBatteryActive = false;
-let debugConsoleOpen = false;
+export let debugConsoleOpen = false;
 let meeraSpeedMultiplier = 1.0;
 let player1PreLockerPos = null;
 let player2PreLockerPos = null;
@@ -1041,7 +1045,12 @@ export const GameState = Object.freeze({
   CHOICE: "choice",
   DECRYPTING: "decrypting"
 });
-let gameState = GameState.MENU;
+export let gameState = GameState.MENU;
+if (typeof window !== "undefined") {
+  window.gameState = gameState;
+  window.GameState = GameState;
+  window.gameplayState = gameplayState;
+}
 
 class GameStateManager {
   constructor() {
@@ -1052,6 +1061,9 @@ class GameStateManager {
     const prevState = this.state;
     this.state = nextState;
     gameState = nextState;
+    if (typeof window !== "undefined") {
+      window.gameState = nextState;
+    }
     document.body.dataset.state = nextState;
     document.body.classList.toggle("started", nextState === GameState.PLAYING || nextState === GameState.PAUSED || nextState === GameState.CHOICE);
     
@@ -4423,6 +4435,8 @@ document.addEventListener("mousemove", (event) => {
   yaw -= event.movementX * 0.0022 * mouseSensitivity;
   pitch += (invertMouseLook ? 1 : -1) * event.movementY * 0.002 * mouseSensitivity;
   pitch = THREE.MathUtils.clamp(pitch, -1.1, 1.1);
+  gameplayState.yaw = yaw;
+  gameplayState.pitch = pitch;
   camera.rotation.set(pitch, yaw, 0, "YXZ");
 });
 

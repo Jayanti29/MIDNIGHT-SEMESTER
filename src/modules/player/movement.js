@@ -18,7 +18,12 @@ import {
   toggleFlashlight,
   moveDirection,
   moveDirection2,
-  gameplayState
+  gameplayState,
+  GameState,
+  getGameState,
+  debugConsoleOpen,
+  renderer,
+  caption
 } from "../../main.js";
 
 export function canOccupy(position) {
@@ -99,17 +104,17 @@ export function canOccupy(position) {
 }
 
 export function updateMovement(delta) {
-  // Access global/proxied states from gameplayState
-  const gameState = window.gameState;
-  const debugConsoleOpen = window.debugConsoleOpen;
-  const renderer = window.renderer;
-  const caption = window.caption;
-  const GameState = window.GameState;
+  // Access global/proxied states safely
+  const curGameState = getGameState ? getGameState() : (window.gameState || "playing");
+  const TargetGameState = GameState || window.GameState || { PLAYING: "playing" };
+  const isDebugOpen = typeof debugConsoleOpen !== "undefined" ? debugConsoleOpen : (window.debugConsoleOpen || false);
+  const curRenderer = typeof renderer !== "undefined" ? renderer : window.renderer;
+  const curCaption = typeof caption !== "undefined" ? caption : window.caption;
 
-  if (gameState !== GameState.PLAYING || debugConsoleOpen) return;
+  if (curGameState !== TargetGameState.PLAYING || isDebugOpen) return;
 
-  if (renderer.xr.enabled && renderer.xr.isPresenting) {
-    const session = renderer.xr.getSession();
+  if (curRenderer && curRenderer.xr && curRenderer.xr.enabled && curRenderer.xr.isPresenting) {
+    const session = curRenderer.xr.getSession();
     if (session) {
       const sources = session.inputSources;
       let vrForward = 0;
@@ -147,18 +152,23 @@ export function updateMovement(delta) {
     }
     return;
   }
-  const forward = Number(keys.has("KeyW")) - Number(keys.has("KeyS"));
-  const strafe = Number(keys.has("KeyD")) - Number(keys.has("KeyA"));
+  const isForwardKey = keys.has("KeyW") || keys.has("Keyw") || keys.has("w") || keys.has("W") || (!coopMode && keys.has("ArrowUp"));
+  const isBackwardKey = keys.has("KeyS") || keys.has("Keys") || keys.has("s") || keys.has("S") || (!coopMode && keys.has("ArrowDown"));
+  const isRightKey = keys.has("KeyD") || keys.has("Keyd") || keys.has("d") || keys.has("D") || (!coopMode && keys.has("ArrowRight"));
+  const isLeftKey = keys.has("KeyA") || keys.has("Keya") || keys.has("a") || keys.has("A") || (!coopMode && keys.has("ArrowLeft"));
+
+  const forward = Number(isForwardKey) - Number(isBackwardKey);
+  const strafe = Number(isRightKey) - Number(isLeftKey);
   const wantsSprint = keys.has("ShiftLeft");
 
   let moveX = strafe;
   let moveZ = -forward;
   let wantsSprintP1 = wantsSprint;
 
-  // Player 1 Mouse / Keyboard Look (if not using split-screen keyboard keys, P1 can look with mouse, but if shared keyboard let's allow arrow keys only if NOT co-op mode)
+  // Player 1 Mouse / Keyboard Look
   let lookX = 0;
   let lookY = 0;
-  if (!coopMode) {
+  if (!coopMode && !isForwardKey && !isBackwardKey && !isRightKey && !isLeftKey) {
     lookX = Number(keys.has("ArrowRight")) - Number(keys.has("ArrowLeft"));
     lookY = Number(keys.has("ArrowDown")) - Number(keys.has("ArrowUp"));
   }

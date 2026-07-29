@@ -856,3 +856,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-07-29T18:10:17.905Z] Part 1321: Fix character forward movement and resolve GameState proxy reference
 - [2026-07-29T18:10:17.940Z] Part 1322: Synchronize camera yaw and pitch with gameplayState direction vectors
 - [2026-07-29T18:10:17.974Z] Part 1323: Normalize WASD and Arrow key input bindings for single-player movement
+- [2026-07-29T18:10:18.007Z] Part 1324: Expose window state proxies and resolve ES module scope declarations

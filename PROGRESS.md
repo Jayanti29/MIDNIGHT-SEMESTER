@@ -868,3 +868,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-07-29T18:10:18.364Z] Part 1333: Normalize WASD and Arrow key input bindings for single-player movement
 - [2026-07-29T18:10:18.403Z] Part 1334: Expose window state proxies and resolve ES module scope declarations
 - [2026-07-29T18:10:18.438Z] Part 1335: Optimize player movement collision checking and room occupancy logic
+- [2026-07-29T18:10:18.476Z] Part 1336: Enhance audio footstep trigger intervals during sprinting and walking

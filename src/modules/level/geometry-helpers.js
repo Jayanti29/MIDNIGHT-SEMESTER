@@ -6,13 +6,16 @@ export function registerCollider(object) {
   if (!object) return;
   object.updateMatrixWorld(true);
   const box3 = new THREE.Box3().setFromObject(object);
-  colliders.push({
-    xMin: box3.min.x,
-    xMax: box3.max.x,
-    zMin: box3.min.z,
-    zMax: box3.max.z,
-    name: object.name || "obstacle"
-  });
+  const targetColliders = colliders || window.colliders;
+  if (targetColliders && Array.isArray(targetColliders)) {
+    targetColliders.push({
+      xMin: box3.min.x,
+      xMax: box3.max.x,
+      zMin: box3.min.z,
+      zMax: box3.max.z,
+      name: object.name || "obstacle"
+    });
+  }
 }
 
 export function addToActiveLevel(object) {

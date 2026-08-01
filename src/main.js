@@ -967,20 +967,26 @@ let decryptTargetPos = 50;
 let decryptSpeedMultiplier = 1.0;
 let lastPlayer1LockerInspected = null;
 let lastPlayer2LockerInspected = null;
-let meeraLockerSearchTimer = 0;
-let runStartTime = 0;
-let runEndTime = 0;
-let statStaminaDrained = 0;
-let statTimesHidden = 0;
-let statCansThrown = 0;
+export let meeraLockerSearchTimer = 0;
+export let runStartTime = 0;
+export let runEndTime = 0;
+export let statStaminaDrained = 0;
+export let statTimesHidden = 0;
+export let statCansThrown = 0;
+export let godModeActive = false;
+export let filmPass = null;
+export let inspected = 0;
+export let shadowFigures = [];
+export let shadowSpawnTimer = 0;
+export let creepyWhisperTimer = 0;
 
-let subtitlesEnabled = true;
-let camShakeMultiplier = 0.7;
-let invertMouseLook = false;
-let vrController1 = null;
-let vrController2 = null;
-let vrControllerGrip1 = null;
-let vrControllerGrip2 = null;
+export let subtitlesEnabled = true;
+export let camShakeMultiplier = 0.7;
+export let invertMouseLook = false;
+export let vrController1 = null;
+export let vrController2 = null;
+export let vrControllerGrip1 = null;
+export let vrControllerGrip2 = null;
 export let player2Flashlight = null;
 export function setPlayer2Flashlight(val) { player2Flashlight = val; }
 export const player2Keys = new Set();
@@ -989,7 +995,7 @@ export const AiState = {
   PATROL: "patrol",
   CHASE: "chase"
 };
-let activeCheckpoint = null;
+export let activeCheckpoint = null;
 try {
   const savedCP = localStorage.getItem("ms_active_checkpoint");
   if (savedCP) {
@@ -998,7 +1004,7 @@ try {
 } catch (e) {
   console.error("Failed to load active checkpoint from localStorage:", e);
 }
-const shakeOffset = new THREE.Vector3();
+export const shakeOffset = new THREE.Vector3();
 export const moveDirection = new THREE.Vector3();
 export const moveDirection2 = new THREE.Vector3();
 const NpcSurvivorState = Object.freeze({ IDLE: "idle", FOLLOW: "follow", FLEE: "flee", HIDE: "hide" });

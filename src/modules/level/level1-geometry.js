@@ -12,7 +12,11 @@ import {
   addLabel,
   initBatteries,
   initLoreNotes,
-  buildDocuments
+  buildDocuments,
+  CampusLayoutBuilder,
+  RoomBuilder,
+  PropFactory,
+  campusLayoutData
 } from "../../main.js";
 import { createCharacter } from "../character/index.js";
 import { box, addToActiveLevel, tagInteractable, registerCollider } from "./geometry-helpers.js";
@@ -125,8 +129,13 @@ export function buildProceduralRoom(side, doorZ, roomName) {
   const h = 3.5;
   const d = 5.0;
 
+  const builder = RoomBuilder || window.RoomBuilder;
+  const props = PropFactory || window.PropFactory;
+
   // Build the room geometry using RoomBuilder
-  window.RoomBuilder.buildRoom(roomName, "dorm", [xCenter, 0, zCenter], [w, h, d]);
+  if (builder?.buildRoom) {
+    builder.buildRoom(roomName, "dorm", [xCenter, 0, zCenter], [w, h, d]);
+  }
 
   // Add room bounds to roomBounds array so player can occupy it
   roomBounds.push({
@@ -137,23 +146,23 @@ export function buildProceduralRoom(side, doorZ, roomName) {
   });
 
   // Spawn simple furniture inside the room
-  const deskPos = [xCenter - direction * 0.8, 0, zCenter - 1.2];
-  window.PropFactory.createDesk(deskPos, side === "left" ? Math.PI / 2 : -Math.PI / 2);
-  window.PropFactory.createChair([deskPos[0] + direction * 0.5, 0, deskPos[2]], side === "left" ? -Math.PI / 2 : Math.PI / 2);
-
-  // Bed
-  window.PropFactory.createBed([xCenter + direction * 0.8, 0, zCenter + 0.8], 0);
-
-  // Locker
-  window.PropFactory.createLocker([xCenter - direction * 1.2, 0, zCenter + 1.2], side === "left" ? Math.PI / 2 : -Math.PI / 2);
-
-  // Add a tubelight to keep it looking great
-  window.PropFactory.createTubeLight([xCenter, h - 0.1, zCenter], false);
+  if (props) {
+    const deskPos = [xCenter - direction * 0.8, 0, zCenter - 1.2];
+    props.createDesk(deskPos, side === "left" ? Math.PI / 2 : -Math.PI / 2);
+    props.createChair([deskPos[0] + direction * 0.5, 0, deskPos[2]], side === "left" ? -Math.PI / 2 : Math.PI / 2);
+    props.createBed([xCenter + direction * 0.8, 0, zCenter + 0.8], 0);
+    props.createLocker([xCenter - direction * 1.2, 0, zCenter + 1.2], side === "left" ? Math.PI / 2 : -Math.PI / 2);
+    props.createTubeLight([xCenter, h - 0.1, zCenter], false);
+  }
 }
 
 export function buildCorridor() {
   // Call data-driven campus layout builder! Loads gate, academic, dorm, canteens, and restricted basement
-  window.CampusLayoutBuilder.buildCampus(window.campusLayoutData);
+  const campusBuilder = CampusLayoutBuilder || window.CampusLayoutBuilder;
+  const layout = campusLayoutData || window.campusLayoutData;
+  if (campusBuilder?.buildCampus && layout) {
+    campusBuilder.buildCampus(layout);
+  }
 
   // Load remaining primary narrative items (Emergency Terminal console, Win Gate, etc.)
   scene.userData.kulkarni = createCharacter({ name: "Professor Kulkarni", position: [-2.4, 0, -15.5], color: 0xffffff, identity: "Kulkarni" });

@@ -74,9 +74,23 @@ export function canOccupy(position) {
   if (!inCorridor && !inRoom) return false;
 
   // Check static colliders registered in the list
-  for (let i = 0; i < colliders.length; i++) {
-    const col = colliders[i];
-    if (col.name && (col.name.includes("floor") || col.name.includes("ceiling"))) continue;
+  const currentColliders = colliders || window.colliders || [];
+  for (let i = 0; i < currentColliders.length; i++) {
+    const col = currentColliders[i];
+    if (!col || !col.name) continue;
+    const nameLower = col.name.toLowerCase();
+    if (
+      nameLower.includes("floor") ||
+      nameLower.includes("ceiling") ||
+      nameLower.includes("player") ||
+      nameLower.includes("aarav") ||
+      nameLower.includes("priya") ||
+      nameLower.includes("rohan") ||
+      nameLower.includes("sam") ||
+      nameLower.includes("trigger")
+    ) {
+      continue;
+    }
     if (x >= col.xMin - playerRadius && x <= col.xMax + playerRadius &&
         z >= col.zMin - playerRadius && z <= col.zMax + playerRadius) {
       return false;

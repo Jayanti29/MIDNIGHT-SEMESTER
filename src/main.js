@@ -658,7 +658,7 @@ export function playPinClick() {
   osc.stop(audioCtx.currentTime + 0.06);
 }
 
-const PropFactory = {
+export const PropFactory = {
   createDesk: (position, rotation = 0) => {
     const group = new THREE.Group();
     group.name = "desk";
@@ -669,14 +669,8 @@ const PropFactory = {
     top.castShadow = true;
     top.receiveShadow = true;
     group.add(top);
-    [[-0.7, -0.3], [0.7, -0.3], [-0.7, 0.3], [0.7, 0.3]].forEach(([x, z]) => {
-      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.74, 0.08), materials.darkWood);
-      leg.position.set(x, 0.37, z);
-      leg.castShadow = true;
-      group.add(leg);
-    });
-    addToActiveLevel(group);
     registerCollider(top);
+    addToActiveLevel(group);
     return group;
   },
   createChair: (position, rotation = 0) => {
@@ -685,21 +679,12 @@ const PropFactory = {
     group.position.set(...position);
     group.rotation.y = rotation;
     const seat = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.05, 0.45), materials.darkWood);
-    seat.position.y = 0.45;
+    seat.position.y = 0.42;
     seat.castShadow = true;
+    seat.receiveShadow = true;
     group.add(seat);
-    const back = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.45, 0.05), materials.darkWood);
-    back.position.set(0, 0.68, -0.2);
-    back.castShadow = true;
-    group.add(back);
-    [[-0.2, -0.2], [0.2, -0.2], [-0.2, 0.2], [0.2, 0.2]].forEach(([x, z]) => {
-      const leg = new THREE.Mesh(new THREE.BoxGeometry(0.04, 0.45, 0.04), materials.darkWood);
-      leg.position.set(x, 0.225, z);
-      leg.castShadow = true;
-      group.add(leg);
-    });
-    addToActiveLevel(group);
     registerCollider(seat);
+    addToActiveLevel(group);
     return group;
   },
   createBed: (position, rotation = 0) => {
@@ -707,15 +692,13 @@ const PropFactory = {
     group.name = "bed";
     group.position.set(...position);
     group.rotation.y = rotation;
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.3, 1.9), materials.darkWood);
-    frame.position.y = 0.15;
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.4, 2.0), materials.darkWood);
+    frame.position.y = 0.2;
     frame.castShadow = true;
+    frame.receiveShadow = true;
     group.add(frame);
-    const mattress = new THREE.Mesh(new THREE.BoxGeometry(0.85, 0.15, 1.85), materials.paper);
-    mattress.position.y = 0.375;
-    group.add(mattress);
-    addToActiveLevel(group);
     registerCollider(frame);
+    addToActiveLevel(group);
     return group;
   },
   createLocker: (position, rotation = 0) => {
@@ -723,13 +706,13 @@ const PropFactory = {
     group.name = "locker";
     group.position.set(...position);
     group.rotation.y = rotation;
-    const body = new THREE.Mesh(new THREE.BoxGeometry(0.65, 1.8, 0.65), materials.brass);
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.6, 1.8, 0.5), materials.metal);
     body.position.y = 0.9;
     body.castShadow = true;
     body.receiveShadow = true;
     group.add(body);
-    addToActiveLevel(group);
     registerCollider(body);
+    addToActiveLevel(group);
     return group;
   },
   createCupboard: (position, rotation = 0) => {
@@ -737,23 +720,12 @@ const PropFactory = {
     group.name = "cupboard";
     group.position.set(...position);
     group.rotation.y = rotation;
-    const body = new THREE.Mesh(new THREE.BoxGeometry(1.2, 2.0, 0.5), materials.darkWood);
+    const body = new THREE.Mesh(new THREE.BoxGeometry(0.9, 2.0, 0.5), materials.darkWood);
     body.position.y = 1.0;
     body.castShadow = true;
+    body.receiveShadow = true;
     group.add(body);
-    addToActiveLevel(group);
     registerCollider(body);
-    return group;
-  },
-  createBlackboard: (position, rotation = 0) => {
-    const group = new THREE.Group();
-    group.name = "blackboard";
-    group.position.set(...position);
-    group.rotation.y = rotation;
-    const board = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.2, 0.05), new THREE.MeshStandardMaterial({ color: 0x1a2e26, roughness: 0.9 }));
-    board.position.y = 1.8;
-    board.castShadow = true;
-    group.add(board);
     addToActiveLevel(group);
     return group;
   },
@@ -762,12 +734,13 @@ const PropFactory = {
     group.name = "bookshelf";
     group.position.set(...position);
     group.rotation.y = rotation;
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(1.4, 1.9, 0.35), materials.darkWood);
+    const frame = new THREE.Mesh(new THREE.BoxGeometry(1.0, 1.9, 0.35), materials.darkWood);
     frame.position.y = 0.95;
     frame.castShadow = true;
+    frame.receiveShadow = true;
     group.add(frame);
-    addToActiveLevel(group);
     registerCollider(frame);
+    addToActiveLevel(group);
     return group;
   },
   createNoticeBoard: (position, rotation = 0) => {
@@ -775,14 +748,6 @@ const PropFactory = {
     group.name = "noticeboard";
     group.position.set(...position);
     group.rotation.y = rotation;
-    const board = new THREE.Mesh(new THREE.BoxGeometry(1.6, 1.0, 0.04), new THREE.MeshStandardMaterial({ color: 0x8b5a2b, roughness: 0.95 }));
-    board.position.y = 1.6;
-    group.add(board);
-    addToActiveLevel(group);
-    return group;
-  },
-  createCeilingFan: (position) => {
-    const group = new THREE.Group();
     group.name = "ceilingfan";
     group.position.set(...position);
     const rod = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.5), materials.brass);
@@ -824,8 +789,8 @@ const PropFactory = {
   }
 };
 
-// Local level builder utility
-const RoomBuilder = {
+// Level builder utilities exported and bound to window for sub-modules
+export const RoomBuilder = {
   buildRoom: (name, type, position, size) => {
     const group = new THREE.Group();
     group.name = name;
@@ -877,8 +842,9 @@ const RoomBuilder = {
   }
 };
 
-const CampusLayoutBuilder = {
+export const CampusLayoutBuilder = {
   buildCampus: (layoutData) => {
+    if (!layoutData || !layoutData.blocks) return;
     layoutData.blocks.forEach(block => {
       const sectorGroup = new THREE.Group();
       sectorGroup.name = block.id;
@@ -916,6 +882,11 @@ const CampusLayoutBuilder = {
     });
   }
 };
+
+window.RoomBuilder = RoomBuilder;
+window.CampusLayoutBuilder = CampusLayoutBuilder;
+window.campusLayoutData = campusLayoutData;
+
 let kulkarniCallPlayed = false;
 let meeraDiaryReacted = false;
 let hardcoreMode = false;

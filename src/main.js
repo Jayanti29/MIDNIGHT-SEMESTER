@@ -4361,6 +4361,20 @@ if (new URLSearchParams(window.location.search).has("autostart")) {
   setGameState(GameState.PLAYING);
   caption.textContent = "Verification mode: playable scene loaded.";
 }
+let isMouseDownOnCanvas = false;
+let lastMouseX = 0;
+let lastMouseY = 0;
+
+canvas.addEventListener("mousedown", (e) => {
+  isMouseDownOnCanvas = true;
+  lastMouseX = e.clientX;
+  lastMouseY = e.clientY;
+});
+
+window.addEventListener("mouseup", () => {
+  isMouseDownOnCanvas = false;
+});
+
 canvas.addEventListener("click", () => {
   if (gameState === GameState.PAUSED) {
     togglePause();
@@ -4384,12 +4398,9 @@ document.addEventListener("pointerlockchange", () => {
   } else {
     pointerLocked = false;
     document.body.style.cursor = "auto";
-    caption.textContent = "Mouse look disabled. Click the game view to resume.";
     if (pointerWasLocked) {
       pointerWasLocked = false;
-      if (gameState === GameState.PLAYING) {
-        setGameState(GameState.PAUSED);
-      }
+      caption.textContent = "Pointer unlocked. Click scene to relock or drag mouse/WASD to play.";
     }
   }
 });
@@ -4398,17 +4409,32 @@ document.addEventListener("pointerlockerror", () => {
   pointerLocked = false;
   pointerWasLocked = false;
   document.body.style.cursor = "auto";
-  caption.textContent = "Mouse look was blocked. Use arrow keys to look, WASD to move.";
+  caption.textContent = "Pointer lock inactive. Click & drag mouse or use WASD/Arrows to play.";
 });
 
 document.addEventListener("mousemove", (event) => {
-  if (!pointerLocked || gameState !== GameState.PLAYING || debugConsoleOpen) return;
-  yaw -= event.movementX * 0.0022 * mouseSensitivity;
-  pitch += (invertMouseLook ? 1 : -1) * event.movementY * 0.002 * mouseSensitivity;
-  pitch = THREE.MathUtils.clamp(pitch, -1.1, 1.1);
-  gameplayState.yaw = yaw;
-  gameplayState.pitch = pitch;
-  camera.rotation.set(pitch, yaw, 0, "YXZ");
+  if (gameState !== GameState.PLAYING || debugConsoleOpen) return;
+
+  if (pointerLocked) {
+    yaw -= event.movementX * 0.0022 * mouseSensitivity;
+    pitch += (invertMouseLook ? 1 : -1) * event.movementY * 0.002 * mouseSensitivity;
+    pitch = THREE.MathUtils.clamp(pitch, -1.1, 1.1);
+    gameplayState.yaw = yaw;
+    gameplayState.pitch = pitch;
+    camera.rotation.set(pitch, yaw, 0, "YXZ");
+  } else if (isMouseDownOnCanvas) {
+    const deltaX = event.clientX - lastMouseX;
+    const deltaY = event.clientY - lastMouseY;
+    lastMouseX = event.clientX;
+    lastMouseY = event.clientY;
+
+    yaw -= deltaX * 0.003 * mouseSensitivity;
+    pitch += (invertMouseLook ? 1 : -1) * deltaY * 0.003 * mouseSensitivity;
+    pitch = THREE.MathUtils.clamp(pitch, -1.1, 1.1);
+    gameplayState.yaw = yaw;
+    gameplayState.pitch = pitch;
+    camera.rotation.set(pitch, yaw, 0, "YXZ");
+  }
 });
 
 function checkDecryptionAlignment() { // Sync minigame status

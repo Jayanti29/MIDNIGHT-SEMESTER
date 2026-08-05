@@ -1061,3 +1061,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:49:07.243Z] Automated polish update part 126: style(menu): refine dossier folder border radius and shadow depth
 - [2026-08-05T16:49:07.281Z] Automated polish update part 127: feat(gameplay): add ambient heartbeat pulse during high fear state
 - [2026-08-05T16:49:07.326Z] Automated polish update part 128: refactor(player): adjust headbob amplitude for smooth movement
+- [2026-08-05T16:49:07.360Z] Automated polish update part 129: style(hud): polish reticle hover pulse animation parameters

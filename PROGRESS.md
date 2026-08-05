@@ -976,3 +976,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:48:47.548Z] Automated polish update part 41: refactor(ui): update horror HUD color tokens and contrast variables
 - [2026-08-05T16:48:47.595Z] Automated polish update part 42: style(hud): fine-tune battery gauge flicker frequency
 - [2026-08-05T16:48:47.646Z] Automated polish update part 43: feat(atmosphere): enhance hallway fog density and light decay rates
+- [2026-08-05T16:48:47.686Z] Automated polish update part 44: fix(audio): optimize spatial whisper attenuation falloff

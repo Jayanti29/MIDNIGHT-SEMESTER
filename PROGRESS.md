@@ -1098,3 +1098,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:49:18.094Z] Automated polish update part 163: feat(atmosphere): enhance hallway fog density and light decay rates
 - [2026-08-05T16:49:18.135Z] Automated polish update part 164: fix(audio): optimize spatial whisper attenuation falloff
 - [2026-08-05T16:49:18.176Z] Automated polish update part 165: docs(progress): update sprint recovery and stamina architecture notes
+- [2026-08-05T16:49:18.227Z] Automated polish update part 166: style(menu): refine dossier folder border radius and shadow depth

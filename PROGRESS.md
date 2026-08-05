@@ -1245,3 +1245,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:55:59.455Z] Individual push sequence 112: style(ui): update CRT scanline overlay transparency
 - [2026-08-05T16:56:02.299Z] Individual push sequence 113: feat(audio): add floorboard creak acoustics on step
 - [2026-08-05T16:56:05.053Z] Individual push sequence 114: refactor(state): tune diegetic battery drain curves
+- [2026-08-05T16:56:07.752Z] Individual push sequence 115: style(menu): enhance restricted dossier stamp opacity

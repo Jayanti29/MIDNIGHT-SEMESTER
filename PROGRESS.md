@@ -1218,3 +1218,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:54:39.379Z] Individual push sequence 85: docs(progress): update sprint recovery architecture notes
 - [2026-08-05T16:54:42.179Z] Individual push sequence 86: style(menu): refine dossier folder shadow depth
 - [2026-08-05T16:54:44.909Z] Individual push sequence 87: feat(gameplay): add ambient heartbeat pulse on high fear
+- [2026-08-05T16:54:47.727Z] Individual push sequence 88: refactor(player): adjust headbob frequency for smooth movement

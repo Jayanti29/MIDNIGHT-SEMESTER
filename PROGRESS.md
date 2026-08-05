@@ -1196,3 +1196,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:53:25.230Z] Individual push sequence 63: feat(atmosphere): adjust hallway fog density and light decay
 - [2026-08-05T16:53:28.463Z] Individual push sequence 64: fix(audio): optimize spatial whisper attenuation falloff
 - [2026-08-05T16:53:32.322Z] Individual push sequence 65: docs(progress): update sprint recovery architecture notes
+- [2026-08-05T16:53:35.281Z] Individual push sequence 66: style(menu): refine dossier folder shadow depth

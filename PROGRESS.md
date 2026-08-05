@@ -1020,3 +1020,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:48:57.236Z] Automated polish update part 85: docs(progress): update sprint recovery and stamina architecture notes
 - [2026-08-05T16:48:57.341Z] Automated polish update part 86: style(menu): refine dossier folder border radius and shadow depth
 - [2026-08-05T16:48:57.431Z] Automated polish update part 87: feat(gameplay): add ambient heartbeat pulse during high fear state
+- [2026-08-05T16:48:57.481Z] Automated polish update part 88: refactor(player): adjust headbob amplitude for smooth movement

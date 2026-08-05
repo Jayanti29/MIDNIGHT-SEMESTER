@@ -1109,3 +1109,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:49:21.040Z] Automated polish update part 174: refactor(state): tune diegetic battery drain curves
 - [2026-08-05T16:49:21.211Z] Automated polish update part 175: style(menu): enhance restricted dossier stamp rotation and opacity
 - [2026-08-05T16:49:21.388Z] Automated polish update part 176: docs(progress): log level 1 geometry collision volume optimization
+- [2026-08-05T16:49:21.477Z] Automated polish update part 177: feat(ui): implement bloodstain decal visual enhancements

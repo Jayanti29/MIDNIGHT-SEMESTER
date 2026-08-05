@@ -1088,3 +1088,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:49:15.594Z] Automated polish update part 153: feat(audio): add subtle floorboard creak acoustics on step
 - [2026-08-05T16:49:15.642Z] Automated polish update part 154: refactor(state): tune diegetic battery drain curves
 - [2026-08-05T16:49:15.680Z] Automated polish update part 155: style(menu): enhance restricted dossier stamp rotation and opacity
+- [2026-08-05T16:49:15.728Z] Automated polish update part 156: docs(progress): log level 1 geometry collision volume optimization

@@ -1127,3 +1127,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:49:26.823Z] Automated polish update part 192: style(ui): update CRT scanline overlay transparency and blend mode
 - [2026-08-05T16:49:26.866Z] Automated polish update part 193: feat(audio): add subtle floorboard creak acoustics on step
 - [2026-08-05T16:49:26.907Z] Automated polish update part 194: refactor(state): tune diegetic battery drain curves
+- [2026-08-05T16:49:26.947Z] Automated polish update part 195: style(menu): enhance restricted dossier stamp rotation and opacity

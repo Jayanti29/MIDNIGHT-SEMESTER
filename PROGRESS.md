@@ -1017,3 +1017,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:48:56.781Z] Automated polish update part 82: style(hud): fine-tune battery gauge flicker frequency
 - [2026-08-05T16:48:56.851Z] Automated polish update part 83: feat(atmosphere): enhance hallway fog density and light decay rates
 - [2026-08-05T16:48:57.080Z] Automated polish update part 84: fix(audio): optimize spatial whisper attenuation falloff
+- [2026-08-05T16:48:57.236Z] Automated polish update part 85: docs(progress): update sprint recovery and stamina architecture notes

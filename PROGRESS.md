@@ -1064,3 +1064,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:49:07.360Z] Automated polish update part 129: style(hud): polish reticle hover pulse animation parameters
 - [2026-08-05T16:49:07.401Z] Automated polish update part 130: fix(level): calibrate tube light flicker intervals in Block A
 - [2026-08-05T16:49:09.430Z] Automated polish update part 131: docs(lore): expand Dr. Verma neural array laboratory records
+- [2026-08-05T16:49:09.481Z] Automated polish update part 132: style(ui): update CRT scanline overlay transparency and blend mode

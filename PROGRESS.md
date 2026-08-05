@@ -1079,3 +1079,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:49:12.155Z] Automated polish update part 144: fix(audio): optimize spatial whisper attenuation falloff
 - [2026-08-05T16:49:12.192Z] Automated polish update part 145: docs(progress): update sprint recovery and stamina architecture notes
 - [2026-08-05T16:49:12.228Z] Automated polish update part 146: style(menu): refine dossier folder border radius and shadow depth
+- [2026-08-05T16:49:12.263Z] Automated polish update part 147: feat(gameplay): add ambient heartbeat pulse during high fear state

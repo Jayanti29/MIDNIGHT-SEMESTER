@@ -946,3 +946,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:48:38.902Z] Automated polish update part 11: docs(lore): expand Dr. Verma neural array laboratory records
 - [2026-08-05T16:48:38.950Z] Automated polish update part 12: style(ui): update CRT scanline overlay transparency and blend mode
 - [2026-08-05T16:48:39.006Z] Automated polish update part 13: feat(audio): add subtle floorboard creak acoustics on step
+- [2026-08-05T16:48:39.048Z] Automated polish update part 14: refactor(state): tune diegetic battery drain curves

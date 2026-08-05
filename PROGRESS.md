@@ -1145,3 +1145,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:50:40.149Z] Individual push sequence 12: style(ui): update CRT scanline overlay transparency
 - [2026-08-05T16:50:42.862Z] Individual push sequence 13: feat(audio): add floorboard creak acoustics on step
 - [2026-08-05T16:50:45.770Z] Individual push sequence 14: refactor(state): tune diegetic battery drain curves
+- [2026-08-05T16:50:49.186Z] Individual push sequence 15: style(menu): enhance restricted dossier stamp opacity

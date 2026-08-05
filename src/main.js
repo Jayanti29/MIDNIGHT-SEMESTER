@@ -4,6 +4,7 @@ import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { ShaderPass } from "three/addons/postprocessing/ShaderPass.js";
 import campusLayoutData from "./campus-layout.json";
+export { campusLayoutData };
 
 export const roomBounds = [];
 if (campusLayoutData && campusLayoutData.blocks) {
@@ -156,6 +157,7 @@ const debugConsole = document.querySelector("#debug-console");
 const debugInput = document.querySelector("#debug-input");
 const debugOutput = document.querySelector("#debug-output");
 const objective = document.querySelector("#objective");
+const charSelectScreen = document.querySelector("#character-select-screen");
 const objectiveSteps = document.querySelectorAll("[data-step]");
 const caseFile = document.querySelector("#case-file");
 const caseTitle = document.querySelector("#case-title");
@@ -166,7 +168,7 @@ const resumeButton = document.querySelector("#resume-button");
 const pauseSettings = document.querySelector("#pause-settings");
 const quitToMenu = document.querySelector("#quit-to-menu");
 export const caption = document.querySelector("#caption");
-const vignette = document.querySelector("#vignette");
+export const vignette = document.querySelector("#vignette");
 const vrToggle = document.querySelector("#vr-toggle");
 const dialogue = document.querySelector("#dialogue");
 const speaker = document.querySelector("#speaker");
@@ -398,9 +400,9 @@ let mouseSensitivity = parseFloat(localStorage.getItem("setting-mouse-sensitivit
 let vignetteScale = 1.0;
 let screenContrast = 1.0;
 let masterVolume = parseFloat(localStorage.getItem("setting-master-volume") || "0.8");
-let sfxVolume = parseFloat(localStorage.getItem("setting-sfx-volume") || "0.8");
+export let sfxVolume = parseFloat(localStorage.getItem("setting-sfx-volume") || "0.8");
 let ambientVolume = parseFloat(localStorage.getItem("setting-ambient-volume") || "0.8");
-let inspected = 0;
+export let inspected = 0;
 const collectedEvidence = new Set();
 const collectedBatteries = new Set();
 const readLoreNotes = new Set();
@@ -523,7 +525,7 @@ export const playerCustomizationState = {
   p2SkinTone: p2Customization.skinTone
 };
 
-let p1Model = playerCustomizationState.p1Model;
+export let p1Model = playerCustomizationState.p1Model;
 let p1OutfitColor = playerCustomizationState.p1OutfitColor;
 let p1HairStyle = playerCustomizationState.p1HairStyle;
 let p1BodyScale = playerCustomizationState.p1BodyScale;
@@ -531,7 +533,7 @@ let p1HasGlasses = playerCustomizationState.p1HasGlasses;
 let p1HasBackpack = playerCustomizationState.p1HasBackpack;
 let p1SkinTone = playerCustomizationState.p1SkinTone;
 
-let p2Model = playerCustomizationState.p2Model;
+export let p2Model = playerCustomizationState.p2Model;
 let p2OutfitColor = playerCustomizationState.p2OutfitColor;
 let p2HairStyle = playerCustomizationState.p2HairStyle;
 let p2BodyScale = playerCustomizationState.p2BodyScale;
@@ -889,15 +891,15 @@ window.campusLayoutData = campusLayoutData;
 
 let kulkarniCallPlayed = false;
 let meeraDiaryReacted = false;
-let hardcoreMode = false;
+export let hardcoreMode = false;
 let tapeRecorderPlaying = false;
 let tapeSoundInstance = null;
 let p1Pills = 0;
 let p2Pills = 0;
 let ecgSensorsCollected = false;
-let shadowSpawnTimer = 0;
-let creepyWhisperTimer = 0;
-let shadowFigures = [];
+export let shadowSpawnTimer = 0;
+export let creepyWhisperTimer = 0;
+export let shadowFigures = [];
 let meeraFinalEventPlayed = false;
 let kulkarniLibraryEventPlayed = false;
 let currentCctvCam = 1;
@@ -944,8 +946,7 @@ export let player2Pitch = 0;
 export let coopMode = false;
 export let camera2 = null;
 export let player2Character = null;
-let godModeActive = false;
-let infiniteBatteryActive = false;
+export let infiniteBatteryActive = false;
 export let debugConsoleOpen = false;
 let meeraSpeedMultiplier = 1.0;
 let player1PreLockerPos = null;
@@ -963,8 +964,10 @@ let activeEndingPath = null;
 let activeDecryptionTerminal = null;
 let decryptProgress = 0;
 let p2DecryptingActive = false;
-let decryptTargetPos = 50;
-let decryptSpeedMultiplier = 1.0;
+export let decryptTargetPos = 50;
+export let decryptSpeedMultiplier = 1.0;
+export let decryptOscillationDir = 1;
+export let decryptIndicatorPos = 50;
 let lastPlayer1LockerInspected = null;
 let lastPlayer2LockerInspected = null;
 export let meeraLockerSearchTimer = 0;
@@ -975,10 +978,6 @@ export let statTimesHidden = 0;
 export let statCansThrown = 0;
 export let godModeActive = false;
 export let filmPass = null;
-export let inspected = 0;
-export let shadowFigures = [];
-export let shadowSpawnTimer = 0;
-export let creepyWhisperTimer = 0;
 
 export let subtitlesEnabled = true;
 export let camShakeMultiplier = 0.7;
@@ -2627,7 +2626,7 @@ export function inspectObject(hit, isPlayer2 = false) {
       });
       
       meeraState = AiState.CHASE;
-      meeraSpeed = 1.48;
+      meeraSpeedMultiplier = 1.48;
       if (scene.userData.meeraCharacter) {
         scene.userData.meeraCharacter.position.set(0, 0, -32);
         scene.userData.meeraCharacter.visible = true;
@@ -3418,7 +3417,7 @@ const filmGrainShader = {
 
 const composer = new EffectComposer(renderer);
 composer.addPass(new RenderPass(scene, camera));
-const filmPass = new ShaderPass(filmGrainShader);
+filmPass = new ShaderPass(filmGrainShader);
 composer.addPass(filmPass);
 
 
@@ -4240,6 +4239,19 @@ coopButton.addEventListener("click", () => {
   initCharacterSelect();
   animateCharacterSelect();
 });
+
+function updateSwatchHighlights() {
+  const p = characterSelectState.activeEditingPlayer === 2 ? p2Customization : p1Customization;
+  document.querySelectorAll("#outfit-swatches .swatch").forEach(btn => {
+    btn.classList.toggle("selected", btn.getAttribute("data-color") === p.outfitColor);
+  });
+  document.querySelectorAll("#skin-swatches .swatch").forEach(btn => {
+    btn.classList.toggle("selected", btn.getAttribute("data-skin") === p.skinTone);
+  });
+  document.querySelectorAll("#hair-swatches .swatch").forEach(btn => {
+    btn.classList.toggle("selected", btn.getAttribute("data-hair") === p.hairStyle);
+  });
+}
 
 const tabP1 = document.getElementById("btn-tab-p1");
 const tabP2 = document.getElementById("btn-tab-p2");

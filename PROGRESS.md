@@ -973,3 +973,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:48:45.420Z] Automated polish update part 38: fix(player): smooth out camera pitch clamping limits
 - [2026-08-05T16:48:45.565Z] Automated polish update part 39: style(hud): update fear meter color transitions from amber to blood red
 - [2026-08-05T16:48:45.605Z] Automated polish update part 40: docs(lore): add watchman log entry regarding 12:07 AM power cut
+- [2026-08-05T16:48:47.548Z] Automated polish update part 41: refactor(ui): update horror HUD color tokens and contrast variables

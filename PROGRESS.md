@@ -1259,3 +1259,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:56:40.140Z] Individual push sequence 126: style(menu): refine dossier folder shadow depth
 - [2026-08-05T16:56:42.885Z] Individual push sequence 127: feat(gameplay): add ambient heartbeat pulse on high fear
 - [2026-08-05T16:56:45.574Z] Individual push sequence 128: refactor(player): adjust headbob frequency for smooth movement
+- [2026-08-05T16:56:48.353Z] Individual push sequence 129: style(hud): polish reticle hover pulse animation

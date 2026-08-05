@@ -1252,3 +1252,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:56:19.232Z] Individual push sequence 119: style(hud): update fear meter color transitions
 - [2026-08-05T16:56:22.077Z] Individual push sequence 120: docs(lore): add watchman log entry regarding power cut
 - [2026-08-05T16:56:24.859Z] Individual push sequence 121: refactor(ui): fine-tune horror HUD color tokens and contrast
+- [2026-08-05T16:56:27.796Z] Individual push sequence 122: style(hud): calibrate battery gauge flicker pulse

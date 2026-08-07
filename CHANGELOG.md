@@ -373,3 +373,4 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Feat**: Camera shake default reduced to 0.7
 
 <!-- commit-ref: 287 -->
+<!-- commit-ref: 297 -->

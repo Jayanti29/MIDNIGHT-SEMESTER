@@ -1285,3 +1285,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 12/350**: fix(level): align floor segment geometry thresholds in Block A hallway [fix-pass 12/50]
 - **Commit 13/350**: fix(render): prevent film grain shader uniform degradation on window resize [fix-pass 13/50]
 - **Commit 14/350**: fix(render): add disposal cleanup for shadow figure meshes [fix-pass 14/50]
+- **Commit 15/350**: fix(state): sanitize initial battery charge level on game restart [fix-pass 15/50]

@@ -1061,3 +1061,5 @@ export function updateState(delta) {
   updateInteractionPrompt();
   camera.position.add(shakeOffset);
 }
+
+// commit-ref: 15

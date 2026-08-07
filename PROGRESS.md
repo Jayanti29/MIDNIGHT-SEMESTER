@@ -1366,3 +1366,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 93/350**: feat(ghost): implement spectral hover animation for ghost hips bone [ghost-pass 43/70]
 - **Commit 94/350**: feat(ghost): add proximity chromatic aberration trigger when ghost approaches [ghost-pass 44/70]
 - **Commit 95/350**: feat(ghost): trigger strobe light flickering during ghost hunting phase [ghost-pass 45/70]
+- **Commit 96/350**: feat(ghost): implement directional whisper audio cue when ghost spawns [ghost-pass 46/70]

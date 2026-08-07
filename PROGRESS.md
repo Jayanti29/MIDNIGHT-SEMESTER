@@ -1381,3 +1381,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 108/350**: feat(ghost): add spectral mist particle cloud around ghost base [ghost-pass 58/70]
 - **Commit 109/350**: feat(ghost): implement ghost vanishing effect when player shines flashlight [ghost-pass 59/70]
 - **Commit 110/350**: feat(ghost): add jumpscare audio stinger modulation based on fear level [ghost-pass 60/70]
+- **Commit 111/350**: feat(ghost): enhance Meera spectral translucent shader opacity curve [ghost-pass 61/70]

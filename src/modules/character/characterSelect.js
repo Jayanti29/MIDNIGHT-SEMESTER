@@ -252,3 +252,5 @@ export function animateCharacterSelect() {
     characterSelectState.charSelectActive = false;
   }
 }
+
+// commit-ref: 5

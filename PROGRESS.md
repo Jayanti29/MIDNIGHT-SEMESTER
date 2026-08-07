@@ -1577,3 +1577,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 302/350**: style(ui): enhance HUD sanity dial with pulsing red warning border [ui-pass 22/70]
 - **Commit 303/350**: style(ui): add glassmorphism backdrop blur to dialogue box index card [ui-pass 23/70]
 - **Commit 304/350**: style(ui): improve character select candidate tabs active state highlight [ui-pass 24/70]
+- **Commit 305/350**: style(ui): polish settings menu range sliders and paper button hover state [ui-pass 25/70]

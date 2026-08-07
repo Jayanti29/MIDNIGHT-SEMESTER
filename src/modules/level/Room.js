@@ -12,3 +12,5 @@ export class Room {
   }
   addInteractable(o) { this.interactables.push(o); }
 }
+
+// commit-ref: 201

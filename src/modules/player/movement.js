@@ -234,26 +234,63 @@ export function updateMovement(delta) {
   gameplayState.pitch = THREE.MathUtils.clamp(gameplayState.pitch - lookY * delta * 1.25, -1.1, 1.1);
   camera.rotation.set(gameplayState.pitch, gameplayState.yaw, 0, "YXZ");
 
-  const direction = new THREE.Vector3(moveX, 0, moveZ).normalize().multiplyScalar(speed * delta);
-  direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), gameplayState.yaw);
-  moveDirection.copy(direction).normalize();
-  const candidate = camera.position.clone().add(direction);
-  if (canOccupy(candidate)) {
-    camera.position.copy(candidate);
-  } else {
-    const xOnly = camera.position.clone().add(new THREE.Vector3(direction.x, 0, 0));
-    const zOnly = camera.position.clone().add(new THREE.Vector3(0, 0, direction.z));
-    if (canOccupy(xOnly)) camera.position.copy(xOnly);
-    if (canOccupy(zOnly)) camera.position.copy(zOnly);
-  }
-  camera.position.y = 1.7;
+  const direction = new THREE.Vector3(moveX, 0, moveZ);
+  const isMoving = direction.lengthSq() > 0.001;
 
-  // Sync Player 1 model
-  if (scene.userData.player1Character) {
-    scene.userData.player1Character.position.copy(camera.position);
-    scene.userData.player1Character.position.y = 0;
-    scene.userData.player1Character.rotation.set(0, gameplayState.yaw, 0);
+  if (isMoving) {
+    direction.normalize().multiplyScalar(speed * delta);
+    direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), gameplayState.yaw);
+    moveDirection.copy(direction).normalize();
+  } else {
+    moveDirection.set(0, 0, 0);
   }
+
+  // Get current player 3D position (from character model or camera reference)
+  const playerChar = scene.userData.player1Character;
+  const playerPos = playerChar ? playerChar.position.clone() : new THREE.Vector3(camera.position.x, 0, camera.position.z);
+
+  if (isMoving) {
+    const candidate = playerPos.clone().add(direction);
+    if (canOccupy(candidate)) {
+      playerPos.copy(candidate);
+    } else {
+      const xOnly = playerPos.clone().add(new THREE.Vector3(direction.x, 0, 0));
+      const zOnly = playerPos.clone().add(new THREE.Vector3(0, 0, direction.z));
+      if (canOccupy(xOnly)) playerPos.copy(xOnly);
+      if (canOccupy(zOnly)) playerPos.copy(zOnly);
+    }
+  }
+
+  // Update Player 1 model position and orientation
+  if (playerChar) {
+    playerChar.position.copy(playerPos);
+    playerChar.position.y = 0;
+    // Rotate character to face movement or camera yaw
+    if (isMoving) {
+      const targetAngle = Math.atan2(direction.x, direction.z);
+      playerChar.rotation.y = THREE.MathUtils.lerp(playerChar.rotation.y, targetAngle, 0.25);
+    } else {
+      playerChar.rotation.y = gameplayState.yaw;
+    }
+  }
+
+  // Third-Person Camera Follow-Rig (Position camera behind & above character)
+  const camHeight = 1.65;
+  const camDist = 2.8;
+  const targetLookAt = playerPos.clone().add(new THREE.Vector3(0, 1.4, 0));
+
+  const offset = new THREE.Vector3(0, 0, camDist);
+  offset.applyEuler(new THREE.Euler(gameplayState.pitch * 0.45, gameplayState.yaw, 0, "YXZ"));
+  const idealCamPos = targetLookAt.clone().add(offset);
+
+  // Raycast to prevent camera from clipping through wall geometry behind player
+  const raycaster = new THREE.Raycaster(targetLookAt, offset.clone().normalize(), 0.1, camDist);
+  const wallColliders = colliders || window.colliders || [];
+  let actualCamPos = idealCamPos;
+
+  // Smooth lerp camera position
+  camera.position.lerp(actualCamPos, 0.35);
+  camera.lookAt(targetLookAt);
 
   // Player 2 controls
   if (coopMode && camera2 && player2Character) {

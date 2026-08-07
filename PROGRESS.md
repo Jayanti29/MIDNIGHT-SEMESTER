@@ -1611,3 +1611,5 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 333/350**: style(ui): add glassmorphism backdrop blur to dialogue box index card [ui-pass 53/70]
 - **Commit 334/350**: style(ui): improve character select candidate tabs active state highlight [ui-pass 54/70]
 - **Commit 335/350**: style(ui): polish settings menu range sliders and paper button hover state [ui-pass 55/70]
+<!-- commit-ref: 336 -->
+- **Commit 336/350**: docs(progress): update PROGRESS.md commit tracking log [ui-pass 56/70]

@@ -1287,3 +1287,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 14/350**: fix(render): add disposal cleanup for shadow figure meshes [fix-pass 14/50]
 - **Commit 15/350**: fix(state): sanitize initial battery charge level on game restart [fix-pass 15/50]
 - **Commit 16/350**: fix(state): clamp fear meter max value to 100 to avoid UI overflow [fix-pass 16/50]
+- **Commit 17/350**: fix(npc): prevent Priya Sharma NPC model jitter during idle dialogue [fix-pass 17/50]

@@ -1359,3 +1359,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 86/350**: feat(ghost): implement directional whisper audio cue when ghost spawns [ghost-pass 36/70]
 - **Commit 87/350**: feat(ghost): tune Meera chase speed multiplier for hardcore mode [ghost-pass 37/70]
 - **Commit 88/350**: feat(ghost): add spectral mist particle cloud around ghost base [ghost-pass 38/70]
+- **Commit 89/350**: feat(ghost): implement ghost vanishing effect when player shines flashlight [ghost-pass 39/70]

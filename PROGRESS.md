@@ -1528,3 +1528,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 255/350**: feat(level): add ceiling beam rafters to Block A dormitory wing [level-pass 55/80]
 - **Commit 256/350**: feat(level): scatter spider lilies along corridor corners [level-pass 56/80]
 - **Commit 257/350**: feat(level): add bloodstain decals near basement security gate [level-pass 57/80]
+- **Commit 258/350**: feat(level): add filing cabinets with interactive lore note drawers [level-pass 58/80]

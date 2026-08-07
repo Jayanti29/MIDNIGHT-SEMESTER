@@ -1335,3 +1335,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 62/350**: feat(ghost): add glowing red emissive eyes to Meera 3D head model [ghost-pass 12/70]
 - **Commit 63/350**: feat(ghost): implement spectral hover animation for ghost hips bone [ghost-pass 13/70]
 - **Commit 64/350**: feat(ghost): add proximity chromatic aberration trigger when ghost approaches [ghost-pass 14/70]
+- **Commit 65/350**: feat(ghost): trigger strobe light flickering during ghost hunting phase [ghost-pass 15/70]

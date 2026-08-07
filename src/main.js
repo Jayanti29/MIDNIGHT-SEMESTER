@@ -237,6 +237,8 @@ loadingManager.onLoad = () => {
       setTimeout(() => { loadingScreen.style.display = "none"; }, 600);
     }
   }, 400);
+};
+
 THREE.Cache.enabled = true;
 
 loadingManager.onError = (url) => {

@@ -5,3 +5,5 @@
 .hud-energy .hud-fill { background: linear-gradient(90deg, #4ade80, #22d3ee); }
 .hud-stress .hud-fill  { background: linear-gradient(90deg, #facc15, #f87171); }
 .hud-stat { font-size: .7rem; color: #ccc; padding: .1rem .4rem; background: rgba(0,0,0,.4); border-radius: 4px; }
+
+/* commit-ref: 282 */

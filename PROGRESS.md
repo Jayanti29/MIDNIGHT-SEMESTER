@@ -1294,3 +1294,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 21/350**: fix(movement): refine corridor bounding box checks in canOccupy [fix-pass 21/50]
 - **Commit 22/350**: fix(movement): optimize playerRadius collision threshold to prevent door stickiness [fix-pass 22/50]
 - **Commit 23/350**: fix(input): add case-insensitive WASD key code handling [fix-pass 23/50]
+- **Commit 24/350**: fix(input): prevent pointer lock exception on async game initialization [fix-pass 24/50]

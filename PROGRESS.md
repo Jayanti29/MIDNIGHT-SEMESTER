@@ -1390,3 +1390,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 117/350**: feat(ghost): tune Meera chase speed multiplier for hardcore mode [ghost-pass 67/70]
 - **Commit 118/350**: feat(ghost): add spectral mist particle cloud around ghost base [ghost-pass 68/70]
 - **Commit 119/350**: feat(ghost): implement ghost vanishing effect when player shines flashlight [ghost-pass 69/70]
+- **Commit 120/350**: feat(ghost): add jumpscare audio stinger modulation based on fear level [ghost-pass 70/70]

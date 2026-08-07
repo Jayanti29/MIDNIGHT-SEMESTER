@@ -1553,3 +1553,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 280/350**: feat(level): add emergency generator pressure gauge valves to Level 2 [level-pass 80/80]
 - **Commit 281/350**: style(ui): update start screen corkboard dossier typography and pin glow [ui-pass 1/70]
 - **Commit 282/350**: style(ui): enhance HUD sanity dial with pulsing red warning border [ui-pass 2/70]
+- **Commit 283/350**: style(ui): add glassmorphism backdrop blur to dialogue box index card [ui-pass 3/70]

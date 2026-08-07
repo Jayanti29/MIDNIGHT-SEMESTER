@@ -21,3 +21,5 @@ export class HUD {
   }
   unmount() { this._el?.remove(); this._el = null; }
 }
+
+// commit-ref: 7

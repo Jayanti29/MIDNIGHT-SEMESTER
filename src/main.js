@@ -3323,6 +3323,18 @@ function animate() {
     const speed = moveDirection2.length();
     updateHumanoidAnimations(player2Character, speed, time);
   }
+  if (scene.userData.kulkarni) {
+    updateHumanoidAnimations(scene.userData.kulkarni, 0, time);
+  }
+  if (scene.userData.priyaNpc) {
+    updateHumanoidAnimations(scene.userData.priyaNpc, 0, time);
+  }
+  if (scene.userData.rohanNpc) {
+    updateHumanoidAnimations(scene.userData.rohanNpc, 0, time);
+  }
+  if (scene.userData.samNpc) {
+    updateHumanoidAnimations(scene.userData.samNpc, 0, time);
+  }
   if (samCharacter) {
     updateNpcSurvivorAnimations(samCharacter, samState, time);
   }

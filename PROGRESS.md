@@ -1342,3 +1342,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 69/350**: feat(ghost): implement ghost vanishing effect when player shines flashlight [ghost-pass 19/70]
 - **Commit 70/350**: feat(ghost): add jumpscare audio stinger modulation based on fear level [ghost-pass 20/70]
 - **Commit 71/350**: feat(ghost): enhance Meera spectral translucent shader opacity curve [ghost-pass 21/70]
+- **Commit 72/350**: feat(ghost): add glowing red emissive eyes to Meera 3D head model [ghost-pass 22/70]

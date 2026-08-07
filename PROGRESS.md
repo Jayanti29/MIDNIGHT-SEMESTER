@@ -1322,3 +1322,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 49/350**: fix(audio): add gain clamping to prevent Web Audio clipping during jumpscares [fix-pass 49/50]
 - **Commit 50/350**: fix(audio): handle AudioContext autoplay resume policy on touch/click [fix-pass 50/50]
 - **Commit 51/350**: feat(ghost): enhance Meera spectral translucent shader opacity curve [ghost-pass 1/70]
+- **Commit 52/350**: feat(ghost): add glowing red emissive eyes to Meera 3D head model [ghost-pass 2/70]

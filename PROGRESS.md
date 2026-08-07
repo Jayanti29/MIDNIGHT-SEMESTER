@@ -1279,3 +1279,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 6/350**: fix(customization): preserve preview camera rotation across swatch changes [fix-pass 6/50]
 - **Commit 7/350**: fix(ui): adjust reticle centering for split-screen coop viewports [fix-pass 7/50]
 - **Commit 8/350**: fix(ui): improve z-index order of interaction prompts over modal dialogs [fix-pass 8/50]
+- **Commit 9/350**: fix(audio): add gain clamping to prevent Web Audio clipping during jumpscares [fix-pass 9/50]

@@ -243,3 +243,5 @@ export class AudioManager {
     this.playSound(name, { volume: 0.5 });
   }
 }
+
+// commit-ref: 9

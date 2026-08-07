@@ -1300,3 +1300,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 27/350**: fix(ui): adjust reticle centering for split-screen coop viewports [fix-pass 27/50]
 - **Commit 28/350**: fix(ui): improve z-index order of interaction prompts over modal dialogs [fix-pass 28/50]
 - **Commit 29/350**: fix(audio): add gain clamping to prevent Web Audio clipping during jumpscares [fix-pass 29/50]
+- **Commit 30/350**: fix(audio): handle AudioContext autoplay resume policy on touch/click [fix-pass 30/50]

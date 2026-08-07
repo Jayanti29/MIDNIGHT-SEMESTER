@@ -228,7 +228,6 @@ export function buildCorridor() {
   // Since basementGateGroup is a global, we can update it in window:
   window.basementGateGroup = newBasementGateGroup;
   addToActiveLevel(newBasementGateGroup);
-  registerCollider(gateFrame);
   interactables.push(gateLeft, gateRight);
   initBatteries();
   initLoreNotes();

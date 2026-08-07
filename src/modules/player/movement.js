@@ -232,14 +232,15 @@ export function updateMovement(delta) {
 
   gameplayState.yaw -= lookX * delta * 1.7;
   gameplayState.pitch = THREE.MathUtils.clamp(gameplayState.pitch - lookY * delta * 1.25, -1.1, 1.1);
-  camera.rotation.set(gameplayState.pitch, gameplayState.yaw, 0, "YXZ");
 
-  const direction = new THREE.Vector3(moveX, 0, moveZ);
-  const isMoving = direction.lengthSq() > 0.001;
+  const rawDir = new THREE.Vector3(moveX, 0, moveZ);
+  const isMoving = rawDir.lengthSq() > 0.001;
 
+  const direction = new THREE.Vector3();
   if (isMoving) {
-    direction.normalize().multiplyScalar(speed * delta);
-    direction.applyAxisAngle(new THREE.Vector3(0, 1, 0), gameplayState.yaw);
+    rawDir.normalize().multiplyScalar(speed * delta);
+    rawDir.applyAxisAngle(new THREE.Vector3(0, 1, 0), gameplayState.yaw);
+    direction.copy(rawDir);
     moveDirection.copy(direction).normalize();
   } else {
     moveDirection.set(0, 0, 0);
@@ -275,22 +276,51 @@ export function updateMovement(delta) {
   }
 
   // Third-Person Camera Follow-Rig (Position camera behind & above character)
-  const camHeight = 1.65;
-  const camDist = 2.8;
   const targetLookAt = playerPos.clone().add(new THREE.Vector3(0, 1.4, 0));
+  const camDist = 2.8;
 
   const offset = new THREE.Vector3(0, 0, camDist);
   offset.applyEuler(new THREE.Euler(gameplayState.pitch * 0.45, gameplayState.yaw, 0, "YXZ"));
   const idealCamPos = targetLookAt.clone().add(offset);
 
-  // Raycast to prevent camera from clipping through wall geometry behind player
-  const raycaster = new THREE.Raycaster(targetLookAt, offset.clone().normalize(), 0.1, camDist);
+  // Spring-arm raycast collision detection so camera never clips inside wall geometry
+  const rayDir = offset.clone().normalize();
+  const raycaster = new THREE.Raycaster(targetLookAt, rayDir, 0.1, camDist);
+  let minHitDist = camDist;
   const wallColliders = colliders || window.colliders || [];
-  let actualCamPos = idealCamPos;
+  for (let i = 0; i < wallColliders.length; i++) {
+    const col = wallColliders[i];
+    if (!col || !col.name) continue;
+    const nameLower = col.name.toLowerCase();
+    if (nameLower.includes("floor") || nameLower.includes("ceiling") || nameLower.includes("player")) continue;
+    
+    const box3 = new THREE.Box3(
+      new THREE.Vector3(col.xMin, 0, col.zMin),
+      new THREE.Vector3(col.xMax, 3.0, col.zMax)
+    );
+    const hitPoint = new THREE.Vector3();
+    if (raycaster.ray.intersectBox(box3, hitPoint)) {
+      const dist = targetLookAt.distanceTo(hitPoint);
+      if (dist < minHitDist) {
+        minHitDist = Math.max(0.5, dist - 0.25);
+      }
+    }
+  }
+
+  const actualCamPos = targetLookAt.clone().add(rayDir.multiplyScalar(minHitDist));
 
   // Smooth lerp camera position
   camera.position.lerp(actualCamPos, 0.35);
   camera.lookAt(targetLookAt);
+
+  // Synchronize Player 1 Flashlight origin to character
+  if (camera.userData.flashlight) {
+    const fl = camera.userData.flashlight;
+    fl.position.copy(playerPos).add(new THREE.Vector3(0, 1.2, 0));
+    const forwardDir = new THREE.Vector3(-Math.sin(gameplayState.yaw), 0, -Math.cos(gameplayState.yaw));
+    fl.target.position.copy(fl.position).add(forwardDir.multiplyScalar(5));
+    if (fl.target.parent !== scene) scene.add(fl.target);
+  }
 
   // Player 2 controls
   if (coopMode && camera2 && player2Character) {

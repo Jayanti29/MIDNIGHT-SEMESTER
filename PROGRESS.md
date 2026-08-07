@@ -1428,3 +1428,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 155/350**: feat(audio): synthesize creepy metronome ticking sound effect [audio-pass 35/80]
 - **Commit 156/350**: feat(audio): add radio static burst effect on terminal decryption hit [audio-pass 36/80]
 - **Commit 157/350**: feat(audio): implement wood creak acoustics for dorm doors [audio-pass 37/80]
+- **Commit 158/350**: feat(audio): tune pill consumption swallowing sound effect [audio-pass 38/80]

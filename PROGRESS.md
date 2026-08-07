@@ -1316,3 +1316,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 43/350**: fix(input): add case-insensitive WASD key code handling [fix-pass 43/50]
 - **Commit 44/350**: fix(input): prevent pointer lock exception on async game initialization [fix-pass 44/50]
 - **Commit 45/350**: fix(customization): cache preview skeleton materials to eliminate drag latency [fix-pass 45/50]
+- **Commit 46/350**: fix(customization): preserve preview camera rotation across swatch changes [fix-pass 46/50]

@@ -1417,3 +1417,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 144/350**: feat(audio): add heart rate dynamic pitch modulation for low sanity [audio-pass 24/80]
 - **Commit 145/350**: feat(audio): synthesize creepy metronome ticking sound effect [audio-pass 25/80]
 - **Commit 146/350**: feat(audio): add radio static burst effect on terminal decryption hit [audio-pass 26/80]
+- **Commit 147/350**: feat(audio): implement wood creak acoustics for dorm doors [audio-pass 27/80]

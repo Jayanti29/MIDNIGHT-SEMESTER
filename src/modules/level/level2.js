@@ -338,3 +338,5 @@ export function buildLevel2() {
   buildLocker([-1.8, 0, -18.0], "Lab Locker 1");
   buildDebrisItem([1.8, 0, -24.0], "can_3");
 }
+
+// commit-ref: 210

@@ -371,3 +371,5 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - **Feat**: Default vignette lowered to 0.7 for better visibility
 - **Feat**: Default FOV updated to 75
 - **Feat**: Camera shake default reduced to 0.7
+
+<!-- commit-ref: 287 -->

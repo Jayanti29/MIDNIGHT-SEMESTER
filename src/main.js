@@ -686,9 +686,11 @@ export const PropFactory = {
     seat.position.y = 0.42;
     seat.castShadow = true;
     seat.receiveShadow = true;
+    tagInteractable(seat, "chair", "Sit on Chair");
     group.add(seat);
     registerCollider(seat);
     addToActiveLevel(group);
+    interactables.push(seat);
     return group;
   },
   createBed: (position, rotation = 0) => {
@@ -2166,6 +2168,30 @@ export function inspectObject(hit, isPlayer2 = false) {
   const type = hit.object.userData.interactionType;
   const playerName = isPlayer2 ? "Rohan" : "Aarav";
 
+  // Trigger physical arm reach animation on player character model
+  const activeChar = isPlayer2 ? player2Character : scene.userData.player1Character;
+  if (activeChar && activeChar.userData) {
+    activeChar.userData.reachTimer = 0.6;
+  }
+
+  if (type === "chair") {
+    if (activeChar) {
+      activeChar.userData.isSitting = !activeChar.userData.isSitting;
+      if (activeChar.userData.isSitting) {
+        const chairGroup = hit.object.parent || hit.object;
+        activeChar.position.set(chairGroup.position.x, 0, chairGroup.position.z);
+        caption.textContent = "Sitting on chair. Press [E] to stand up.";
+        addTaskLog("Sat down on chair.");
+      } else {
+        activeChar.position.z += 0.4;
+        caption.textContent = "Stood up from chair.";
+        addTaskLog("Stood up from chair.");
+      }
+    }
+    if (audioManager) audioManager.playSound("ui_hover", { volume: 0.3 });
+    return;
+  }
+
   if (type === "hiding_spot") {
     if (!isPlayer2) {
       if (!isPlayerHidden) {
@@ -2256,6 +2282,7 @@ export function inspectObject(hit, isPlayer2 = false) {
   }
 
   if (type === "npc") {
+    completeObjective("start");
     const name = hit.object.name || (hit.object.parent ? hit.object.parent.name : "") || "Professor Kulkarni";
     if (name.includes("Kulkarni")) {
       queueStory([
@@ -2264,24 +2291,28 @@ export function inspectObject(hit, isPlayer2 = false) {
         ["Professor Kulkarni", "We were researching cognitive synchronization. Meera... she was our prime volunteer. But something went wrong. The frequency... it trapped her."],
         ["Professor Kulkarni", "Find the three pieces of evidence: Verma's memo, the Watchman's logbook, and Meera's ID. That will unlock the basement gate. But be careful... Meera is wandering these halls!"]
       ]);
+      addTaskLog("Spoke with Professor Kulkarni; learned of the 2004 cognitive trial.");
     } else if (name.includes("Priya")) {
       queueStory([
         ["Priya", "Aarav! The power grid in Block A is fluctuating wildly. 12Hz... it matches the 2004 incident records!"],
         ["Aarav", "Priya, how do we get out? The main gate is locked."],
         ["Priya", "We need to unlock the basement gate. Kulkarni has the overrides, but he's terrified of Meera. I'm trying to bypass the electrical sub-station from here."]
       ]);
+      addTaskLog("Spoke with Priya Sharma; power grid frequency confirmed at 12Hz.");
     } else if (name.includes("Rohan")) {
       queueStory([
         ["Rohan", "Aarav, I'm finding documents about Meera's volunteer profile. She didn't sign up willingly. Kulkarni and the Dean forced her!"],
         ["Aarav", "What? Why?"],
         ["Rohan", "They wanted to achieve total neural synchronization. I'm gathering all the files I can find. We need to expose this!"]
       ]);
+      addTaskLog("Spoke with Rohan Verma; recovered trial volunteer records.");
     } else if (name.includes("Sam")) {
       queueStory([
         ["Sam", "Aarav, keep your voice down! She's patrolling the dorm hallway. I saw her walk through the walls!"],
         ["Aarav", "Meera? What does she want?"],
         ["Sam", "She's searching for her lost ID card. It was left in one of the study tables. If you find it, do not let her see you with it!"]
       ]);
+      addTaskLog("Spoke with Sam Shekhar; warned of ghost patrol route.");
     }
     return;
   }
@@ -2293,6 +2324,7 @@ export function inspectObject(hit, isPlayer2 = false) {
         if (door.userData.label.includes("Room 32 left") && inspected >= 1) {
           door.userData.locked = false;
           door.userData.open = true;
+          door.userData.targetRotationY = Math.PI / 2;
           caption.textContent = "You unlock and open Room 32 using the credentials from Dr. Verma's memo.";
           addTaskLog("Unlocked Room 32 Left Door.");
           sayLine(playerName, "Okay, it's open. Let's see what's in here.");
@@ -2301,6 +2333,7 @@ export function inspectObject(hit, isPlayer2 = false) {
         } else if (door.userData.label.includes("Room 29 right") && inspected >= 2) {
           door.userData.locked = false;
           door.userData.open = true;
+          door.userData.targetRotationY = Math.PI / 2;
           caption.textContent = "You unlock and open Room 29 using the access card from the Watchman's Logbook.";
           addTaskLog("Unlocked Room 29 Right Door.");
           sayLine(playerName, "The right wing dorm is unlocked. I should check the study tables.");
@@ -2314,6 +2347,7 @@ export function inspectObject(hit, isPlayer2 = false) {
         }
       } else {
         door.userData.open = !door.userData.open;
+        door.userData.targetRotationY = door.userData.open ? Math.PI / 2 : 0;
         if (isPlayer2) {
           fear2 = Math.min(100, fear2 + 4);
         } else {
@@ -3203,6 +3237,13 @@ function animate() {
     updateRain(delta);
     updateThunder(delta);
 
+    // Smoothly animate door rotations
+    doors.forEach(door => {
+      if (door && door.userData && door.userData.targetRotationY !== undefined) {
+        door.rotation.y = THREE.MathUtils.lerp(door.rotation.y, door.userData.targetRotationY, 0.12);
+      }
+    });
+
   // Handle sanity creepy whispers looping audio triggers
   if (gameState === GameState.PLAYING) {
     if (p1Sanity < 50 || (coopMode && p2Sanity < 50)) {
@@ -3353,10 +3394,10 @@ const filmGrainShader = {
   uniforms: {
     tDiffuse: { value: null },
     time: { value: 0.0 },
-    grainAmount: { value: 0.09 },
-    vignetteAmount: { value: 0.55 },
-    aberrationAmount: { value: 0.0018 },
-    scanlineAmount: { value: 0.04 },
+    grainAmount: { value: 0.04 },
+    vignetteAmount: { value: 0.45 },
+    aberrationAmount: { value: 0.0003 },
+    scanlineAmount: { value: 0.01 },
     redShiftAmount: { value: 0.0 },
     desaturationAmount: { value: 0.0 }
   },

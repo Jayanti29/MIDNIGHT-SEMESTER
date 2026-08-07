@@ -1295,3 +1295,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 22/350**: fix(movement): optimize playerRadius collision threshold to prevent door stickiness [fix-pass 22/50]
 - **Commit 23/350**: fix(input): add case-insensitive WASD key code handling [fix-pass 23/50]
 - **Commit 24/350**: fix(input): prevent pointer lock exception on async game initialization [fix-pass 24/50]
+- **Commit 25/350**: fix(customization): cache preview skeleton materials to eliminate drag latency [fix-pass 25/50]

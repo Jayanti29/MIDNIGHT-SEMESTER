@@ -242,6 +242,35 @@ export class AudioManager {
   playSFX(name = 'button_click') {
     this.playSound(name, { volume: 0.5 });
   }
+
+  /**
+   * Play a 3D spatial positional sound at a world position using THREE.PositionalAudio.
+   * @param {string} name 
+   * @param {THREE.Vector3|Array<number>} position 
+   * @param {Object} opts 
+   */
+  playPositionalSound(name, position, opts = {}) {
+    if (!this._ctx || !this.listener) return null;
+    const buffer = this.buffers.get(name);
+    if (!buffer) return null;
+
+    try {
+      const sound = new THREE.PositionalAudio(this.listener);
+      sound.setBuffer(buffer);
+      sound.setRefDistance(opts.refDistance || 2.0);
+      sound.setMaxDistance(opts.maxDistance || 16.0);
+      sound.setVolume((opts.volume !== undefined ? opts.volume : 0.7) * this._sfxVolume * this._masterVolume);
+      if (position) {
+        if (Array.isArray(position)) sound.position.set(...position);
+        else if (position.isVector3) sound.position.copy(position);
+      }
+      sound.play();
+      return sound;
+    } catch (e) {
+      console.warn(`[AudioManager] Failed to play positional sound "${name}":`, e);
+      return null;
+    }
+  }
 }
 
 // commit-ref: 9

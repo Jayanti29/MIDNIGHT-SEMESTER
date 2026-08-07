@@ -1470,3 +1470,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 197/350**: feat(audio): implement wood creak acoustics for dorm doors [audio-pass 77/80]
 - **Commit 198/350**: feat(audio): tune pill consumption swallowing sound effect [audio-pass 78/80]
 - **Commit 199/350**: feat(audio): add camera switch click audio buffer [audio-pass 79/80]
+- **Commit 200/350**: feat(audio): refine intercom dialogue static envelope [audio-pass 80/80]

@@ -1473,3 +1473,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 200/350**: feat(audio): refine intercom dialogue static envelope [audio-pass 80/80]
 - **Commit 201/350**: feat(level): add procedural wood wainscoting panels to RoomBuilder [level-pass 1/80]
 - **Commit 202/350**: feat(level): enhance classroom blackboard geometry with chalk frame trim [level-pass 2/80]
+- **Commit 203/350**: feat(level): add detailed book stacks to library study tables [level-pass 3/80]

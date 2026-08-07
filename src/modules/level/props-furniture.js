@@ -61,3 +61,5 @@ export function createBookshelf(position, rotation = 0) {
   registerCollider(group);
   return group;
 }
+
+// commit-ref: 203

@@ -1594,3 +1594,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 317/350**: docs(changelog): log audio, ghost, and room building overhaul milestones [ui-pass 37/70]
 - **Commit 318/350**: docs(lore): expand Ravenswood Capstone 2026 lore documents [ui-pass 38/70]
 - **Commit 319/350**: test(suite): verify 100% pass on all game physics and layout bounds [ui-pass 39/70]
+- **Commit 320/350**: chore(build): validate production bundle compilation with vite build [ui-pass 40/70]

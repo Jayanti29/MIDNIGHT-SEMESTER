@@ -1312,3 +1312,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 39/350**: test(physics): add boundary assertion tests to run-game-tests.js [fix-pass 39/50]
 - **Commit 40/350**: test(layout): add block structure integrity validation [fix-pass 40/50]
 - **Commit 41/350**: fix(movement): refine corridor bounding box checks in canOccupy [fix-pass 41/50]
+- **Commit 42/350**: fix(movement): optimize playerRadius collision threshold to prevent door stickiness [fix-pass 42/50]

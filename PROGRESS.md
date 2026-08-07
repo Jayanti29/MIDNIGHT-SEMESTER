@@ -1549,3 +1549,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 276/350**: feat(level): scatter spider lilies along corridor corners [level-pass 76/80]
 - **Commit 277/350**: feat(level): add bloodstain decals near basement security gate [level-pass 77/80]
 - **Commit 278/350**: feat(level): add filing cabinets with interactive lore note drawers [level-pass 78/80]
+- **Commit 279/350**: feat(level): implement volumetric dust particle simulation in atmosphere [level-pass 79/80]

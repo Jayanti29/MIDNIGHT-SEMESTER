@@ -1,8 +1,46 @@
+import * as THREE from "three";
+
+// Enable Three.js global asset caching
+THREE.Cache.enabled = true;
+
+/**
+ * Global THREE.LoadingManager for project asset loading.
+ */
+export const loadingManager = new THREE.LoadingManager();
+
+loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+  const pct = Math.round((itemsLoaded / itemsTotal) * 100);
+  const progressEl = document.querySelector("#loading-progress");
+  const statusEl = document.querySelector("#loading-status");
+  if (progressEl) progressEl.style.width = `${pct}%`;
+  if (statusEl) statusEl.textContent = `Compiling shaders & assets... ${pct}% (${itemsLoaded}/${itemsTotal})`;
+};
+
+loadingManager.onLoad = () => {
+  const loadingScreen = document.querySelector("#loading-screen");
+  const statusEl = document.querySelector("#loading-status");
+  if (statusEl) statusEl.textContent = "Assets loaded successfully. Ready.";
+  if (loadingScreen) {
+    loadingScreen.style.transition = "opacity 0.4s ease";
+    loadingScreen.style.opacity = "0";
+    setTimeout(() => { loadingScreen.style.display = "none"; }, 400);
+  }
+};
+
+loadingManager.onError = (url) => {
+  console.warn(`[AssetLoader] Non-fatal asset loading issue at: ${url}`);
+};
+
 /**
  * AssetLoader.js — Batch-loads images and JSON with progress tracking.
  */
 export class AssetLoader {
-  constructor() { this.cache = new Map(); this.total = 0; this.loaded = 0; }
+  constructor() {
+    this.cache = new Map();
+    this.total = 0;
+    this.loaded = 0;
+    this.textureLoader = new THREE.TextureLoader(loadingManager);
+  }
   get progress() { return this.total === 0 ? 1 : this.loaded / this.total; }
   add(manifest) {
     for (const [k, u] of Object.entries(manifest)) this.cache.set(k, { url: u, asset: null });
@@ -22,3 +60,4 @@ export class AssetLoader {
     return url;
   }
 }
+

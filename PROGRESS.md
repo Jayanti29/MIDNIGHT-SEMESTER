@@ -1272,3 +1272,4 @@ Track A focused on critical stability and resource management improvements. This
 - [2026-08-05T16:57:20.708Z] Individual push sequence 139: style(hud): update fear meter color transitions
 - [2026-08-05T16:57:23.784Z] Individual push sequence 140: docs(lore): add watchman log entry regarding power cut
 - **Commit 1/350**: fix(movement): refine corridor bounding box checks in canOccupy [fix-pass 1/50]
+- **Commit 2/350**: fix(movement): optimize playerRadius collision threshold to prevent door stickiness [fix-pass 2/50]

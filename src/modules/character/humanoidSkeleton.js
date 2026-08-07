@@ -221,17 +221,25 @@ export function createProceduralHumanoidSkeleton({
   head.add(headMesh);
 
   if (isAarav) {
-    const hBand = new THREE.Mesh(new THREE.BoxGeometry(0.38, 0.03, 0.06), new THREE.MeshStandardMaterial({ color: 0xcc1111, roughness: 0.8 }));
-    hBand.position.set(0, 0.21, 0);
+    // Curved overhead headphone arch band wrapping neatly around the head without clipping
+    const hBandGeo = new THREE.TorusGeometry(0.19, 0.012, 8, 16, Math.PI);
+    const hBandMat = new THREE.MeshStandardMaterial({ color: 0xcc1111, roughness: 0.5, metalness: 0.2 });
+    const hBand = new THREE.Mesh(hBandGeo, hBandMat);
+    hBand.name = "headphones_band";
+    hBand.position.set(0, 0.12, 0);
+    hBand.rotation.x = -Math.PI / 2;
     head.add(hBand);
 
-    const cupL = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.03, 12), new THREE.MeshStandardMaterial({ color: 0xcc1111, roughness: 0.8 }));
-    cupL.position.set(-0.19, 0.12, 0.01);
+    const cupMat = new THREE.MeshStandardMaterial({ color: 0x222222, roughness: 0.6, metalness: 0.4 });
+    const cupL = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.035, 12), cupMat);
+    cupL.name = "headphone_cup_L";
+    cupL.position.set(-0.195, 0.12, 0.01);
     cupL.rotation.z = Math.PI / 2;
     head.add(cupL);
 
-    const cupR = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.03, 12), new THREE.MeshStandardMaterial({ color: 0xcc1111, roughness: 0.8 }));
-    cupR.position.set(0.19, 0.12, 0.01);
+    const cupR = new THREE.Mesh(new THREE.CylinderGeometry(0.055, 0.055, 0.035, 12), cupMat);
+    cupR.name = "headphone_cup_R";
+    cupR.position.set(0.195, 0.12, 0.01);
     cupR.rotation.z = Math.PI / 2;
     head.add(cupR);
   }
@@ -244,9 +252,10 @@ export function createProceduralHumanoidSkeleton({
   }
 
   if (!isGhost) {
-    const nose = new THREE.Mesh(new THREE.BoxGeometry(0.022, 0.032, 0.025), skinMat);
+    const nose = new THREE.Mesh(new THREE.ConeGeometry(0.02, 0.04, 4), skinMat);
     nose.name = "nose";
-    nose.position.set(0, 0.11, 0.18);
+    nose.position.set(0, 0.11, 0.185);
+    nose.rotation.x = Math.PI / 4;
     head.add(nose);
 
     const earL = new THREE.Mesh(new THREE.SphereGeometry(0.026, 8, 8), skinMat);

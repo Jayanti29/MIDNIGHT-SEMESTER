@@ -24,19 +24,19 @@ npm run preview
 
 ---
 
-## Controls
+## Controls (Third-Person Perspective)
 
 | Input | Action |
 |-------|--------|
-| `WASD` | Move |
-| Mouse / Arrow keys | Look |
+| `WASD` | Move character relative to camera orientation |
+| Mouse / Arrow keys | Orbit camera look around character |
 | `Shift` | Sprint (stamina-limited) |
-| `F` | Toggle flashlight |
-| `E` | Inspect / Interact |
-| `P` / `Esc` | Pause |
-| `Tab` | Open case file (collected evidence) |
-| **Gamepad** | Left stick move · Right stick look · A interact · X flashlight · L3 sprint |
-| **Mobile** | Drag right 40% of screen to look · tap on-screen buttons to interact/toggle flashlight |
+| `F` | Toggle flashlight (attached to character forward) |
+| `E` | Inspect evidence / Interact & trigger voice lines |
+| `P` / `Esc` | Pause menu |
+| `Tab` / `I` | Open case file inventory |
+| **Gamepad** | Left stick move · Right stick orbit look · A interact · X flashlight · L3 sprint |
+| **Mobile** | Drag screen to orbit camera · tap on-screen buttons to interact/toggle flashlight |
 
 ---
 

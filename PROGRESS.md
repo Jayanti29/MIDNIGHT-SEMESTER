@@ -1580,3 +1580,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 305/350**: style(ui): polish settings menu range sliders and paper button hover state [ui-pass 25/70]
 <!-- commit-ref: 306 -->
 - **Commit 306/350**: docs(progress): update PROGRESS.md commit tracking log [ui-pass 26/70]
+- **Commit 307/350**: docs(changelog): log audio, ghost, and room building overhaul milestones [ui-pass 27/70]

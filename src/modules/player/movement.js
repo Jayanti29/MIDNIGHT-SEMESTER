@@ -29,44 +29,46 @@ import {
 export function canOccupy(position) {
   const x = position.x;
   const z = position.z;
+  const rad = 0.22; // Tightened player collision radius for fluid corridor navigation
 
-  // Check if player is in the corridor
+  // Check if player is in the main corridor or entry lobby
   let inCorridor = false;
-  if (Math.abs(x) <= 3.55) {
+  if (Math.abs(x) <= 4.2) {
     if (currentLevel === 1) {
-      if (z <= 25.5 && z >= -88.5) {
+      if (z <= 32.0 && z >= -92.0) {
         inCorridor = true;
       }
     } else {
-      if (z <= 10.5 && z >= -40.5) {
+      if (z <= 12.0 && z >= -45.0) {
         inCorridor = true;
       }
     }
   }
 
-  // Check if player is inside any room
+  // Check if player is inside any defined room or building structure
   let inRoom = false;
   if (currentLevel === 1) {
     // Check hardcoded Level 1 Dorm room (Room 32)
     const roomZ = -35;
-    if (x >= -6.5 && x <= 6.5 && z >= roomZ - 6 && z <= roomZ + 6) {
+    if (x >= -7.5 && x <= 7.5 && z >= roomZ - 7 && z <= roomZ + 7) {
       inRoom = true;
     }
 
     // Check all data-driven rooms
-    for (const r of roomBounds) {
-      if (x >= r.xMin && x <= r.xMax && z >= r.zMin && z <= r.zMax) {
+    const bounds = roomBounds || window.roomBounds || [];
+    for (const r of bounds) {
+      if (x >= r.xMin - 0.3 && x <= r.xMax + 0.3 && z >= r.zMin - 0.3 && z <= r.zMax + 0.3) {
         inRoom = true;
         break;
       }
     }
   } else if (currentLevel === 2) {
     // Generator Room
-    if (x >= -1.0 && x <= 9.2 && z >= -24.2 && z <= -15.8) {
+    if (x >= -2.0 && x <= 10.2 && z >= -25.2 && z <= -14.8) {
       inRoom = true;
     }
     // Library Archive Room
-    if (x >= -9.2 && x <= 1.0 && z >= -16.2 && z <= -3.8) {
+    if (x >= -10.2 && x <= 2.0 && z >= -17.2 && z <= -2.8) {
       inRoom = true;
     }
   }
@@ -87,28 +89,35 @@ export function canOccupy(position) {
       nameLower.includes("priya") ||
       nameLower.includes("rohan") ||
       nameLower.includes("sam") ||
-      nameLower.includes("trigger")
+      nameLower.includes("trigger") ||
+      nameLower.includes("carpet") ||
+      nameLower.includes("panel") ||
+      nameLower.includes("lily") ||
+      nameLower.includes("paper") ||
+      nameLower.includes("debris") ||
+      nameLower.includes("tubelight")
     ) {
       continue;
     }
-    if (x >= col.xMin - playerRadius && x <= col.xMax + playerRadius &&
-        z >= col.zMin - playerRadius && z <= col.zMax + playerRadius) {
+    if (x >= col.xMin - rad && x <= col.xMax + rad &&
+        z >= col.zMin - rad && z <= col.zMax + rad) {
       return false;
     }
   }
 
   // Check doors (closed doors block movement through their frame segment)
-  for (let i = 0; i < doors.length; i++) {
-    const door = doors[i];
-    if (!door.userData.open) {
+  const currentDoors = doors || window.doors || [];
+  for (let i = 0; i < currentDoors.length; i++) {
+    const door = currentDoors[i];
+    if (door && door.userData && !door.userData.open) {
       const xDoor = door.position.x;
       const zDoor = door.position.z;
       const xMin = xDoor - 0.25;
       const xMax = xDoor + 0.25;
       const zMin = zDoor - 0.65;
       const zMax = zDoor + 0.65;
-      if (x >= xMin - playerRadius && x <= xMax + playerRadius &&
-          z >= zMin - playerRadius && z <= zMax + playerRadius) {
+      if (x >= xMin - rad && x <= xMax + rad &&
+          z >= zMin - rad && z <= zMax + rad) {
         return false;
       }
     }
@@ -324,3 +333,5 @@ export function updateMovement(delta) {
     gameplayState.footstepTimer = 0.35;
   }
 }
+
+// commit-ref: 1

@@ -159,12 +159,6 @@ export function initCharacterSelect() {
 export function updatePreviewModel() {
   if (!characterSelectState.selectScene) return;
 
-  if (characterSelectState.selectMesh) {
-    disposeObject3D(characterSelectState.selectMesh);
-    characterSelectState.selectScene.remove(characterSelectState.selectMesh);
-    characterSelectState.selectMesh = null;
-  }
-
   const activeEditingPlayer = characterSelectState.activeEditingPlayer;
   const currentVar = activeEditingPlayer === 1 ? characterSelectState.selectedVariant : characterSelectState.selectedVariant2;
   const currentColor = activeEditingPlayer === 1 ? characterSelectState.selectedOutfitColor : characterSelectState.selectedOutfitColor2;
@@ -173,6 +167,15 @@ export function updatePreviewModel() {
   const currentBackpack = activeEditingPlayer === 1 ? characterSelectState.selectedHasBackpack : characterSelectState.selectedHasBackpack2;
   const currentSkin = activeEditingPlayer === 1 ? characterSelectState.selectedSkinTone : characterSelectState.selectedSkinTone2;
   const currentScale = activeEditingPlayer === 1 ? characterSelectState.selectedBodyScale : characterSelectState.selectedBodyScale2;
+
+  // Save previous Y rotation if preview mesh already exists
+  const existingRotY = characterSelectState.selectMesh ? characterSelectState.selectMesh.rotation.y : 0;
+
+  if (characterSelectState.selectMesh) {
+    characterSelectState.selectScene.remove(characterSelectState.selectMesh);
+    disposeObject3D(characterSelectState.selectMesh);
+    characterSelectState.selectMesh = null;
+  }
 
   characterSelectState.selectMesh = createProceduralHumanoidSkeleton({
     name: "previewModel",
@@ -185,6 +188,8 @@ export function updatePreviewModel() {
     hasBackpackOverride: currentBackpack,
     skinColorOverride: currentSkin
   });
+
+  characterSelectState.selectMesh.rotation.y = existingRotY;
 
   let scaleMult = 1.0;
   if (currentScale === "short") scaleMult = 0.88;

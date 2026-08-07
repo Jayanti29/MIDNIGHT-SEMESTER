@@ -1563,3 +1563,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 289/350**: test(suite): verify 100% pass on all game physics and layout bounds [ui-pass 9/70]
 - **Commit 290/350**: chore(build): validate production bundle compilation with vite build [ui-pass 10/70]
 - **Commit 291/350**: style(ui): update start screen corkboard dossier typography and pin glow [ui-pass 11/70]
+- **Commit 292/350**: style(ui): enhance HUD sanity dial with pulsing red warning border [ui-pass 12/70]

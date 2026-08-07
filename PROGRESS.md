@@ -1461,3 +1461,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 188/350**: feat(audio): tune pill consumption swallowing sound effect [audio-pass 68/80]
 - **Commit 189/350**: feat(audio): add camera switch click audio buffer [audio-pass 69/80]
 - **Commit 190/350**: feat(audio): refine intercom dialogue static envelope [audio-pass 70/80]
+- **Commit 191/350**: feat(audio): add low-frequency binaural hum to procedural drone buffer [audio-pass 71/80]

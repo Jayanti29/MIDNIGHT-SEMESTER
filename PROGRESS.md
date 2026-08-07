@@ -1383,3 +1383,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 110/350**: feat(ghost): add jumpscare audio stinger modulation based on fear level [ghost-pass 60/70]
 - **Commit 111/350**: feat(ghost): enhance Meera spectral translucent shader opacity curve [ghost-pass 61/70]
 - **Commit 112/350**: feat(ghost): add glowing red emissive eyes to Meera 3D head model [ghost-pass 62/70]
+- **Commit 113/350**: feat(ghost): implement spectral hover animation for ghost hips bone [ghost-pass 63/70]

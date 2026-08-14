@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4161/4409**
+Commit counter: **Commit 4162/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4162/4409**: refactor(ui): update swatch highlights for active editing player tab
 - **Commit 4161/4409**: test(suite): verify GameState PLAYING value string equality
 - **Commit 4160/4409**: fix(movement): correct third-person camera lookAt target Y offset
 - **Commit 4159/4409**: docs(changelog): add section for minigame synchronization fixes

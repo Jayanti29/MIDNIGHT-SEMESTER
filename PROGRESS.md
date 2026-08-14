@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4381/4409**
+Commit counter: **Commit 4382/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4382/4409**: docs(progress): append progress log entry for audio lifecycle cleanup
 - **Commit 4381/4409**: test(customization): add test case for swatch array color matching
 - **Commit 4380/4409**: feat(minigame): add progress threshold validation to checkDecryptionAlignment
 - **Commit 4379/4409**: refactor(player): unify Player 1 character model position lerping in solo mode

@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4198/4409**
+Commit counter: **Commit 4199/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4199/4409**: docs(notes): update asset loading manager error handling notes
 - **Commit 4198/4409**: style(menu): polish character dossier preview canvas container
 - **Commit 4197/4409**: refactor(level): load campus layout data dynamically from JSON module
 - **Commit 4196/4409**: test(physics): test vector distance calculation in room bounds

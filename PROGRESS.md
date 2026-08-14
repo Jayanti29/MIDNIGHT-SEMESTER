@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4277/4409**
+Commit counter: **Commit 4278/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4278/4409**: style(menu): refine character variant button padding and font
 - **Commit 4277/4409**: refactor(player): clamp player stamina between 0 and 100
 - **Commit 4276/4409**: test(physics): test player character scale multiplier calculations
 - **Commit 4275/4409**: feat(minigame): increase decrypt speed multiplier on progress increase

@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4239/4409**
+Commit counter: **Commit 4240/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4240/4409**: perf(render): use frustum culling on level prop meshes
 - **Commit 4239/4409**: docs(story): expand Dr. Verma confession tape lore details
 - **Commit 4238/4409**: style(menu): polish dossier file folder paper texture styling
 - **Commit 4237/4409**: refactor(player): apply yaw rotation to raw movement vector

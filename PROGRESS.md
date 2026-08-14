@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4188/4409**
+Commit counter: **Commit 4189/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4189/4409**: docs(story): add Kulkarni library dialogue lore entries
 - **Commit 4188/4409**: fix(audio): disconnect heartbeat gain nodes on game reset
 - **Commit 4187/4409**: test(physics): test zero velocity movement dampening
 - **Commit 4186/4409**: feat(level): add checkpoint console interactable prop builder

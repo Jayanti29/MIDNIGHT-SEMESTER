@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4283/4409**
+Commit counter: **Commit 4284/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4284/4409**: style(hud): polish reticle dot size and shadow
 - **Commit 4283/4409**: refactor(audio): export voice audio buffer loading functions
 - **Commit 4282/4409**: test(suite): test skin tone swatch data color attribute matching
 - **Commit 4281/4409**: fix(collision): filter tubelight fixture colliders from pathing

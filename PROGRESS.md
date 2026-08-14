@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4144/4409**
+Commit counter: **Commit 4145/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4145/4409**: feat(movement): support Arrow keys for single player mouse look fallback
 - **Commit 4144/4409**: fix(audio): stop heartbeat nodes on game over state change
 - **Commit 4143/4409**: style(ui): adjust case file dossier stamp transform
 - **Commit 4142/4409**: refactor(level): tag security terminal interactable objects

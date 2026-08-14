@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4354/4409**
+Commit counter: **Commit 4355/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4355/4409**: test(suite): add test cases for dynamic bounds, state transitions, and minigame math
 - **Commit 4354/4409**: fix(ui): clean up pointer lock and audio state on quitToMenu
 - **Commit 4353/4409**: fix(ui): update swatch query selectors and active class toggling in main.js
 - **Commit 4352/4409**: fix(audio): add stopAll method to clean up looping sound sources on game reset

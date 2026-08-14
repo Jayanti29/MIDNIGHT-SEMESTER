@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4315/4409**
+Commit counter: **Commit 4316/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4316/4409**: test(physics): test third-person camera spring arm collision distance
 - **Commit 4315/4409**: feat(minigame): play failure sfx on decryption sync error
 - **Commit 4314/4409**: fix(audio): clean up all sound sources on gameover quit button click
 - **Commit 4313/4409**: docs(progress): update PROGRESS.md commit counter to final target

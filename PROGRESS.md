@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4191/4409**
+Commit counter: **Commit 4192/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4192/4409**: style(ui): update start plus button hardcore mode border color
 - **Commit 4191/4409**: test(suite): test level 1 corridor boundary validity at z=-90
 - **Commit 4190/4409**: refactor(player): clamp player pitch within safe camera rotation bounds
 - **Commit 4189/4409**: docs(story): add Kulkarni library dialogue lore entries

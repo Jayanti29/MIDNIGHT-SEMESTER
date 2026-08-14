@@ -29,10 +29,10 @@ npm run preview
 | Input | Action |
 |-------|--------|
 | `WASD` | Move character relative to camera orientation |
-| Mouse / Arrow keys | Orbit camera look around character |
+| Mouse / Arrow keys | Orbit TPP chase camera around character |
 | `Shift` | Sprint (stamina-limited) |
-| `F` | Toggle flashlight (attached to character forward) |
-| `E` | Inspect evidence / Interact & trigger voice lines |
+| `F` | Toggle hand-held flashlight (attached to right hand bone) |
+| `E` | Reach & interact (doors, chairs, evidence, NPCs) |
 | `P` / `Esc` | Pause menu |
 | `Tab` / `I` | Open case file inventory |
 | **Gamepad** | Left stick move · Right stick orbit look · A interact · X flashlight · L3 sprint |
@@ -40,29 +40,25 @@ npm run preview
 
 ---
 
-## Features (v0.2.1-advanced)
+## Features (v0.3.0-rebuild)
 
-### Gameplay
-- **3-evidence progressive unlock** — collect Dr. Verma Memo, Watchman's Logbook, and Meera's ID to advance through locked doors and reach the basement gate
-- **Ghost AI** — Meera Iyer's ghost patrols Block A, transitions to chase on flashlight/sprint detection, triggers game-over on catch
-- **Flashlight battery** — drains over time; 3 recharge pickups placed around the corridor
-- **Stamina system** — sprinting depletes, recovers on rest
-- **Fear meter** — builds from depth, darkness, and ghost proximity; drives chromatic aberration, grain, and vignette intensity; game-over at 100%
-- **Win condition** — escape through the basement gate after gathering all evidence (3-line narrative cinematic → completion screen with run stats)
-- **Lose condition** — fear overflow or caught by Meera → game-over screen with reason text
-- **Checkpoint** — Emergency Terminal at corridor midpoint saves state for mid-run restarts
-- **4 lore notes** — readable wall notes (maintenance notice, torn lab page, Meera's scrawl, burned dean's safety notice)
+### Gameplay & Character Rigging
+- **Stylized Human Character Rig** — stylized anime-realistic human mesh with sharp hair locks, detailed facial features (jaw, nose, ears, mouth, eyes), and non-clipping headphones.
+- **Multi-State Skeletal Animation** — procedural skeleton driving `IDLE` chest breathing, `WALK` & `RUN` stride cycles, `REACH` right-arm interaction extensions, and `SIT` chair postures.
+- **Physical Interaction System** — character visibly reaches out to open doors (smooth 90° rotation lerp), pick up evidence documents, sit on chairs/benches (`E` sit / stand toggle), and hold flashlight in-hand.
+- **Interactive Story NPCs** — Professor Kulkarni, Priya Sharma, Rohan Verma, and Sam Shekhar stationed at narrative points with idle behavior, dialogue conversations, and Task Log / Journal objective advancement.
+- **TPP Spring-Arm Follow Camera** — chase camera with `THREE.Raycaster` wall collision prevention so the camera never clips through environment geometry.
+- **3-evidence progressive unlock** — collect Dr. Verma Memo, Watchman's Logbook, and Meera's ID to advance through locked doors and reach the basement gate.
 
 ### Audio
 - Procedural ambient hum, footsteps (tile vs. concrete), door creak, flashlight click
-- Jump-scare stinger
-- Spatial audio with custom `AudioManager`
-- Ambient ducking during dialogue
-- UI sounds (hover, select, pause)
-- Volume/SFX/ambient sliders in Settings
+- 3D spatial positional audio (`THREE.PositionalAudio`) for environment stingers and NPC voices
+- Dialogue system with typewriter subtitles and swappable voice-line audio hooks (`setVoiceAudioSource`)
+- Volume/SFX/ambient category controls in Settings panel
 
 ### Visual / Post-Processing
-- `EffectComposer` + custom `FilmGrainShader` (film grain, chromatic aberration, scanlines, vignette) — all driven by fear level
+- `EffectComposer` + custom `FilmGrainShader` (vignette, film grain, subtle desaturation) — tuned for crisp UI readability
+- Live 3D character dossier preview canvas rendering real-time outfit, skin tone, hair style, glasses, and backpack customization swatches
 - Flickering corridor lights + blackout event at evidence threshold
 - Dust particle field
 - Procedural 512×512 wall/floor/ceiling textures (tiled and repeating)

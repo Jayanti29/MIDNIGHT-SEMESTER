@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4378/4409**
+Commit counter: **Commit 4379/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4379/4409**: refactor(player): unify Player 1 character model position lerping in solo mode
 - **Commit 4378/4409**: fix(collision): prevent closed doors from blocking adjacent corridor segments
 - **Commit 4377/4409**: test(suite): test decryption minigame tolerance calculations
 - **Commit 4376/4409**: docs(readme): add troubleshooting section for browser mouse pointer lock

@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4123/4409**
+Commit counter: **Commit 4124/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4124/4409**: feat(audio): add positional sound fallback when listener context is uninitialized
 - **Commit 4123/4409**: docs(changelog): update CHANGELOG.md for sprint 1 fixes
 - **Commit 4122/4409**: style(menu): adjust corkboard pinned photo rotation angles
 - **Commit 4121/4409**: test(suite): test inventory document collection Map operations

@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4061/4409**
+Commit counter: **Commit 4062/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4062/4409**: fix(audio): add stopAll method to clean up looping sound sources on game reset
 - **Commit 4061/4409**: fix(audio): import THREE module in AudioManager to resolve spatial audio crash
 - **Commit 4060/4409**: fix(movement): overhaul canOccupy dynamic bounds for Level 1 and Level 2
 - **Commit 385/500**: Track C - refactor: verify animate() loop fully wired through player modules (updateMovement/updateState/initCoopKeyHandlers); all three imports confirmed in main.js.

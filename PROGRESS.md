@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4257/4409**
+Commit counter: **Commit 4258/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4258/4409**: style(hud): update objective title kicker spacing
 - **Commit 4257/4409**: refactor(player): sync Player 1 flashlight position to character head
 - **Commit 4256/4409**: test(minigame): test breathing hit tolerance window
 - **Commit 4255/4409**: feat(level): add dorm room bed and study table prop factory builders

@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4131/4409**
+Commit counter: **Commit 4132/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4132/4409**: fix(collision): exclude tubelight meshes from static obstacle colliders
 - **Commit 4131/4409**: test(suite): add test case for level 2 engine room boundary validation
 - **Commit 4130/4409**: style(hud): refine reticle CSS positioning for split-screen co-op mode
 - **Commit 4129/4409**: refactor(player): normalize movement vector before applying yaw rotation

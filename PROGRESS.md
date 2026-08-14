@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4296/4409**
+Commit counter: **Commit 4297/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4297/4409**: refactor(player): update Player 2 camera yaw rotation lerp
 - **Commit 4296/4409**: test(minigame): test breathing progress increment calculation
 - **Commit 4295/4409**: feat(level): add filing cabinet and decryptor terminal props
 - **Commit 4294/4409**: fix(audio): stop metronome tick sound when leaving game

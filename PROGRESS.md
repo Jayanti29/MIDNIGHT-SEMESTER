@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4401/4409**
+Commit counter: **Commit 4402/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4402/4409**: docs(progress): log character select customization fix
 - **Commit 4401/4409**: style(ui): improve paper button hover state background contrast
 - **Commit 4400/4409**: test(suite): verify default character selection attributes
 - **Commit 4399/4409**: refactor(core): decouple state transition event handlers from stateManager

@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4105/4409**
+Commit counter: **Commit 4106/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4106/4409**: perf(render): limit point light shadow map resolution for ambient strobes
 - **Commit 4105/4409**: docs(story): expand character dossier details for Priya Sharma
 - **Commit 4104/4409**: fix(menu): reset debug console input value after command execution
 - **Commit 4103/4409**: style(hud): add subtle pulse animation for nightmare run hardcore badge

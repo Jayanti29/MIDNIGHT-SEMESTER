@@ -29,58 +29,44 @@ import {
 export function canOccupy(position) {
   const x = position.x;
   const z = position.z;
-  const rad = 0.22; // Tightened player collision radius for fluid corridor navigation
+  const rad = 0.18; // Optimized player collision radius for fluid corridor and doorway movement
 
-  // Check if player is in the main corridor or entry lobby
-  let inCorridor = false;
-  if (Math.abs(x) <= 4.2) {
-    if (currentLevel === 1) {
-      if (z <= 32.0 && z >= -92.0) {
-        inCorridor = true;
-      }
-    } else {
-      if (z <= 12.0 && z >= -45.0) {
-        inCorridor = true;
-      }
+  // 1. Level-wide boundary validation
+  let inBounds = false;
+  const lvl = typeof currentLevel !== "undefined" ? currentLevel : 1;
+
+  if (lvl === 1) {
+    // Level 1 covers Gate Sector (z up to 32), Main Corridor, Academic/Hostel Wings, Canteen (x down to -25), Basement
+    if (x >= -26.0 && x <= 16.0 && z >= -95.0 && z <= 35.0) {
+      inBounds = true;
+    }
+  } else {
+    // Level 2 covers Generator Engine Room, Library Archives, Operations Terminal Hall, Basement Tunnels
+    if (x >= -22.0 && x <= 22.0 && z >= -65.0 && z <= 25.0) {
+      inBounds = true;
     }
   }
 
-  // Check if player is inside any defined room or building structure
-  let inRoom = false;
-  if (currentLevel === 1) {
-    // Check hardcoded Level 1 Dorm room (Room 32)
-    const roomZ = -35;
-    if (x >= -7.5 && x <= 7.5 && z >= roomZ - 7 && z <= roomZ + 7) {
-      inRoom = true;
-    }
-
-    // Check all data-driven rooms
-    const bounds = roomBounds || window.roomBounds || [];
-    for (const r of bounds) {
-      if (x >= r.xMin - 0.3 && x <= r.xMax + 0.3 && z >= r.zMin - 0.3 && z <= r.zMax + 0.3) {
-        inRoom = true;
-        break;
-      }
-    }
-  } else if (currentLevel === 2) {
-    // Generator Room
-    if (x >= -2.0 && x <= 10.2 && z >= -25.2 && z <= -14.8) {
-      inRoom = true;
-    }
-    // Library Archive Room
-    if (x >= -10.2 && x <= 2.0 && z >= -17.2 && z <= -2.8) {
-      inRoom = true;
+  // Check dynamic room bounds as secondary validation
+  const bounds = roomBounds || window.roomBounds || [];
+  for (let i = 0; i < bounds.length; i++) {
+    const r = bounds[i];
+    if (r && x >= r.xMin - 0.5 && x <= r.xMax + 0.5 && z >= r.zMin - 0.5 && z <= r.zMax + 0.5) {
+      inBounds = true;
+      break;
     }
   }
 
-  if (!inCorridor && !inRoom) return false;
+  if (!inBounds) return false;
 
-  // Check static colliders registered in the list
+  // 2. Static collider collision detection
   const currentColliders = colliders || window.colliders || [];
   for (let i = 0; i < currentColliders.length; i++) {
     const col = currentColliders[i];
     if (!col || !col.name) continue;
     const nameLower = col.name.toLowerCase();
+    
+    // Skip non-solid / trigger / decorative / light / character / pickup meshes
     if (
       nameLower.includes("floor") ||
       nameLower.includes("ceiling") ||
@@ -89,23 +75,34 @@ export function canOccupy(position) {
       nameLower.includes("priya") ||
       nameLower.includes("rohan") ||
       nameLower.includes("sam") ||
+      nameLower.includes("kulkarni") ||
+      nameLower.includes("meera") ||
       nameLower.includes("trigger") ||
       nameLower.includes("carpet") ||
       nameLower.includes("panel") ||
       nameLower.includes("lily") ||
       nameLower.includes("paper") ||
       nameLower.includes("debris") ||
-      nameLower.includes("tubelight")
+      nameLower.includes("tubelight") ||
+      nameLower.includes("light") ||
+      nameLower.includes("label") ||
+      nameLower.includes("note") ||
+      nameLower.includes("strobe") ||
+      nameLower.includes("ghost") ||
+      nameLower.includes("npc") ||
+      nameLower.includes("pillbox") ||
+      nameLower.includes("can_")
     ) {
       continue;
     }
+
     if (x >= col.xMin - rad && x <= col.xMax + rad &&
         z >= col.zMin - rad && z <= col.zMax + rad) {
       return false;
     }
   }
 
-  // Check doors (closed doors block movement through their frame segment)
+  // 3. Closed door collision segment checking
   const currentDoors = doors || window.doors || [];
   for (let i = 0; i < currentDoors.length; i++) {
     const door = currentDoors[i];

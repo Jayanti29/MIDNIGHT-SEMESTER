@@ -1,4 +1,6 @@
 // @ts-nocheck
+import * as THREE from "three";
+
 /**
  * AudioManager.js — Full implementation for Midnight Semester game audio.
  * Handles SFX playback, ambient layers, looping sounds, volume categories,

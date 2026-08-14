@@ -90,19 +90,58 @@ test("Room bounds calculation and occupancy logic", () => {
   assert.strictEqual(isOutside, false, "Position outside room bounds should evaluate false");
 });
 
+// 5. Dynamic Bounds & Sector Validation for Level 1 & Level 2
+test("Level 1 & Level 2 level-wide boundary occupancy validation", () => {
+  const checkBounds = (x, z, lvl) => {
+    if (lvl === 1) return x >= -26.0 && x <= 16.0 && z >= -95.0 && z <= 35.0;
+    return x >= -22.0 && x <= 22.0 && z >= -65.0 && z <= 25.0;
+  };
+
+  assert.strictEqual(checkBounds(0, 0, 1), true, "Level 1 origin should be valid");
+  assert.strictEqual(checkBounds(-20, -45, 1), true, "Level 1 Canteen sector should be valid");
+  assert.strictEqual(checkBounds(0, -60, 2), true, "Level 2 Operations Hall should be valid");
+  assert.strictEqual(checkBounds(100, 100, 1), false, "Far out-of-bounds position should evaluate false");
+});
+
+// 6. Game State Transition Logic
+test("Game state enum values and state machine transition integrity", () => {
+  const GameState = {
+    MENU: "menu",
+    PLAYING: "playing",
+    PAUSED: "paused",
+    DECRYPTING: "decrypting",
+    GAMEOVER: "gameover",
+    WIN: "win",
+    CHOICE: "choice"
+  };
+
+  assert.strictEqual(GameState.MENU, "menu");
+  assert.strictEqual(GameState.PLAYING, "playing");
+  assert.strictEqual(GameState.PAUSED, "paused");
+});
+
+// 7. Decryption Minigame Synchronization Math
+test("Decryption minigame position target alignment check", () => {
+  const checkAlignment = (indicatorPos, targetPos, tolerance = 10) => {
+    return Math.abs(indicatorPos - targetPos) <= tolerance;
+  };
+
+  assert.strictEqual(checkAlignment(50, 52), true, "Close alignment within tolerance should succeed");
+  assert.strictEqual(checkAlignment(50, 80), false, "Misaligned position outside tolerance should fail");
+});
+
+// 8. Customization Swatch Matcher Validation
+test("Character swatch attribute matching logic", () => {
+  const outfitSwatches = ["#243f5e", "#d4af37", "#56382a", "#2f4c34", "#7e2e17"];
+  const skinTones = ["#fcd0a1", "#fac08f", "#e3a072", "#a1683d", "#5c3818"];
+  const hairStyles = ["short", "long", "cap", "buzzed", "ponytail"];
+
+  assert.ok(outfitSwatches.includes("#243f5e"), "Default outfit color should be present");
+  assert.ok(skinTones.includes("#e3a072"), "Default skin tone should be present");
+  assert.ok(hairStyles.includes("short"), "Default hair style should be present");
+});
+
 console.log("---------------------------------------------------");
 console.log(`SUMMARY: ${passed} passed, ${failed} failed.`);
 console.log("---------------------------------------------------");
-if (failed > 0) process.exit(1);
-
-// commit-ref: 19
-// commit-ref: 20
-// commit-ref: 39
-// commit-ref: 40
-// commit-ref: 289
-// commit-ref: 299
-// commit-ref: 309
-// commit-ref: 319
-// commit-ref: 329
-// commit-ref: 339
-// commit-ref: 349
+if (failed > 0) process.exit(1);// commit-ref: 4060

@@ -4297,14 +4297,14 @@ coopButton.addEventListener("click", () => {
 
 function updateSwatchHighlights() {
   const p = characterSelectState.activeEditingPlayer === 2 ? p2Customization : p1Customization;
-  document.querySelectorAll("#outfit-swatches .swatch").forEach(btn => {
-    btn.classList.toggle("selected", btn.getAttribute("data-color") === p.outfitColor);
+  document.querySelectorAll("#outfit-swatches .swatch-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-color") === p.outfitColor);
   });
-  document.querySelectorAll("#skin-swatches .swatch").forEach(btn => {
-    btn.classList.toggle("selected", btn.getAttribute("data-skin") === p.skinTone);
+  document.querySelectorAll("#skin-swatches .skin-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-color") === p.skinTone);
   });
-  document.querySelectorAll("#hair-swatches .swatch").forEach(btn => {
-    btn.classList.toggle("selected", btn.getAttribute("data-hair") === p.hairStyle);
+  document.querySelectorAll("#hair-swatches .hair-style-btn").forEach(btn => {
+    btn.classList.toggle("active", btn.getAttribute("data-style") === p.hairStyle);
   });
 }
 
@@ -5008,44 +5008,39 @@ playAgainButton?.addEventListener("click", () => {
 });
 
 quitToMenu.addEventListener("click", () => {
+  if (document.pointerLockElement) document.exitPointerLock?.();
   if (p1HeartbeatSlowNode) { try { p1HeartbeatSlowNode.stop(); } catch(e) {} p1HeartbeatSlowNode = null; }
   if (p1HeartbeatFastNode) { try { p1HeartbeatFastNode.stop(); } catch(e) {} p1HeartbeatFastNode = null; }
   if (p2HeartbeatSlowNode) { try { p2HeartbeatSlowNode.stop(); } catch(e) {} p2HeartbeatSlowNode = null; }
   if (p2HeartbeatFastNode) { try { p2HeartbeatFastNode.stop(); } catch(e) {} p2HeartbeatFastNode = null; }
   if (audioManager) {
-    audioManager.stopSound("metronome_tick");
-    audioManager.stopSound("electric_buzz");
-    audioManager.stopSound("strobe_buzz");
-    audioManager.stopSound("creepy_whispers");
+    audioManager.stopAll();
   }
+  resetGame();
   setGameState(GameState.MENU);
 });
 
 document.getElementById("gameover-quit-button")?.addEventListener("click", () => {
+  if (document.pointerLockElement) document.exitPointerLock?.();
   if (p1HeartbeatSlowNode) { try { p1HeartbeatSlowNode.stop(); } catch(e) {} p1HeartbeatSlowNode = null; }
   if (p1HeartbeatFastNode) { try { p1HeartbeatFastNode.stop(); } catch(e) {} p1HeartbeatFastNode = null; }
   if (p2HeartbeatSlowNode) { try { p2HeartbeatSlowNode.stop(); } catch(e) {} p2HeartbeatSlowNode = null; }
   if (p2HeartbeatFastNode) { try { p2HeartbeatFastNode.stop(); } catch(e) {} p2HeartbeatFastNode = null; }
   if (audioManager) {
-    audioManager.stopSound("metronome_tick");
-    audioManager.stopSound("electric_buzz");
-    audioManager.stopSound("strobe_buzz");
-    audioManager.stopSound("creepy_whispers");
+    audioManager.stopAll();
   }
   resetGame();
   setGameState(GameState.MENU);
 });
 
 document.getElementById("win-quit-button")?.addEventListener("click", () => {
+  if (document.pointerLockElement) document.exitPointerLock?.();
   if (p1HeartbeatSlowNode) { try { p1HeartbeatSlowNode.stop(); } catch(e) {} p1HeartbeatSlowNode = null; }
   if (p1HeartbeatFastNode) { try { p1HeartbeatFastNode.stop(); } catch(e) {} p1HeartbeatFastNode = null; }
   if (p2HeartbeatSlowNode) { try { p2HeartbeatSlowNode.stop(); } catch(e) {} p2HeartbeatSlowNode = null; }
   if (p2HeartbeatFastNode) { try { p2HeartbeatFastNode.stop(); } catch(e) {} p2HeartbeatFastNode = null; }
   if (audioManager) {
-    audioManager.stopSound("metronome_tick");
-    audioManager.stopSound("electric_buzz");
-    audioManager.stopSound("strobe_buzz");
-    audioManager.stopSound("creepy_whispers");
+    audioManager.stopAll();
   }
   resetGame();
   setGameState(GameState.MENU);

@@ -476,3 +476,4 @@ if (failed > 0) process.exit(1);// commit-ref: 4060
 // commit-ref: 4389
 // commit-ref: 4390
 // commit-ref: 4391
+// commit-ref: 4392

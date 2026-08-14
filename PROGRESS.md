@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4218/4409**
+Commit counter: **Commit 4219/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4219/4409**: docs(readme): outline game controls and keybindings
 - **Commit 4218/4409**: style(hud): improve subtitle line text legibility
 - **Commit 4217/4409**: refactor(player): update Player 2 flashlight toggle handler
 - **Commit 4216/4409**: test(minigame): test decryption progress meter value bounds

@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4325/4409**
+Commit counter: **Commit 4326/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4326/4409**: feat(player): update stamina recovery condition when shift is released
 - **Commit 4325/4409**: docs(changelog): document final bug fixes and test suite coverage
 - **Commit 4324/4409**: style(hud): polish inventory panel close button style
 - **Commit 4323/4409**: refactor(audio): check AudioContext state before playing sfx

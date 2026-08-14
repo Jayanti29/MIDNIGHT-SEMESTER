@@ -1,11 +1,12 @@
 # Midnight Semester Development Progress
 
-Commit counter: **Commit 4246/4409**
+Commit counter: **Commit 4247/4409**
 
 ## Track A — Stability Fixes Summary
 Track A focused on critical stability and resource management improvements. This included implementing recursive 3D object disposal (`disposeObject3D()`, `disposeRenderer()`, `disposeLevel()`) to prevent GPU memory leaks and context exhaustion, adding error boundaries (`try-catch` wrapping on animation loops with UI error banners), context lost/restored handling on canvases, and a global texture cache to prevent duplicate GPU uploads.
 
 ## Commits Log
+- **Commit 4247/4409**: test(physics): test position occupancy inside room bounds
 - **Commit 4246/4409**: feat(player): track rusted cans thrown in game statistics
 - **Commit 4245/4409**: docs(changelog): record level 2 boundary occupancy fix
 - **Commit 4244/4409**: style(hud): refine fear meter color gradient transition

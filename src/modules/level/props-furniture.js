@@ -72,3 +72,4 @@ export function createBookshelf(position, rotation = 0) {
 // commit-ref: 273
 // commit-ref: 203
 // commit-ref: 213
+// commit-ref: 223

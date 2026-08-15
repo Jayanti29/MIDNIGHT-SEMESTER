@@ -2272,3 +2272,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 291/350**: style(ui): update start screen corkboard dossier typography and pin glow [ui-pass 11/70]
 - **Commit 292/350**: style(ui): enhance HUD sanity dial with pulsing red warning border [ui-pass 12/70]
 - **Commit 293/350**: style(ui): add glassmorphism backdrop blur to dialogue box index card [ui-pass 13/70]
+- **Commit 294/350**: style(ui): improve character select candidate tabs active state highlight [ui-pass 14/70]

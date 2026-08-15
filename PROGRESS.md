@@ -2332,3 +2332,4 @@ Track A focused on critical stability and resource management improvements. This
 <!-- commit-ref: 346 -->
 - **Commit 346/350**: docs(progress): update PROGRESS.md commit tracking log [ui-pass 66/70]
 - **Commit 347/350**: docs(changelog): log audio, ghost, and room building overhaul milestones [ui-pass 67/70]
+- **Commit 348/350**: docs(lore): expand Ravenswood Capstone 2026 lore documents [ui-pass 68/70]

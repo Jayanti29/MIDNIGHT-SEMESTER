@@ -2034,3 +2034,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 54/350**: feat(ghost): add proximity chromatic aberration trigger when ghost approaches [ghost-pass 4/70]
 - **Commit 55/350**: feat(ghost): trigger strobe light flickering during ghost hunting phase [ghost-pass 5/70]
 - **Commit 56/350**: feat(ghost): implement directional whisper audio cue when ghost spawns [ghost-pass 6/70]
+- **Commit 57/350**: feat(ghost): tune Meera chase speed multiplier for hardcore mode [ghost-pass 7/70]

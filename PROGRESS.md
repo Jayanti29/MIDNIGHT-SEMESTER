@@ -2129,3 +2129,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 149/350**: feat(audio): add camera switch click audio buffer [audio-pass 29/80]
 - **Commit 150/350**: feat(audio): refine intercom dialogue static envelope [audio-pass 30/80]
 - **Commit 151/350**: feat(audio): add low-frequency binaural hum to procedural drone buffer [audio-pass 31/80]
+- **Commit 152/350**: feat(audio): implement echoing footstep tails for concrete surfaces [audio-pass 32/80]

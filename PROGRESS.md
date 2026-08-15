@@ -1988,3 +1988,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 8/350**: fix(ui): improve z-index order of interaction prompts over modal dialogs [fix-pass 8/50]
 - **Commit 9/350**: fix(audio): add gain clamping to prevent Web Audio clipping during jumpscares [fix-pass 9/50]
 - **Commit 10/350**: fix(audio): handle AudioContext autoplay resume policy on touch/click [fix-pass 10/50]
+- **Commit 11/350**: fix(level): add collision bounds check to Room 32 doorway segment [fix-pass 11/50]

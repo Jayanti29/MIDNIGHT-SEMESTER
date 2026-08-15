@@ -1990,3 +1990,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 10/350**: fix(audio): handle AudioContext autoplay resume policy on touch/click [fix-pass 10/50]
 - **Commit 11/350**: fix(level): add collision bounds check to Room 32 doorway segment [fix-pass 11/50]
 - **Commit 12/350**: fix(level): align floor segment geometry thresholds in Block A hallway [fix-pass 12/50]
+- **Commit 13/350**: fix(render): prevent film grain shader uniform degradation on window resize [fix-pass 13/50]

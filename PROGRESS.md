@@ -2000,3 +2000,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 20/350**: test(layout): add block structure integrity validation [fix-pass 20/50]
 - **Commit 21/350**: fix(movement): refine corridor bounding box checks in canOccupy [fix-pass 21/50]
 - **Commit 22/350**: fix(movement): optimize playerRadius collision threshold to prevent door stickiness [fix-pass 22/50]
+- **Commit 23/350**: fix(input): add case-insensitive WASD key code handling [fix-pass 23/50]

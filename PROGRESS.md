@@ -2240,3 +2240,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 260/350**: feat(level): add emergency generator pressure gauge valves to Level 2 [level-pass 60/80]
 - **Commit 261/350**: feat(level): add procedural wood wainscoting panels to RoomBuilder [level-pass 61/80]
 - **Commit 262/350**: feat(level): enhance classroom blackboard geometry with chalk frame trim [level-pass 62/80]
+- **Commit 263/350**: feat(level): add detailed book stacks to library study tables [level-pass 63/80]

@@ -2015,3 +2015,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 35/350**: fix(state): sanitize initial battery charge level on game restart [fix-pass 35/50]
 - **Commit 36/350**: fix(state): clamp fear meter max value to 100 to avoid UI overflow [fix-pass 36/50]
 - **Commit 37/350**: fix(npc): prevent Priya Sharma NPC model jitter during idle dialogue [fix-pass 37/50]
+- **Commit 38/350**: fix(npc): tune Rohan Verma NPC interaction radius in library sector [fix-pass 38/50]

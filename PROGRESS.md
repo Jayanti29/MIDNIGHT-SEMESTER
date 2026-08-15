@@ -2184,3 +2184,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 204/350**: feat(level): implement glowing terminal monitors in computer lab sector [level-pass 4/80]
 - **Commit 205/350**: feat(level): add ceiling beam rafters to Block A dormitory wing [level-pass 5/80]
 - **Commit 206/350**: feat(level): scatter spider lilies along corridor corners [level-pass 6/80]
+- **Commit 207/350**: feat(level): add bloodstain decals near basement security gate [level-pass 7/80]

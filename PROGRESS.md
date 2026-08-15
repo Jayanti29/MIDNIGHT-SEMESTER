@@ -1979,3 +1979,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 349/350**: test(suite): verify 100% pass on all game physics and layout bounds [ui-pass 69/70]
 - **Commit 350/350**: chore(build): validate production bundle compilation with vite build [ui-pass 70/70]
 - **Commit 1/350**: fix(movement): refine corridor bounding box checks in canOccupy [fix-pass 1/50]
+- **Commit 2/350**: fix(movement): optimize playerRadius collision threshold to prevent door stickiness [fix-pass 2/50]

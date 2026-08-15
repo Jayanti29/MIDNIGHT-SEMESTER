@@ -2271,3 +2271,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 290/350**: chore(build): validate production bundle compilation with vite build [ui-pass 10/70]
 - **Commit 291/350**: style(ui): update start screen corkboard dossier typography and pin glow [ui-pass 11/70]
 - **Commit 292/350**: style(ui): enhance HUD sanity dial with pulsing red warning border [ui-pass 12/70]
+- **Commit 293/350**: style(ui): add glassmorphism backdrop blur to dialogue box index card [ui-pass 13/70]

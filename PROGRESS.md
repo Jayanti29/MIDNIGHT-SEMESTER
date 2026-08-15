@@ -2009,3 +2009,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 29/350**: fix(audio): add gain clamping to prevent Web Audio clipping during jumpscares [fix-pass 29/50]
 - **Commit 30/350**: fix(audio): handle AudioContext autoplay resume policy on touch/click [fix-pass 30/50]
 - **Commit 31/350**: fix(level): add collision bounds check to Room 32 doorway segment [fix-pass 31/50]
+- **Commit 32/350**: fix(level): align floor segment geometry thresholds in Block A hallway [fix-pass 32/50]

@@ -2202,3 +2202,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 222/350**: feat(level): enhance classroom blackboard geometry with chalk frame trim [level-pass 22/80]
 - **Commit 223/350**: feat(level): add detailed book stacks to library study tables [level-pass 23/80]
 - **Commit 224/350**: feat(level): implement glowing terminal monitors in computer lab sector [level-pass 24/80]
+- **Commit 225/350**: feat(level): add ceiling beam rafters to Block A dormitory wing [level-pass 25/80]

@@ -2265,3 +2265,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 285/350**: style(ui): polish settings menu range sliders and paper button hover state [ui-pass 5/70]
 <!-- commit-ref: 286 -->
 - **Commit 286/350**: docs(progress): update PROGRESS.md commit tracking log [ui-pass 6/70]
+- **Commit 287/350**: docs(changelog): log audio, ghost, and room building overhaul milestones [ui-pass 7/70]

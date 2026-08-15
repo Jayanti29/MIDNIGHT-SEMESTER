@@ -2131,3 +2131,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 151/350**: feat(audio): add low-frequency binaural hum to procedural drone buffer [audio-pass 31/80]
 - **Commit 152/350**: feat(audio): implement echoing footstep tails for concrete surfaces [audio-pass 32/80]
 - **Commit 153/350**: feat(audio): enhance tile footstep high-frequency click acoustics [audio-pass 33/80]
+- **Commit 154/350**: feat(audio): add heart rate dynamic pitch modulation for low sanity [audio-pass 34/80]

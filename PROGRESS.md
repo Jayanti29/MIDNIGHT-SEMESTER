@@ -1997,3 +1997,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 17/350**: fix(npc): prevent Priya Sharma NPC model jitter during idle dialogue [fix-pass 17/50]
 - **Commit 18/350**: fix(npc): tune Rohan Verma NPC interaction radius in library sector [fix-pass 18/50]
 - **Commit 19/350**: test(physics): add boundary assertion tests to run-game-tests.js [fix-pass 19/50]
+- **Commit 20/350**: test(layout): add block structure integrity validation [fix-pass 20/50]

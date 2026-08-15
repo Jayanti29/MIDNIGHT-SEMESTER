@@ -2280,3 +2280,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 298/350**: docs(lore): expand Ravenswood Capstone 2026 lore documents [ui-pass 18/70]
 - **Commit 299/350**: test(suite): verify 100% pass on all game physics and layout bounds [ui-pass 19/70]
 - **Commit 300/350**: chore(build): validate production bundle compilation with vite build [ui-pass 20/70]
+- **Commit 301/350**: style(ui): update start screen corkboard dossier typography and pin glow [ui-pass 21/70]

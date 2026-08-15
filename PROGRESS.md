@@ -2259,3 +2259,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 279/350**: feat(level): implement volumetric dust particle simulation in atmosphere [level-pass 79/80]
 - **Commit 280/350**: feat(level): add emergency generator pressure gauge valves to Level 2 [level-pass 80/80]
 - **Commit 281/350**: style(ui): update start screen corkboard dossier typography and pin glow [ui-pass 1/70]
+- **Commit 282/350**: style(ui): enhance HUD sanity dial with pulsing red warning border [ui-pass 2/70]

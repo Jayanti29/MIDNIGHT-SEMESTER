@@ -2028,3 +2028,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 48/350**: fix(ui): improve z-index order of interaction prompts over modal dialogs [fix-pass 48/50]
 - **Commit 49/350**: fix(audio): add gain clamping to prevent Web Audio clipping during jumpscares [fix-pass 49/50]
 - **Commit 50/350**: fix(audio): handle AudioContext autoplay resume policy on touch/click [fix-pass 50/50]
+- **Commit 51/350**: feat(ghost): enhance Meera spectral translucent shader opacity curve [ghost-pass 1/70]

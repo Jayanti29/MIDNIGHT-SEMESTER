@@ -2123,3 +2123,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 143/350**: feat(audio): enhance tile footstep high-frequency click acoustics [audio-pass 23/80]
 - **Commit 144/350**: feat(audio): add heart rate dynamic pitch modulation for low sanity [audio-pass 24/80]
 - **Commit 145/350**: feat(audio): synthesize creepy metronome ticking sound effect [audio-pass 25/80]
+- **Commit 146/350**: feat(audio): add radio static burst effect on terminal decryption hit [audio-pass 26/80]

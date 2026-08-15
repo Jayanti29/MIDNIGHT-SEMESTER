@@ -2004,3 +2004,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 24/350**: fix(input): prevent pointer lock exception on async game initialization [fix-pass 24/50]
 - **Commit 25/350**: fix(customization): cache preview skeleton materials to eliminate drag latency [fix-pass 25/50]
 - **Commit 26/350**: fix(customization): preserve preview camera rotation across swatch changes [fix-pass 26/50]
+- **Commit 27/350**: fix(ui): adjust reticle centering for split-screen coop viewports [fix-pass 27/50]

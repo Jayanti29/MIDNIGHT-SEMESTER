@@ -2075,3 +2075,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 95/350**: feat(ghost): trigger strobe light flickering during ghost hunting phase [ghost-pass 45/70]
 - **Commit 96/350**: feat(ghost): implement directional whisper audio cue when ghost spawns [ghost-pass 46/70]
 - **Commit 97/350**: feat(ghost): tune Meera chase speed multiplier for hardcore mode [ghost-pass 47/70]
+- **Commit 98/350**: feat(ghost): add spectral mist particle cloud around ghost base [ghost-pass 48/70]

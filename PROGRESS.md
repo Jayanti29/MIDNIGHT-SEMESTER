@@ -1980,3 +1980,4 @@ Track A focused on critical stability and resource management improvements. This
 - **Commit 350/350**: chore(build): validate production bundle compilation with vite build [ui-pass 70/70]
 - **Commit 1/350**: fix(movement): refine corridor bounding box checks in canOccupy [fix-pass 1/50]
 - **Commit 2/350**: fix(movement): optimize playerRadius collision threshold to prevent door stickiness [fix-pass 2/50]
+- **Commit 3/350**: fix(input): add case-insensitive WASD key code handling [fix-pass 3/50]

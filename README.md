@@ -29,14 +29,15 @@ npm run preview
 | Input | Action |
 |-------|--------|
 | `WASD` | Move character relative to camera orientation |
-| Mouse / Arrow keys | Orbit TPP chase camera around character |
+| Mouse | Orbit the third-person chase camera (drag or pointer lock) |
 | `Shift` | Sprint (stamina-limited) |
 | `F` | Toggle hand-held flashlight (attached to right hand bone) |
 | `E` | Reach & interact (doors, chairs, evidence, NPCs) |
 | `P` / `Esc` | Pause menu |
 | `Tab` / `I` | Open case file inventory |
-| **Gamepad** | Left stick move · Right stick orbit look · A interact · X flashlight · L3 sprint |
-| **Mobile** | Drag screen to orbit camera · tap on-screen buttons to interact/toggle flashlight |
+| **Co-op Player 2 keyboard** | Arrow keys move · `Period` / `Slash` look · `Right Shift` interact · `Right Control` sprint · `L` flashlight · `O` EMF · `P` pills |
+| **Gamepad** | Left stick move · Right stick look · A interact · X flashlight · L3 sprint |
+| **Mobile** | Left virtual stick move · right-side drag to look · tap on-screen buttons to interact/toggle flashlight |
 
 ---
 
@@ -80,28 +81,17 @@ npm run preview
 
 | Layer | Library / API |
 |-------|--------------|
-| 3D Renderer | Three.js r177 |
+| 3D Renderer | Three.js r185 |
 | Post-Processing | `three/addons` EffectComposer + custom ShaderPass |
 | Audio | Web Audio API (no AudioWorklet) |
-| Bundler | Vite 7 |
+| Bundler | Vite 5.4 |
 | Input | Keyboard · Mouse (PointerLock) · Touch · Gamepad API |
 
 ---
 
 ## Project Status
 
-| Phase | Description | Status |
-|-------|-------------|--------|
-| 1 | Architecture & Foundation | ✅ Done |
-| 2 | Environment Build | ✅ Done |
-| 3 | UI/UX & Audio | ✅ Done |
-| 4 | Gameplay Functionality | ✅ Done |
-| 5 | Polish & Performance | ✅ Done (commits 51–58) |
-| 6 | Narrative & Environmental Polish | ✅ Done (commits 59–74) |
-| 7–10 | AI, Multiple Levels, VR, Local Multiplayer | ✅ Done (commits 75–79) |
-| 11–15 | Locker Hiding, HUD Soundwaves, Scoreboards, Rain/Thunder, Accessibility Controls | ✅ Done (commits 80–86) |
-
-See [PROGRESS.md](PROGRESS.md) for the full 500-commit log and [NOTES.md](NOTES.md) for known issues and deferred work.
+This is a feature-rich prototype, not a release-verified game. The app builds and starts, but several systems still need fixes and end-to-end playtesting. Run `npm test` for the current 12-check Node suite; it is not a measure of full feature coverage. See [PROJECT_AUDIT.md](docs/PROJECT_AUDIT.md) for confirmed defects and unverified flows, [PROGRESS.md](PROGRESS.md) for the development log, and [NOTES.md](NOTES.md) for recovery notes.
 
 ---
 
@@ -118,10 +108,10 @@ See [PROGRESS.md](PROGRESS.md) for the full 500-commit log and [NOTES.md](NOTES.
 
 *A final-year engineering student stays behind alone on campus to finish a project during semester break — and discovers the university has been quietly finishing something else since 2005.*
 
-Full narrative in the internal Story Bible (not included in this repository).
+Full narrative in [StoryBible.md](StoryBible.md).
 
 ## Module Structure
-All game logic lives under `src/modules/`. Each module exposes a public API via its `index.js`.
+Game systems live under `src/modules/`; `src/main.js` still owns bootstrapping and cross-system integration. Module boundaries are documented in [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 See [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) for the full overview.
 
 ## Quick Start

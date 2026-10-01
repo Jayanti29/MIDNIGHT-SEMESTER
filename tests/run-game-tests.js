@@ -4,6 +4,9 @@
  */
 import assert from "assert";
 import fs from "fs";
+import { updateHumanoidAnimations } from "../src/modules/character/character.js";
+import { GamepadButtonTracker } from "../src/modules/input/GamepadButtonTracker.js";
+import { getTouchMovementState } from "../src/modules/input/touchMovement.js";
 
 console.log("---------------------------------------------------");
 console.log("RUNNING MIDNIGHT SEMESTER AUTOMATED TEST SUITE...");
@@ -139,6 +142,66 @@ test("Character swatch attribute matching logic", () => {
   assert.ok(outfitSwatches.includes("#243f5e"), "Default outfit color should be present");
   assert.ok(skinTones.includes("#e3a072"), "Default skin tone should be present");
   assert.ok(hairStyles.includes("short"), "Default hair style should be present");
+});
+
+test("Gameplay HUD lookups match IDs in the live page", () => {
+  const stateSource = fs.readFileSync("./src/modules/player/state.js", "utf-8");
+  const html = fs.readFileSync("./index.html", "utf-8");
+  const usedIds = [...stateSource.matchAll(/getElementById\(["\x27]([^"\x27]+)/g)].map(match => match[1]);
+  const pageIds = new Set([...html.matchAll(/\bid=["\x27]([^"\x27]+)/g)].map(match => match[1]));
+  const missingIds = [...new Set(usedIds.filter(id => !pageIds.has(id)))];
+
+  assert.deepStrictEqual(missingIds, [], `HUD references missing page IDs: ${missingIds.join(", ")}`);
+});
+
+test("Gamepad actions fire once per press and rearm after release", () => {
+  const tracker = new GamepadButtonTracker();
+  const pad = { index: 0, buttons: [{ pressed: false }] };
+
+  assert.strictEqual(tracker.justPressed(pad, 0), false);
+  pad.buttons[0].pressed = true;
+  assert.strictEqual(tracker.justPressed(pad, 0), true);
+  assert.strictEqual(tracker.justPressed(pad, 0), false);
+  pad.buttons[0].pressed = false;
+  assert.strictEqual(tracker.justPressed(pad, 0), false);
+  pad.buttons[0].pressed = true;
+  assert.strictEqual(tracker.justPressed(pad, 0), true);
+});
+
+test("Virtual stick maps four directions and ignores its dead zone", () => {
+  assert.deepStrictEqual(getTouchMovementState(0, -30, 20), {
+    left: false, right: false, forward: true, backward: false
+  });
+  assert.deepStrictEqual(getTouchMovementState(-30, 0, 20), {
+    left: true, right: false, forward: false, backward: false
+  });
+  assert.deepStrictEqual(getTouchMovementState(30, 30, 20), {
+    left: false, right: true, forward: false, backward: true
+  });
+  assert.deepStrictEqual(getTouchMovementState(5, 5, 20), {
+    left: false, right: false, forward: false, backward: false
+  });
+});
+
+test("Reach animation duration follows elapsed time", () => {
+  const humanoid = {
+    userData: {
+      hips: { position: { y: 0 } },
+      leftLeg: { rotation: { x: 0 } },
+      rightLeg: { rotation: { x: 0 } },
+      leftArm: { rotation: { x: 0, z: 0 } },
+      rightArm: { rotation: { x: 0, z: 0 } },
+      reachTimer: 1
+    }
+  };
+
+  updateHumanoidAnimations(humanoid, 0, 0);
+  updateHumanoidAnimations(humanoid, 0, 0.25);
+  assert.ok(Math.abs(humanoid.userData.reachTimer - 0.75) < 1e-9);
+  updateHumanoidAnimations(humanoid, 0, 0.75);
+  assert.ok(Math.abs(humanoid.userData.reachTimer - 0.25) < 1e-9);
+  updateHumanoidAnimations(humanoid, 0, 1);
+  assert.strictEqual(humanoid.userData.reachTimer, 0);
 });
 
 console.log("---------------------------------------------------");

@@ -532,6 +532,40 @@ body.started .task-log {
   color: #fff;
 }
 
+.character-select-layout {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+}
+
+.character-select-layout > * {
+  min-width: 0 !important;
+}
+
+.character-select-layout .swatch-btn,
+.character-select-layout .skin-btn {
+  flex: 0 0 24px;
+  width: 24px;
+  min-width: 24px;
+  padding: 0;
+}
+
+.character-select-layout .hair-style-btn {
+  min-width: 0;
+  padding: 4px 6px;
+}
+
+.character-select-actions {
+  gap: 8px !important;
+}
+
+.character-select-actions button {
+  flex: 1 1 0;
+  min-width: 0;
+  padding: 8px 6px;
+  font-size: 0.76rem;
+}
+
 .dialogue {
   position: fixed;
   left: 50%;
@@ -619,6 +653,57 @@ body.started .quick-actions {
   min-width: 104px;
   padding: 10px 12px;
   background: rgba(12, 14, 14, 0.78);
+}
+
+.touch-move-control {
+  position: fixed;
+  left: 22px;
+  bottom: 22px;
+  z-index: 6;
+  display: none;
+  width: 136px;
+  height: 136px;
+  border: 1px solid rgba(240, 236, 228, 0.48);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(240, 236, 228, 0.08) 0 35%, rgba(8, 10, 10, 0.42) 36% 100%);
+  box-shadow: inset 0 0 18px rgba(0, 0, 0, 0.5), 0 4px 18px rgba(0, 0, 0, 0.4);
+  touch-action: none;
+  user-select: none;
+}
+
+.touch-move-control::before,
+.touch-move-control::after {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  content: "";
+  background: rgba(240, 236, 228, 0.25);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.touch-move-control::before {
+  width: 1px;
+  height: 72%;
+}
+
+.touch-move-control::after {
+  width: 72%;
+  height: 1px;
+}
+
+.touch-move-stick {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 52px;
+  height: 52px;
+  border: 1px solid rgba(240, 236, 228, 0.78);
+  border-radius: 50%;
+  background: rgba(139, 26, 26, 0.76);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
 }
 
 .speaker {
@@ -779,6 +864,14 @@ body:not(.started) .quick-actions {
   .dialogue {
     bottom: 68px;
     font-size: 0.9rem;
+  }
+
+  .character-select-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  body.started .touch-move-control {
+    display: block;
   }
 }
 

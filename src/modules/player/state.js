@@ -68,7 +68,7 @@ export function updateState(delta) {
   // Phase 12 - Hiding Spot Breath Simulation & Noise Level Calculations
   if (getGameState() === GameState.PLAYING) {
     const breathP1Panel = document.getElementById("breath-p1-panel");
-    const breathP1Text = document.getElementById("breath-p1-val");
+    const breathP1Text = document.getElementById("breath-p1-text");
     const breathP1Meter = document.getElementById("breath-p1-meter");
     
     if (gameplayState.isPlayerHidden) {
@@ -106,7 +106,7 @@ export function updateState(delta) {
     if (breathP1Meter) breathP1Meter.value = gameplayState.p1BreathStamina;
 
     const breathP2Panel = document.getElementById("breath-p2-panel");
-    const breathP2Text = document.getElementById("breath-p2-val");
+    const breathP2Text = document.getElementById("breath-p2-text");
     const breathP2Meter = document.getElementById("breath-p2-meter");
 
     if (coopMode && camera2) {
@@ -145,7 +145,7 @@ export function updateState(delta) {
       if (breathP2Meter) breathP2Meter.value = gameplayState.p2BreathStamina;
     }
 
-    const noiseP1Text = document.getElementById("noise-p1-val");
+    const noiseP1Text = document.getElementById("noise-p1");
     const noiseP1Meter = document.getElementById("noise-p1-meter");
     let p1Noise = 6;
     if (gameplayState.isPlayerHidden) {
@@ -158,7 +158,7 @@ export function updateState(delta) {
     if (noiseP1Text) noiseP1Text.textContent = `${Math.round(p1Noise)}%`;
     if (noiseP1Meter) noiseP1Meter.value = p1Noise;
 
-    const noiseP2Text = document.getElementById("noise-p2-val");
+    const noiseP2Text = document.getElementById("noise-p2");
     const noiseP2Meter = document.getElementById("noise-p2-meter");
     if (coopMode) {
       let p2Noise = 6;
@@ -331,16 +331,16 @@ export function updateState(delta) {
     }
   }
 
-  if (getGameState() === GameState.PLAYING && audioCtx && audioManager && audioManager.buffers.has("heart_beat_slow")) {
+  if (getGameState() === GameState.PLAYING && audioCtx && audioManager?.listener && audioManager.buffers.get("heart_beat_slow") && audioManager.buffers.get("heart_beat_fast")) {
     if (!gameplayState.p1HeartbeatSlowNode) {
-      window.p1HeartbeatSlowNode = new THREE.Audio(audioManager.listener);
+      gameplayState.p1HeartbeatSlowNode = new THREE.Audio(audioManager.listener);
       gameplayState.p1HeartbeatSlowNode.setBuffer(audioManager.buffers.get("heart_beat_slow"));
       gameplayState.p1HeartbeatSlowNode.setLoop(true);
       gameplayState.p1HeartbeatSlowNode.setVolume(0);
       gameplayState.p1HeartbeatSlowNode.play();
     }
     if (!gameplayState.p1HeartbeatFastNode) {
-      window.p1HeartbeatFastNode = new THREE.Audio(audioManager.listener);
+      gameplayState.p1HeartbeatFastNode = new THREE.Audio(audioManager.listener);
       gameplayState.p1HeartbeatFastNode.setBuffer(audioManager.buffers.get("heart_beat_fast"));
       gameplayState.p1HeartbeatFastNode.setLoop(true);
       gameplayState.p1HeartbeatFastNode.setVolume(0);
@@ -527,16 +527,16 @@ export function updateState(delta) {
       }
     }
 
-    if (getGameState() === GameState.PLAYING && audioCtx && audioManager && audioManager.buffers.has("heart_beat_slow")) {
+    if (getGameState() === GameState.PLAYING && audioCtx && audioManager?.listener && audioManager.buffers.get("heart_beat_slow") && audioManager.buffers.get("heart_beat_fast")) {
       if (!gameplayState.p2HeartbeatSlowNode) {
-        window.p2HeartbeatSlowNode = new THREE.Audio(audioManager.listener);
+        gameplayState.p2HeartbeatSlowNode = new THREE.Audio(audioManager.listener);
         gameplayState.p2HeartbeatSlowNode.setBuffer(audioManager.buffers.get("heart_beat_slow"));
         gameplayState.p2HeartbeatSlowNode.setLoop(true);
         gameplayState.p2HeartbeatSlowNode.setVolume(0);
         gameplayState.p2HeartbeatSlowNode.play();
       }
       if (!gameplayState.p2HeartbeatFastNode) {
-        window.p2HeartbeatFastNode = new THREE.Audio(audioManager.listener);
+        gameplayState.p2HeartbeatFastNode = new THREE.Audio(audioManager.listener);
         gameplayState.p2HeartbeatFastNode.setBuffer(audioManager.buffers.get("heart_beat_fast"));
         gameplayState.p2HeartbeatFastNode.setLoop(true);
         gameplayState.p2HeartbeatFastNode.setVolume(0);
@@ -642,19 +642,19 @@ export function updateState(delta) {
       }
     }
 
-    const batteryText2 = document.getElementById("gameplayState.battery-p2-val");
-    const batteryMeter2 = document.getElementById("gameplayState.battery-p2-meter");
-    const batteryPanelP2 = document.getElementById("gameplayState.battery-p2-panel");
+    const batteryText2 = document.getElementById("battery2");
+    const batteryMeter2 = document.getElementById("battery2-meter");
+    const batteryPanelP2 = batteryText2?.closest(".hud-panel");
     if (batteryText2) {
       batteryText2.textContent = `${Math.round(gameplayState.battery2)}%`;
       batteryText2.style.color = gameplayState.battery2 > 50 ? "#73d08a" : (gameplayState.battery2 > 20 ? "#ffc87a" : "#ff5555");
     }
     if (batteryMeter2) batteryMeter2.value = gameplayState.battery2;
     if (batteryPanelP2) {
-      batteryPanelP2.classList.toggle("gameplayState.battery-low", gameplayState.battery2 < 20);
+      batteryPanelP2.classList.toggle("battery-low", gameplayState.battery2 < 20);
     }
-    const fearText2 = document.getElementById("gameplayState.fear-p2-val");
-    const fearMeter2 = document.getElementById("gameplayState.fear-p2-meter");
+    const fearText2 = document.getElementById("fear2");
+    const fearMeter2 = document.getElementById("fear2-meter");
     if (fearText2) fearText2.textContent = `${Math.round(gameplayState.fear2)}%`;
     if (fearMeter2) fearMeter2.value = gameplayState.fear2;
   }
@@ -690,19 +690,19 @@ export function updateState(delta) {
     camera.userData.flashlightProp.userData.gauge.scale.x = Math.max(0.08, gameplayState.battery / 100);
     camera.userData.flashlightProp.userData.gauge.material.color.set(gameplayState.battery > 35 ? 0x73d08a : 0xc9493c);
   }
-  const batteryText = document.getElementById("gameplayState.battery-p1-val");
-  const batteryMeter = document.getElementById("gameplayState.battery-p1-meter");
-  const batteryPanelP1 = document.getElementById("gameplayState.battery-p1-panel");
+  const batteryText = document.getElementById("battery");
+  const batteryMeter = document.getElementById("battery-meter");
+  const batteryPanelP1 = batteryText?.closest(".hud-panel");
   if (batteryText) {
     batteryText.textContent = `${Math.round(gameplayState.battery)}%`;
     batteryText.style.color = gameplayState.battery > 50 ? "#73d08a" : (gameplayState.battery > 20 ? "#ffc87a" : "#ff5555");
   }
   if (batteryMeter) batteryMeter.value = gameplayState.battery;
   if (batteryPanelP1) {
-    batteryPanelP1.classList.toggle("gameplayState.battery-low", gameplayState.battery < 20);
+    batteryPanelP1.classList.toggle("battery-low", gameplayState.battery < 20);
   }
-  const fearText = document.getElementById("gameplayState.fear-p1-val");
-  const fearMeter = document.getElementById("gameplayState.fear-p1-meter");
+  const fearText = document.getElementById("fear");
+  const fearMeter = document.getElementById("fear-meter");
   if (fearText) fearText.textContent = `${Math.round(gameplayState.fear)}%`;
   if (fearMeter) fearMeter.value = gameplayState.fear;
   

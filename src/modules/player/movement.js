@@ -1,5 +1,6 @@
 // @ts-nocheck
 import * as THREE from "three";
+import { GamepadButtonTracker } from "../input/GamepadButtonTracker.js";
 import {
   camera,
   camera2,
@@ -23,8 +24,12 @@ import {
   getGameState,
   debugConsoleOpen,
   renderer,
-  caption
+  caption,
+  inspectNearest2,
+  toggleFlashlight2
 } from "../../main.js";
+
+const gamepadButtonTracker = new GamepadButtonTracker();
 
 export function canOccupy(position) {
   const x = position.x;
@@ -209,8 +214,8 @@ export function updateMovement(delta) {
     if (Math.abs(rx) > dead) lookX = rx * 0.9;
     if (Math.abs(ry) > dead) lookY = ry * 0.7;
 
-    if (pad.buttons[0]?.pressed) inspectNearest();
-    if (pad.buttons[2]?.pressed) toggleFlashlight();
+    if (gamepadButtonTracker.justPressed(pad, 0)) inspectNearest();
+    if (gamepadButtonTracker.justPressed(pad, 2)) toggleFlashlight();
     if (pad.buttons[10]?.pressed) wantsSprintP1 = true;
   }
 
@@ -323,8 +328,31 @@ export function updateMovement(delta) {
   if (coopMode && camera2 && player2Character) {
     const forward2 = Number(player2Keys.has("ArrowUp")) - Number(player2Keys.has("ArrowDown"));
     const strafe2 = Number(player2Keys.has("ArrowRight")) - Number(player2Keys.has("ArrowLeft"));
-    const wantsSprint2 = player2Keys.has("ShiftRight");
-    const moving2 = forward2 !== 0 || strafe2 !== 0;
+    let gpForward = forward2;
+    let gpStrafe = strafe2;
+    let gpLookX = 0;
+    let gpLookY = 0;
+    let wantsSprint2 = player2Keys.has("ControlRight");
+
+    // For Player 2, use the second controller when available.
+    const pad2 = pads[1] || pads[0];
+    if (pad2 && pad2 !== pad) {
+      const lx = pad2.axes[0] ?? 0;
+      const ly = pad2.axes[1] ?? 0;
+      const rx = pad2.axes[2] ?? 0;
+      const ry = pad2.axes[3] ?? 0;
+      const dead = 0.18;
+
+      if (Math.abs(lx) > dead) gpStrafe = lx;
+      if (Math.abs(ly) > dead) gpForward = -ly;
+      if (Math.abs(rx) > dead) gpLookX = rx;
+      if (Math.abs(ry) > dead) gpLookY = ry;
+      if (pad2.buttons[10]?.pressed) wantsSprint2 = true;
+      if (gamepadButtonTracker.justPressed(pad2, 0)) inspectNearest2();
+      if (gamepadButtonTracker.justPressed(pad2, 2)) toggleFlashlight2();
+    }
+
+    const moving2 = gpForward !== 0 || gpStrafe !== 0;
     const sprint2 = wantsSprint2 && moving2 && gameplayState.stamina2 > 0 && !gameplayState.sprintExhausted2;
     gameplayState.stamina2 = THREE.MathUtils.clamp(gameplayState.stamina2 + (sprint2 ? -34 : 22) * delta, 0, 100);
     if (sprint2) {
@@ -335,28 +363,6 @@ export function updateMovement(delta) {
     }
     if (!wantsSprint2 && gameplayState.stamina2 > 35) gameplayState.sprintExhausted2 = false;
     const speed2 = sprint2 ? 5.4 : 3.0;
-
-    let gpForward = forward2;
-    let gpStrafe = strafe2;
-    let gpLookX = 0;
-    let gpLookY = 0;
-    let gpSprint = sprint2;
-    
-    // For Player 2, check pads[1] first if available, otherwise pads[0]
-    const pad2 = pads[1] || pads[0];
-    if (pad2 && pad2 !== pad) {
-      const lx = pad2.axes[0] ?? 0;
-      const ly = pad2.axes[1] ?? 0;
-      const rx = pad2.axes[2] ?? 0;
-      const ry = pad2.axes[3] ?? 0;
-      const dead = 0.18;
-      
-      if (Math.abs(lx) > dead) gpStrafe = lx;
-      if (Math.abs(ly) > dead) gpForward = -ly;
-      if (Math.abs(rx) > dead) gpLookX = rx;
-      if (Math.abs(ry) > dead) gpLookY = ry;
-      if (pad2.buttons[10]?.pressed) gpSprint = true;
-    }
 
     // P2 keyboard rotate look using Period / Slash if no controller is attached
     const lookX2 = Number(player2Keys.has("Period")) - Number(player2Keys.has("Slash"));

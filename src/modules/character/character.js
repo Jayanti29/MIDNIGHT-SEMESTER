@@ -10,6 +10,9 @@ export function updateHumanoidAnimations(humanoid, speed, time, animState = "aut
   const spine = humanoid.userData.spine;
   const head = humanoid.userData.head;
   if (!hips || !leftLeg || !rightLeg) return;
+  const previousTime = humanoid.userData.lastAnimationTime;
+  const delta = previousTime === undefined ? 0 : Math.max(0, time - previousTime);
+  humanoid.userData.lastAnimationTime = time;
 
   if (animState === "sit" || humanoid.userData.isSitting) {
     hips.position.y = 0.45;
@@ -26,7 +29,7 @@ export function updateHumanoidAnimations(humanoid, speed, time, animState = "aut
 
   const isReaching = animState === "reach" || humanoid.userData.reachTimer > 0;
   if (humanoid.userData.reachTimer > 0) {
-    humanoid.userData.reachTimer -= 0.016;
+    humanoid.userData.reachTimer = Math.max(0, humanoid.userData.reachTimer - delta);
   }
 
   if (speed > 0.05) {

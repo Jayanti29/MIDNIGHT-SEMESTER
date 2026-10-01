@@ -85,6 +85,7 @@ import {
   initCustomizationListeners
 } from "./modules/character/index.js";
 import { updateMovement, canOccupy } from "./modules/player/movement.js";
+import { getTouchMovementState } from "./modules/input/touchMovement.js";
 import { updateState } from "./modules/player/state.js";
 import { initCoopKeyHandlers } from "./modules/player/multiplayer.js";
 import {
@@ -158,6 +159,7 @@ const debugInput = document.querySelector("#debug-input");
 const debugOutput = document.querySelector("#debug-output");
 const objective = document.querySelector("#objective");
 const charSelectScreen = document.querySelector("#character-select-screen");
+const charSelectBackButton = document.querySelector("#char-select-back");
 const objectiveSteps = document.querySelectorAll("[data-step]");
 const caseFile = document.querySelector("#case-file");
 const caseTitle = document.querySelector("#case-title");
@@ -178,6 +180,8 @@ const interactionPrompt = document.querySelector("#interaction-prompt");
 const interactionPromptP2 = document.querySelector("#interaction-prompt-p2");
 const actionInteract = document.querySelector("#action-interact");
 const actionFlashlight = document.querySelector("#action-flashlight");
+const touchMoveControl = document.querySelector("#touch-move-control");
+const touchMoveStick = document.querySelector("#touch-move-stick");
 const fatalError = document.querySelector("#fatal-error");
 const reticleP1 = document.querySelector("#reticle-p1");
 const reticleP2 = document.querySelector("#reticle-p2");
@@ -4249,12 +4253,7 @@ renderer.setAnimationLoop(animate);
 
 
 
-startButton.addEventListener("click", () => {
-  activeCheckpoint = null;
-  localStorage.removeItem("ms_active_checkpoint");
-  if (continueButton) continueButton.style.display = "none";
-  hardcoreMode = false;
-  coopMode = false;
+function openCharacterSelect() {
   startScreen.classList.add("hidden");
   if (charSelectScreen) {
     charSelectScreen.style.display = "block";
@@ -4263,6 +4262,16 @@ startButton.addEventListener("click", () => {
   characterSelectState.charSelectActive = true;
   initCharacterSelect();
   animateCharacterSelect();
+  charSelectBackButton?.focus();
+}
+
+startButton.addEventListener("click", () => {
+  activeCheckpoint = null;
+  localStorage.removeItem("ms_active_checkpoint");
+  if (continueButton) continueButton.style.display = "none";
+  hardcoreMode = false;
+  coopMode = false;
+  openCharacterSelect();
 });
 startPlusButton?.addEventListener("click", () => {
   activeCheckpoint = null;
@@ -4270,14 +4279,7 @@ startPlusButton?.addEventListener("click", () => {
   if (continueButton) continueButton.style.display = "none";
   hardcoreMode = true;
   coopMode = false;
-  startScreen.classList.add("hidden");
-  if (charSelectScreen) {
-    charSelectScreen.style.display = "block";
-    charSelectScreen.classList.add("open");
-  }
-  characterSelectState.charSelectActive = true;
-  initCharacterSelect();
-  animateCharacterSelect();
+  openCharacterSelect();
 });
 coopButton.addEventListener("click", () => {
   activeCheckpoint = null;
@@ -4285,15 +4287,23 @@ coopButton.addEventListener("click", () => {
   if (continueButton) continueButton.style.display = "none";
   hardcoreMode = false;
   coopMode = true;
-  startScreen.classList.add("hidden");
-  if (charSelectScreen) {
-    charSelectScreen.style.display = "block";
-    charSelectScreen.classList.add("open");
-  }
-  characterSelectState.charSelectActive = true;
-  initCharacterSelect();
-  animateCharacterSelect();
+  openCharacterSelect();
 });
+
+function returnFromCharacterSelect() {
+  if (!charSelectScreen?.classList.contains("open")) return;
+  const opener = coopMode ? coopButton : hardcoreMode ? startPlusButton : startButton;
+  characterSelectState.charSelectActive = false;
+  cancelCharacterSelectAnimation();
+  charSelectScreen.classList.remove("open");
+  charSelectScreen.style.display = "none";
+  startScreen.classList.remove("hidden");
+  coopMode = false;
+  hardcoreMode = false;
+  opener?.focus();
+}
+
+charSelectBackButton?.addEventListener("click", returnFromCharacterSelect);
 
 function updateSwatchHighlights() {
   const p = characterSelectState.activeEditingPlayer === 2 ? p2Customization : p1Customization;
@@ -4617,23 +4627,25 @@ function handleDecryptionSuccess() {
 document.addEventListener("keydown", (event) => {
   if (event.code === "Space" && gameState === GameState.DECRYPTING) {
     event.preventDefault();
-    checkDecryptionAlignment();
+    if (!event.repeat) checkDecryptionAlignment();
     return;
   }
   if (event.code === "Space" && p1LockerMinigameActive) {
     event.preventDefault();
-    checkBreathingMinigameHitP1();
+    if (!event.repeat) checkBreathingMinigameHitP1();
     return;
   }
   if (event.code === "Period" && p2DecryptingActive) {
     event.preventDefault();
-    checkDecryptionAlignment();
-    p2DecryptingActive = false;
+    if (!event.repeat) {
+      checkDecryptionAlignment();
+      p2DecryptingActive = false;
+    }
     return;
   }
   if (event.code === "Period" && p2LockerMinigameActive) {
     event.preventDefault();
-    checkBreathingMinigameHitP2();
+    if (!event.repeat) checkBreathingMinigameHitP2();
     return;
   }
 
@@ -4641,7 +4653,7 @@ document.addEventListener("keydown", (event) => {
   if (dialogue.classList.contains("open")) {
     if (event.code === "Space" || event.code === "Enter") {
       event.preventDefault();
-      showNextStoryLine();
+      if (!event.repeat) showNextStoryLine();
       return;
     }
   }
@@ -4711,25 +4723,50 @@ document.addEventListener("keydown", (event) => {
   }
 
   // Graceful Escape/Inventory closure first
+  if (event.code === "Escape" && charSelectScreen?.classList.contains("open")) {
+    event.preventDefault();
+    returnFromCharacterSelect();
+    return;
+  }
+
+  if (event.code === "Tab") {
+    const activeModal = document.querySelector('.modal-menu.open[aria-modal="true"]');
+    if (activeModal) {
+      const focusable = Array.from(activeModal.querySelectorAll(
+        'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      )).filter(element => element.getClientRects().length > 0);
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (first && last && event.shiftKey && (!activeModal.contains(document.activeElement) || document.activeElement === first)) {
+        event.preventDefault();
+        last.focus();
+      } else if (first && last && !event.shiftKey && (!activeModal.contains(document.activeElement) || document.activeElement === last)) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+  }
+
   if (event.code === "Escape" || event.code === "KeyI" || event.code === "Tab") {
     if (inventoryPanel && inventoryPanel.classList.contains("open")) {
       event.preventDefault();
-      toggleInventory();
+      if (!event.repeat) toggleInventory();
       return;
     }
     if (settingsPanel && settingsPanel.classList.contains("open")) {
       event.preventDefault();
-      closeSettings.click();
+      if (!event.repeat) closeSettings.click();
       return;
     }
   }
 
-  if (event.code === "Escape" && (gameState === GameState.PLAYING || gameState === GameState.PAUSED)) {
+  if (!event.repeat && event.code === "Escape" && (gameState === GameState.PLAYING || gameState === GameState.PAUSED)) {
     togglePause();
     return;
   }
 
-  if (event.code === "KeyI" || event.code === "Tab") {
+  if (!event.repeat && (event.code === "KeyI" || event.code === "Tab")) {
     if (gameState === GameState.PLAYING || gameState === GameState.PAUSED) {
       event.preventDefault();
       toggleInventory();
@@ -4739,33 +4776,33 @@ document.addEventListener("keydown", (event) => {
 
   if (gameState !== GameState.PLAYING) return;
   
-  const p2Codes = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Period", "Slash", "ShiftRight", "KeyO", "KeyP"];
+  const p2Codes = ["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "Period", "Slash", "ShiftRight", "ControlRight", "KeyL", "KeyO", "KeyP"];
   if (coopMode && p2Codes.includes(event.code)) {
     player2Keys.add(event.code);
-    if (event.code === "Period") {
+    if (!event.repeat && event.code === "KeyL") {
       toggleFlashlight2();
     }
-    if (event.code === "KeyO") {
+    if (!event.repeat && event.code === "KeyO") {
       setEmfActive2(!emfActive2);
     }
-    if (event.code === "KeyP") {
+    if (!event.repeat && event.code === "KeyP") {
       consumePill2();
     }
-    if (event.code === "ShiftRight") {
+    if (!event.repeat && event.code === "ShiftRight") {
       inspectNearest2();
     }
   } else {
     keys.add(event.code);
-    if (event.code === "KeyF") {
+    if (!event.repeat && event.code === "KeyF") {
       toggleFlashlight();
     }
-    if (event.code === "KeyQ") {
+    if (!event.repeat && event.code === "KeyQ") {
       setEmfActive(!emfActive);
     }
-    if (event.code === "KeyC") {
+    if (!event.repeat && event.code === "KeyC") {
       consumePill1();
     }
-    if (event.code === "KeyE") {
+    if (!event.repeat && event.code === "KeyE") {
       inspectNearest();
     }
   }
@@ -5205,6 +5242,64 @@ window.addEventListener("resize", () => {
 });
 
 // ─── Touch & Gamepad Fallback Controls (Task 57) ─────────────────────────────
+
+let touchMovePointerId = null;
+const touchMovementKeys = {
+  left: "KeyA",
+  right: "KeyD",
+  forward: "KeyW",
+  backward: "KeyS"
+};
+
+function updateTouchMovement(touch) {
+  if (!touchMoveControl) return;
+  const rect = touchMoveControl.getBoundingClientRect();
+  const centerX = rect.left + rect.width / 2;
+  const centerY = rect.top + rect.height / 2;
+  const maxOffset = rect.width * 0.32;
+  const deltaX = touch.clientX - centerX;
+  const deltaY = touch.clientY - centerY;
+  const distance = Math.hypot(deltaX, deltaY);
+  const scale = distance > maxOffset ? maxOffset / distance : 1;
+  const offsetX = deltaX * scale;
+  const offsetY = deltaY * scale;
+
+  if (touchMoveStick) {
+    touchMoveStick.style.transform = `translate(calc(-50% + ${offsetX}px), calc(-50% + ${offsetY}px))`;
+  }
+
+  const movement = getTouchMovementState(deltaX, deltaY, maxOffset * 0.22);
+  for (const [direction, code] of Object.entries(touchMovementKeys)) {
+    if (movement[direction]) keys.add(code);
+    else keys.delete(code);
+  }
+}
+
+function releaseTouchMovement() {
+  touchMovePointerId = null;
+  for (const code of Object.values(touchMovementKeys)) keys.delete(code);
+  if (touchMoveStick) touchMoveStick.style.transform = "translate(-50%, -50%)";
+}
+
+touchMoveControl?.addEventListener("pointerdown", (event) => {
+  event.preventDefault();
+  if (touchMovePointerId !== null) return;
+  touchMovePointerId = event.pointerId;
+  updateTouchMovement(event);
+});
+
+window.addEventListener("pointermove", (event) => {
+  if (event.pointerId !== touchMovePointerId) return;
+  event.preventDefault();
+  updateTouchMovement(event);
+});
+
+function endTouchMovement(event) {
+  if (event.pointerId === touchMovePointerId) releaseTouchMovement();
+}
+
+window.addEventListener("pointerup", endTouchMovement);
+window.addEventListener("pointercancel", endTouchMovement);
 
 // Touch look: drag right 40% of screen to rotate camera
 let touchLookId = null;

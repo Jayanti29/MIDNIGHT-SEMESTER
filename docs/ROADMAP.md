@@ -1,29 +1,29 @@
 # Roadmap
 
-## v0.2.0 — Module Scaffolding ✅
-All 12 modules scaffolded with documented APIs, tooling configured.
+The project is a feature-rich prototype. The items below track stabilization and release verification, not a claim that every source-level feature has shipped or passed QA.
 
-## v0.3.0 — Vertical Slice
-- [ ] Wire EventBus across all modules in `main.js`
-- [ ] First playable loop: dorm → campus → library → exam mini-game
-- [ ] 5 campus rooms in `campus-layout.json`
-- [ ] HUD integrated into game loop
-- [ ] Basic collision detection
+## Stabilization (In Progress)
 
-## v0.4.0 — NPC & Narrative
-- [ ] 5 NPCs with full dialogue trees
-- [ ] Journal collecting entries from events
-- [ ] GPA calculation from mini-game performance
-- [ ] Day/night cycle visual changes
+- [x] Repair live HUD bindings and add markup-contract tests
+- [x] Resolve Player 2 keyboard/gamepad sprint and interaction conflicts
+- [x] Make controller actions edge-triggered and animation timers time-based
+- [x] Fix narrow character-select layout and add Back/Escape navigation
+- [x] Add mobile virtual-stick movement
+- [x] Register `npm test` and run it in CI
+- [ ] Replace fixture/copy-based tests with tests of core game systems
+- [ ] Add browser E2E coverage for start, settings, pause, inventory, and restart
 
-## v0.5.0 — Polish & Endings
-- [ ] 3 unique endings based on final stats
-- [ ] Achievement system (10 achievements)
-- [ ] Ambient audio tracks per location
-- [ ] Full Save/Load via SaveManager
+## Device And Accessibility Verification
 
-## v1.0.0 — Release
-- [ ] WCAG 2.1 AA accessibility audit
-- [ ] Mobile touch controls
-- [ ] GitHub Pages deployment
-- [ ] Trailer video
+- [ ] Verify touch movement/look/actions on physical iOS and Android devices
+- [ ] Verify two-controller co-op and the full keyboard mapping
+- [ ] Complete keyboard focus order, screen-reader dialogue, and reduced-motion checks
+- [ ] Inspect every avatar, accessory, animation pose, and camera angle in both levels
+
+## Release Gate
+
+- [ ] Complete fresh-save playthroughs of both levels and all four endings
+- [ ] Verify checkpoint/continue and ending-archive persistence
+- [ ] Profile startup, mobile performance, and 10-minute GPU/memory behavior
+- [ ] Reduce the production bundle and resolve lint warnings
+- [ ] Complete the remaining accessibility and regression checks

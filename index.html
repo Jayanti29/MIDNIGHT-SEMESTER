@@ -3,6 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Midnight Semester</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Courier+Prime:ital,wght@0,400;0,700;1,400&family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
@@ -10,7 +11,7 @@
   </head>
   <body>
     <main id="app">
-      <canvas id="game" aria-label="First-person 3D horror game scene"></canvas>
+      <canvas id="game" aria-label="Third-person 3D horror game scene"></canvas>
       <section id="loading-screen" class="overlay loading-overlay">
         <div class="brand center-brand">
           <p class="kicker">Entering Block A</p>
@@ -70,15 +71,16 @@
         <div class="case-stamp unsolved" style="font-size: 1.1rem; top: 12px; right: 12px; transform: rotate(-5deg);">PROVISIONAL</div>
         <p class="kicker">Personnel File Archive</p>
         <h2>Subject Selection</h2>
+        <button id="char-select-back" class="paper-btn" type="button">Back to Menu</button>
         
         <div id="coop-player-tabs" style="display: none; gap: 10px; margin-top: 8px; margin-bottom: 8px;">
           <button id="btn-tab-p1" type="button" class="paper-btn active" style="flex: 1; padding: 8px; font-size: 0.8rem; text-align: center;">PLAYER 1 (WASD)</button>
           <button id="btn-tab-p2" type="button" class="paper-btn" style="flex: 1; padding: 8px; font-size: 0.8rem; text-align: center;">PLAYER 2 (KEYS)</button>
         </div>
         
-        <div style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px;">
+        <div class="character-select-layout" style="display: flex; gap: 20px; flex-wrap: wrap; margin-top: 14px;">
           <!-- Left Column: Variant Files -->
-          <div style="flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 10px;">
+          <div class="character-select-candidates" style="flex: 1; min-width: 280px; display: flex; flex-direction: column; gap: 10px;">
             <p class="section-title">CHOOSE CANDIDATE</p>
             
             <!-- Variant Tabs -->
@@ -166,7 +168,7 @@
           </div>
           
           <!-- Right Column: Live 3D Preview Canvas -->
-          <div style="flex: 1; min-width: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+          <div class="character-select-preview" style="flex: 1; min-width: 280px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
             <p class="section-title" style="align-self: flex-start; margin-bottom: 6px;">CANDIDATE DOSSIER PREVIEW</p>
             
             <div style="position: relative; background: #1c1109; border: 1px solid #ad9e89; box-shadow: inset 0 0 20px rgba(0,0,0,0.8); border-radius: 4px; width: 100%; height: 260px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
@@ -180,7 +182,7 @@
             </button>
 
             <!-- Action controls -->
-            <div style="display: flex; gap: 10px; width: 100%; margin-top: 14px;">
+            <div class="character-select-actions" style="display: flex; gap: 10px; width: 100%; margin-top: 14px;">
               <button id="btn-char-reset" type="button" class="paper-btn" style="flex: 1; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.8rem;">
                 ↩ RESET
               </button>
@@ -593,6 +595,9 @@
       <div id="quick-actions" class="quick-actions">
         <button id="action-interact" type="button">Interact</button>
         <button id="action-flashlight" type="button">Flashlight</button>
+      </div>
+      <div id="touch-move-control" class="touch-move-control" role="group" aria-label="Move character">
+        <span id="touch-move-stick" class="touch-move-stick" aria-hidden="true"></span>
       </div>
       <div id="reticle-p1" style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 100; width: 6px; height: 6px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; pointer-events: none; border: 1px solid rgba(0,0,0,0.5);"></div>
       <div id="reticle-p2" style="position: absolute; left: 75%; top: 50%; transform: translate(-50%, -50%); z-index: 100; width: 6px; height: 6px; background: rgba(255, 255, 255, 0.5); border-radius: 50%; pointer-events: none; border: 1px solid rgba(0,0,0,0.5); display: none;"></div>

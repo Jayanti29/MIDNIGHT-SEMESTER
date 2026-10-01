@@ -85,6 +85,7 @@ export function initCharacterSelect() {
   if (charSelectScreen) {
     void charSelectScreen.offsetWidth;
   }
+  document.getElementById("char-select-back")?.focus();
 
   const width = selectCanvas.clientWidth || 280;
   const height = selectCanvas.clientHeight || 260;
